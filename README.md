@@ -37,9 +37,9 @@ El sistema impide situaciones inconsistentes como reservar un recurso inexistent
 
 ## Desarrolladores
 
-- **Adrian Naum** (legajo)
-- **Valentina Lesspade** (legajo)
-- **Santiago Castillo** (legajo)
+- **Adrian Naum**
+- **Valentina Lesspade**
+- **Santiago Castillo**
 
 **Docente a cargo:** Prof. Lic. Adrián Aroca
 

@@ -1,0 +1,488 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Algoritmos II - Trabajo Práctico Final 2026</title>
+<style>
+:root{
+  --navy:#0b2b4a; --navy2:#1a4b6d; --gold:#f5b042; --ink:#1e293b;
+  --muted:#64748b; --bg:#f4f7fc; --line:#e2e8f0; --soft:#f8fafc;
+  --blue:#eff6ff; --green:#ecfdf5; --amber:#fffbeb; --red:#fef2f2;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink);line-height:1.65;padding:18px}
+main{max-width:1180px;margin:auto;background:#fff;border-radius:20px;box-shadow:0 16px 46px rgba(15,23,42,.09);overflow:hidden;padding:0 28px 38px}
+header{background:linear-gradient(145deg,var(--navy),var(--navy2));color:#fff;padding:27px 30px 21px;margin:0 -28px 20px;border-bottom:4px solid var(--gold)}
+.top{display:flex;justify-content:space-between;gap:12px 24px;align-items:center;flex-wrap:wrap}
+.inst strong{color:var(--gold)}
+.carrera{font-size:.92rem;background:rgba(255,255,255,.12);padding:5px 14px;border-radius:30px}
+header h1{font-size:2.05rem;line-height:1.2;margin-top:12px}
+header h1 small{display:block;font-size:1rem;font-weight:400;opacity:.86;margin-top:6px}
+.badge{display:inline-block;margin-top:10px;background:var(--gold);color:var(--navy);font-weight:800;font-size:.74rem;padding:4px 12px;border-radius:30px;text-transform:uppercase;letter-spacing:.4px}
+.toolbar{display:flex;justify-content:flex-end;margin-bottom:10px}.print{border:0;background:var(--navy);color:#fff;padding:8px 14px;border-radius:24px;font-weight:650;cursor:pointer}
+nav{display:flex;flex-wrap:wrap;gap:6px;border-bottom:2px solid #e9eef3;padding:5px 0 7px;margin-bottom:20px;position:sticky;top:0;background:#fff;z-index:5}
+nav button{border:0;background:transparent;color:#52687d;font-weight:650;padding:8px 13px;border-radius:24px;cursor:pointer}
+nav button.active{background:var(--navy);color:#fff}
+.tab{display:none}.tab.active{display:block}
+h2{color:var(--navy);font-size:1.65rem;margin:24px 0 10px}
+h3{color:var(--navy2);font-size:1.18rem;margin:20px 0 8px}
+h4{color:#334155;font-size:1rem;margin:16px 0 7px}
+p{margin:0 0 13px}ul,ol{margin:8px 0 15px 24px}li{margin-bottom:5px}
+code{font-family:Consolas,"Courier New",monospace}
+.code{position:relative;background:#0f1a2b;color:#e2e8f0;padding:18px 20px;border-radius:12px;margin:14px 0 18px;overflow:auto;font:.88rem/1.6 Consolas,"Courier New",monospace;white-space:pre}
+.info,.tip,.warn,.danger,.stage{padding:14px 16px;border-radius:10px;margin:15px 0;border-left:5px solid}
+.info{background:var(--blue);border-color:#3b82f6}
+.tip{background:var(--green);border-color:#10b981}
+.warn{background:var(--amber);border-color:#f59e0b}
+.danger{background:var(--red);border-color:#ef4444}
+.stage{background:#f8fafc;border-color:var(--navy2)}
+.tree,.summary{background:#f8fafc;border:1px solid var(--line);border-radius:12px;padding:15px 17px;margin:14px 0 18px}
+.tree{font-family:Consolas,"Courier New",monospace;white-space:pre-wrap}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:14px 0}
+.card{border:1px solid var(--line);border-radius:12px;padding:15px 16px;background:#fff}
+.card h3{margin-top:0}
+.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:11px;margin:14px 0 20px}
+table{border-collapse:collapse;width:100%;font-size:.93rem}
+th{background:#f1f5f9;color:var(--navy);text-align:left;padding:10px 12px;border-bottom:2px solid #dce3ec}
+td{padding:10px 12px;border-bottom:1px solid #e9eef3;vertical-align:top}
+.req{font-weight:750;color:var(--navy)}
+.future{display:inline-block;background:#fff1c7;color:#7a5300;border:1px solid #f6d879;border-radius:20px;padding:1px 8px;font-size:.76rem;font-weight:700}
+.now{display:inline-block;background:#dcfce7;color:#166534;border:1px solid #a7f3d0;border-radius:20px;padding:1px 8px;font-size:.76rem;font-weight:700}
+.footer{margin-top:36px;padding-top:20px;border-top:2px solid #e9eef3;text-align:center;color:var(--muted);font-size:.86rem}
+@media(max-width:760px){body{padding:8px}main{padding:0 15px 28px}header{margin:0 -15px 18px;padding:20px 17px}.top{flex-direction:column;align-items:flex-start}nav{position:static}.grid2{grid-template-columns:1fr}.code{font-size:.78rem;padding:16px 12px}}
+@media print{body{background:#fff;padding:0}main{max-width:none;box-shadow:none;border-radius:0;padding:0 12mm}.toolbar,nav{display:none!important}.tab{display:block!important}.tab+.tab{border-top:2px solid #ddd;margin-top:24px;padding-top:8px}.code{white-space:pre-wrap;background:#f6f6f6;color:#111;border:1px solid #ddd}.card,.info,.tip,.warn,.danger,.stage,.tree,.summary,.table-wrap{page-break-inside:avoid}}
+</style>
+</head>
+<body>
+<main>
+
+<header>
+  <div class="top">
+    <span class="inst"><strong>Instituto Argentino de la Empresa</strong></span>
+    <span class="carrera">Analista de Sistemas de Información · 2º año · Algoritmos II</span>
+  </div>
+  <h1>Trabajo Práctico Final 2026
+    <small>Sistema de Gestión de Coworking y Reservas</small>
+  </h1>
+  <span class="badge">Proyecto integrador anual</span>
+</header>
+
+<div class="toolbar"><button class="print" onclick="window.print()">Imprimir / Guardar PDF</button></div>
+
+<nav>
+  <button class="active" data-tab="objetivo">Objetivo</button>
+  <button data-tab="escenario">Escenario</button>
+  <button data-tab="etapas">Etapas</button>
+  <button data-tab="bdd">1. Base de datos</button>
+  <button data-tab="poo">2. POO</button>
+  <button data-tab="winforms">3. Windows Forms</button>
+  <button data-tab="errores">4. Errores</button>
+  <button data-tab="evolutivos">5. Evolución</button>
+  <button data-tab="entrega">Entregables</button>
+  <button data-tab="evaluacion">Evaluación</button>
+</nav>
+
+<section id="objetivo" class="tab active">
+<h2>Objetivo general</h2>
+
+<p>Desarrollar una aplicación de escritorio en C# con Windows Forms que permita administrar un espacio de coworking, sus recursos y las reservas realizadas por los clientes.</p>
+
+<p>El trabajo debe integrar contenidos desarrollados durante ambos cuatrimestres, combinando Programación Orientada a Objetos, interfaz gráfica, persistencia en MySQL y organización progresiva del código.</p>
+
+<div class="info"><strong>Importante:</strong> el proyecto comienza con los contenidos ya trabajados. Algunos requerimientos se incorporarán durante las próximas clases a medida que sean desarrollados en la materia. No se espera que todos estén implementados desde el primer día.</div>
+
+<div class="tree">ANÁLISIS
+   ↓
+BASE DE DATOS
+   ↓
+OBJETOS Y REGLAS
+   ↓
+WINDOWS FORMS
+   ↓
+INTEGRACIÓN CON MYSQL
+   ↓
+MANEJO DE ERRORES
+   ↓
+ORGANIZACIÓN DEL ACCESO A DATOS
+   ↓
+JSON / CONFIGURACIÓN
+   ↓
+PRUEBAS Y PRESENTACIÓN FINAL</div>
+
+<div class="tip"><strong>Criterio general:</strong> priorizar que cada requerimiento tenga una función real dentro del sistema. No agregar clases, interfaces, procedimientos o controles únicamente para “cumplir”.</div>
+</section>
+
+<section id="escenario" class="tab">
+<h2>Escenario del sistema</h2>
+
+<p>Un espacio de coworking dispone de distintos recursos que pueden ser utilizados por clientes mediante reservas. El sistema debe permitir registrar los recursos, administrar clientes, generar reservas y consultar su estado.</p>
+
+<h3>Recursos posibles</h3>
+<ul>
+<li>salas de reunión;</li>
+<li>puestos de trabajo;</li>
+<li>oficinas privadas;</li>
+<li>otros recursos que el grupo proponga y justifique.</li>
+</ul>
+
+<p>Cada recurso posee características comunes —identificación, nombre, ubicación, estado— y características particulares según el tipo de recurso.</p>
+
+<h3>Operación principal</h3>
+
+<p>Un cliente debe poder reservar un recurso para una fecha y horario determinados. El sistema debe impedir situaciones inconsistentes, por ejemplo:</p>
+
+<ul>
+<li>reservar un recurso inexistente;</li>
+<li>reservar un recurso que no se encuentra disponible;</li>
+<li>superponer reservas para el mismo recurso;</li>
+<li>registrar datos inválidos;</li>
+<li>eliminar información necesaria para operaciones existentes.</li>
+</ul>
+
+<div class="warn"><strong>El dominio puede ampliarse</strong> con servicios adicionales, estados de reserva, costos, cancelaciones u otros elementos, pero el crecimiento del sistema debe mantenerse controlado.</div>
+</section>
+
+<section id="etapas" class="tab">
+<h2>Desarrollo por etapas</h2>
+
+<div class="stage"><strong>ETAPA 1 · Inicio del proyecto</strong> <span class="now">Puede comenzar inmediatamente</span><br>
+Análisis del problema, modelo de datos, creación de la base, tablas, relaciones, procedimientos, vistas, función y pruebas en Workbench.</div>
+
+<div class="stage"><strong>ETAPA 2 · POO + interfaz</strong> <span class="now">Puede comenzar inmediatamente</span><br>
+Diseño de clases, clase abstracta, herencia, interfaz, formularios y controles principales.</div>
+
+<div class="stage"><strong>ETAPA 3 · Integración</strong> <span class="now">Contenido ya trabajado / inmediato</span><br>
+Conexión centralizada, consumo de procedimientos, vistas y funciones desde Windows Forms.</div>
+
+<div class="stage"><strong>ETAPA 4 · Manejo de errores</strong> <span class="now">Clase del 16/10</span><br>
+Captura en C# de excepciones provenientes de MySQL, diferenciando errores generales y errores personalizados.</div>
+
+<div class="stage"><strong>ETAPA 5 · Organización del acceso a datos</strong> <span class="future">Se incorporará durante la cursada</span><br>
+Separación de responsabilidades y clases específicas de acceso a datos.</div>
+
+<div class="stage"><strong>ETAPA 6 · Intercambio y configuración</strong> <span class="future">Se incorporará durante la cursada</span><br>
+Importación/exportación JSON y configuración externa de la conexión.</div>
+
+<div class="info"><strong>Regla de trabajo:</strong> no adelantarse copiando soluciones de temas todavía no desarrollados. Cada nueva etapa será explicada y luego incorporada al proyecto.</div>
+</section>
+
+<section id="bdd" class="tab">
+<h2>1. Base de datos MySQL</h2>
+
+<p><strong>Esta parte debe resolverse y probarse antes de comenzar la integración con C#.</strong></p>
+
+<h3>Modelo mínimo</h3>
+
+<p>La base debe incluir como mínimo las siguientes entidades conceptuales:</p>
+
+<div class="grid2">
+<div class="card">
+<h3>Clientes</h3>
+<p>Personas que pueden realizar reservas.</p>
+</div>
+<div class="card">
+<h3>Recursos</h3>
+<p>Elementos del coworking que pueden ser reservados.</p>
+</div>
+<div class="card">
+<h3>Tipos de recurso</h3>
+<p>Clasificación de salas, puestos, oficinas u otros.</p>
+</div>
+<div class="card">
+<h3>Reservas</h3>
+<p>Relación entre un cliente, un recurso y un período de uso.</p>
+</div>
+</div>
+
+<p>El grupo puede ampliar el modelo si el diseño lo requiere. Toda tabla adicional debe estar justificada.</p>
+
+<h3>Requisitos de implementación</h3>
+<ul>
+<li>Definir claves primarias y claves foráneas.</li>
+<li>Utilizar tipos de datos adecuados.</li>
+<li>Incorporar restricciones que ayuden a preservar la integridad.</li>
+<li>Cargar datos iniciales suficientes para probar el sistema.</li>
+<li>Evitar información duplicada que corresponda modelar mediante relaciones.</li>
+</ul>
+
+<h3>Procedimientos almacenados</h3>
+
+<p>Crear procedimientos para las principales operaciones de escritura del sistema. Como mínimo:</p>
+<ul>
+<li>alta de cliente;</li>
+<li>alta de recurso;</li>
+<li>modificación de recurso;</li>
+<li>alta de reserva;</li>
+<li>cancelación o modificación de una reserva.</li>
+</ul>
+
+<div class="tip"><strong>No es obligatorio que cada SELECT se convierta en un procedimiento.</strong> Elegir el objeto de base de datos adecuado según la operación.</div>
+
+<h3>Vistas</h3>
+
+<p>Crear al menos <strong>dos vistas</strong> útiles para la aplicación. Ejemplos:</p>
+<ul>
+<li>detalle completo de reservas con datos del cliente y del recurso;</li>
+<li>resumen de recursos con estado o cantidad de reservas.</li>
+</ul>
+
+<h3>Función almacenada</h3>
+
+<p>Crear al menos <strong>una función definida por el usuario</strong> que tenga una utilidad real. Ejemplos posibles:</p>
+<ul>
+<li>determinar disponibilidad;</li>
+<li>calcular duración;</li>
+<li>calcular un importe si el grupo incorpora costos.</li>
+</ul>
+
+<h3>Trigger</h3>
+
+<p>Incorporar al menos <strong>un trigger</strong> con una finalidad justificada. Se recomienda utilizarlo para una auditoría pequeña de una operación importante.</p>
+
+<div class="summary"><strong>Antes de pasar a C#:</strong><br>
+probar en Workbench procedimientos, vistas, función, restricciones y trigger. Guardar el script completo de creación de la base.</div>
+</section>
+
+<section id="poo" class="tab">
+<h2>2. Programación Orientada a Objetos</h2>
+
+<p>El proyecto debe recuperar contenidos importantes del primer cuatrimestre y utilizarlos dentro de una aplicación real.</p>
+
+<h3>Clase abstracta</h3>
+
+<p>Definir una clase abstracta que represente un concepto común del dominio. Una posibilidad es:</p>
+
+<div class="code"><code>Recurso
+   ├── Sala
+   ├── PuestoTrabajo
+   └── OficinaPrivada</code></div>
+
+<p>La clase abstracta debe aportar atributos, propiedades o comportamiento común. Las clases derivadas deben justificar su existencia mediante características o comportamiento propio.</p>
+
+<h3>Herencia y polimorfismo</h3>
+
+<p>Utilizar herencia de manera funcional. El proyecto debe contener al menos una situación donde una referencia del tipo base pueda trabajar con diferentes objetos derivados.</p>
+
+<h3>Interfaz</h3>
+
+<p>Definir al menos una interfaz asociada a una capacidad o comportamiento concreto del sistema. Por ejemplo:</p>
+
+<div class="code"><code>public interface IReservable
+{
+    bool PuedeReservarse(DateTime fecha);
+}</code></div>
+
+<div class="warn"><strong>El ejemplo es orientativo.</strong> La interfaz final debe diseñarse de acuerdo con el modelo elegido y no copiarse automáticamente si no resulta adecuada.</div>
+
+<h3>Colecciones</h3>
+
+<p>Utilizar colecciones genéricas de .NET cuando sean necesarias para resolver una tarea concreta de la aplicación. <strong>No se exige crear estructuras genéricas propias ni utilizar LINQ como requisito del trabajo.</strong></p>
+
+<h3>Gestión de responsabilidades</h3>
+
+<p>Evitar que todo el comportamiento del sistema quede concentrado dentro de los formularios. Las clases del dominio deben representar información y reglas que les correspondan.</p>
+</section>
+
+<section id="winforms" class="tab">
+<h2>3. Aplicación Windows Forms</h2>
+
+<p>Construir una interfaz funcional y clara. El diseño visual será considerado, pero no se evalúa como un concurso de estética.</p>
+
+<h3>Módulos mínimos</h3>
+
+<ul>
+<li>gestión de clientes;</li>
+<li>gestión de recursos;</li>
+<li>gestión de reservas;</li>
+<li>consulta de reservas y disponibilidad.</li>
+</ul>
+
+<h3>Controles esperados</h3>
+
+<p>Utilizar los controles que correspondan al problema, por ejemplo:</p>
+
+<ul>
+<li><code>DataGridView</code> para listados;</li>
+<li><code>ComboBox</code> para seleccionar datos relacionados;</li>
+<li><code>DateTimePicker</code> para fechas;</li>
+<li><code>NumericUpDown</code> cuando resulte adecuado;</li>
+<li><code>TabControl</code>, menús o formularios modales cuando mejoren la organización.</li>
+</ul>
+
+<div class="tip"><strong>Los ComboBox deben mostrar descripciones comprensibles</strong> para el usuario y conservar internamente el identificador necesario para operar con la base.</div>
+
+<h3>Conexión</h3>
+
+<p>Utilizar una clase centralizada <code>ConexionBD</code>. No repetir la cadena de conexión en los formularios.</p>
+
+<div class="tree">Windows Forms
+      ↓
+clases / lógica
+      ↓
+acceso a datos
+      ↓
+ConexionBD
+      ↓
+MySQL</div>
+
+<p>La separación definitiva del acceso a datos será incorporada posteriormente durante la cursada.</p>
+</section>
+
+<section id="errores" class="tab">
+<h2>4. Manejo de errores</h2>
+
+<p>Las operaciones críticas deben contemplar errores provenientes de MySQL.</p>
+
+<h3>Error genérico</h3>
+
+<p>Capturar errores del proveedor mediante:</p>
+
+<div class="code"><code>catch (MySqlException ex)
+{
+    // tratamiento del error proveniente de MySQL
+}</code></div>
+
+<h3>Error personalizado</h3>
+
+<p>Al menos una regla de negocio debe ser validada desde la base mediante:</p>
+
+<div class="code"><code>SIGNAL SQLSTATE '45000'
+    SET MESSAGE_TEXT = 'Mensaje de negocio';</code></div>
+
+<p>La aplicación deberá reconocer ese SQLSTATE y mostrar al usuario el mensaje correspondiente.</p>
+
+<div class="tree">SP detecta condición inválida
+        ↓
+SIGNAL 45000
+        ↓
+MySQL propaga excepción
+        ↓
+MySqlException en C#
+        ↓
+ex.SqlState == "45000"
+        ↓
+mensaje específico</div>
+
+<h3>Errores no específicos de MySQL</h3>
+
+<p>Puede utilizarse un segundo <code>catch (Exception ex)</code> para situaciones generales de la aplicación.</p>
+
+<div class="danger"><strong>No utilizar bloques <code>catch</code> vacíos.</strong> Los errores no deben ocultarse.</div>
+</section>
+
+<section id="evolutivos" class="tab">
+<h2>5. Requerimientos evolutivos</h2>
+
+<p>Los siguientes elementos forman parte del objetivo final, pero serán incorporados cuando sean desarrollados en clase.</p>
+
+<h3>Acceso a datos / DAO <span class="future">Próximamente</span></h3>
+
+<p>Retirar progresivamente del formulario el código específico de acceso a MySQL y ubicarlo en clases responsables de esas operaciones.</p>
+
+<div class="tree">Form
+  ↓
+lógica / dominio
+  ↓
+RecursoDAO / ReservaDAO / ClienteDAO
+  ↓
+ConexionBD
+  ↓
+MySQL</div>
+
+<div class="info"><strong>No se exige una arquitectura empresarial completa.</strong> El objetivo es comprender separación de responsabilidades y evitar que el formulario concentre interfaz, reglas y acceso a datos.</div>
+
+<h3>JSON <span class="future">Próximamente</span></h3>
+
+<p>Incorporar una operación de importación o exportación mediante JSON. Debe utilizar objetos reales del sistema y tener una finalidad concreta.</p>
+
+<p>Ejemplos:</p>
+<ul>
+<li>exportar catálogo de recursos;</li>
+<li>exportar reservas;</li>
+<li>importar recursos desde un archivo preparado para ese fin.</li>
+</ul>
+
+<h3>Configuración externa <span class="future">Próximamente</span></h3>
+
+<p>Retirar del código fuente los datos de conexión que no deberían quedar escritos directamente dentro de <code>ConexionBD</code> y leerlos desde la configuración de la aplicación.</p>
+
+<div class="warn"><strong>Estos requisitos serán explicados antes de ser exigidos.</strong> No deben implementarse anticipadamente utilizando soluciones que el grupo no pueda justificar.</div>
+</section>
+
+<section id="entrega" class="tab">
+<h2>Entregables</h2>
+
+<p>La entrega final deberá incluir:</p>
+
+<ul>
+<li>solución completa de Visual Studio;</li>
+<li>script SQL capaz de crear la base desde cero;</li>
+<li>datos mínimos de prueba;</li>
+<li>todos los procedimientos, vistas, funciones y triggers utilizados;</li>
+<li>archivo JSON de ejemplo cuando se incorpore ese contenido;</li>
+<li>breve documentación técnica del sistema;</li>
+<li>diagrama del modelo de datos;</li>
+<li>diagrama de clases simplificado;</li>
+<li>instrucciones necesarias para ejecutar el proyecto.</li>
+</ul>
+
+<h3>Documentación mínima</h3>
+
+<p>Explicar brevemente:</p>
+<ul>
+<li>objetivo del sistema;</li>
+<li>modelo de datos;</li>
+<li>clases principales;</li>
+<li>uso de herencia, abstractas e interfaces;</li>
+<li>objetos de MySQL utilizados y por qué;</li>
+<li>manejo de errores;</li>
+<li>decisiones importantes tomadas por el grupo.</li>
+</ul>
+
+<div class="tip"><strong>Presentación:</strong> todos los integrantes deberán poder explicar las partes principales del proyecto y justificar las decisiones adoptadas.</div>
+</section>
+
+<section id="evaluacion" class="tab">
+<h2>Criterios de evaluación</h2>
+
+<div class="table-wrap">
+<table>
+<thead>
+<tr><th>Área</th><th>Se observará</th><th>Ponderación orientativa</th></tr>
+</thead>
+<tbody>
+<tr><td><strong>POO</strong></td><td>Clases, responsabilidades, herencia, clase abstracta, interfaz y polimorfismo con sentido.</td><td>20%</td></tr>
+<tr><td><strong>Base de datos</strong></td><td>Modelo relacional, integridad, SP, vistas, UDF, trigger y pruebas.</td><td>25%</td></tr>
+<tr><td><strong>Windows Forms</strong></td><td>Funcionamiento de la interfaz, navegación, controles y claridad de uso.</td><td>15%</td></tr>
+<tr><td><strong>Integración C# + MySQL</strong></td><td>Conexión centralizada, parámetros, ejecución correcta de objetos de BD y manejo de errores.</td><td>20%</td></tr>
+<tr><td><strong>Evolución del diseño</strong></td><td>Separación de acceso a datos, JSON y configuración cuando sean incorporados.</td><td>10%</td></tr>
+<tr><td><strong>Documentación y defensa</strong></td><td>Claridad, coherencia y capacidad para explicar el sistema.</td><td>10%</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="summary"><strong>No se evaluará por cantidad de código.</strong><br>
+Se valorará que la aplicación funcione, que las decisiones puedan explicarse y que los contenidos de la materia estén integrados de manera coherente.</div>
+
+<h3>Condición de autoría</h3>
+
+<p>Podrán utilizarse herramientas de asistencia como apoyo durante el desarrollo, pero cada integrante deberá comprender y poder explicar el código que presenta. Durante la defensa podrán solicitarse modificaciones o explicaciones sobre partes concretas del proyecto.</p>
+</section>
+
+<div class="footer">Prof. Lic. Adrián Aroca · Instituto Argentino de la Empresa · Algoritmos II · Trabajo Práctico Final 2026</div>
+</main>
+
+<script>
+document.querySelectorAll('nav button').forEach(function(btn){
+  btn.addEventListener('click', function(){
+    document.querySelectorAll('nav button').forEach(function(b){b.classList.remove('active');});
+    document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active');});
+    btn.classList.add('active');
+    document.getElementById(btn.dataset.tab).classList.add('active');
+    window.scrollTo({top:0,behavior:'smooth'});
+  });
+});
+</script>
+</body>
+</html>

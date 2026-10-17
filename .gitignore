@@ -1,0 +1,56 @@
+# ============================================
+# Archivos personales del equipo / tooling
+# ============================================
+AGENTS.md
+
+# ============================================
+# Build outputs y binarios de .NET
+# ============================================
+bin/
+obj/
+out/
+
+# ============================================
+# Archivos generados por Visual Studio
+# ============================================
+*.user
+*.userosscache
+*.sln.docstates
+*.suo
+*.cache
+*.dbmdl
+*.jfm
+
+# ============================================
+# Carpeta de packages de NuGet
+# ============================================
+packages/
+*.nupkg
+
+# ============================================
+# Logs y archivos de runtime
+# ============================================
+*.log
+*.tmp
+*~
+
+# ============================================
+# Archivos del sistema operativo
+# ============================================
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ============================================
+# Archivos de backup locales
+# ============================================
+*.bak
+*.backup
+*.orig
+
+# ============================================
+# Conexión y configuración local (NO commits)
+# ============================================
+appsettings.local.json
+conn.config
+ConnectionStrings.json

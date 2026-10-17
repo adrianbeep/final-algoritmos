@@ -1,0 +1,10 @@
+# Carpeta del proyecto C# (Windows Forms)
+# Aqui iran los archivos generados por Visual Studio cuando se cree la solucion.
+# La estructura esperada es:
+# SistemaCoworking/
+#   ├── SistemaCoworking.sln
+#   └── SistemaCoworking/
+#       ├── Forms/
+#       ├── Models/
+#       ├── DAO/
+#       └── ...

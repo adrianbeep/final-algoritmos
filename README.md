@@ -1,4 +1,4 @@
-# 🏢 Sistema Coworking
+# Sistema Coworking
 
 > Sistema de Gestión de Coworking y Reservas
 
@@ -6,7 +6,7 @@ Aplicación de escritorio para administrar un espacio de coworking, sus recursos
 
 ---
 
-## 📋 Descripción del problema
+## Descripción del problema
 
 Un espacio de coworking dispone de distintos recursos que pueden ser utilizados por clientes mediante reservas. El sistema permite:
 
@@ -20,22 +20,22 @@ El sistema impide situaciones inconsistentes como reservar un recurso inexistent
 
 ---
 
-## 🚀 Tecnologías
+## Tecnologías
 
 | Tecnología | Uso |
 |---|---|
-| 🟣 **C#** | Lenguaje principal |
-| 🖥️ **Windows Forms** | Framework de interfaz gráfica |
-| ⚙️ **.NET Framework** | Runtime |
-| 🗄️ **MySQL** | Base de datos relacional |
-| 🔧 **Visual Studio 2022** | IDE de desarrollo |
-| 🔌 **MySql.Data** | Conector de base de datos |
-| 🐙 **Git + GitHub** | Control de versiones |
-| 📋 **GitHub Projects** | Tablero Kanban de seguimiento |
+| C# | Lenguaje principal |
+| Windows Forms | Framework de interfaz gráfica |
+| .NET 8.0 | Runtime |
+| MySQL | Base de datos relacional |
+| Visual Studio 2022 | IDE de desarrollo |
+| MySql.Data | Conector de base de datos |
+| Git + GitHub | Control de versiones |
+| GitHub Projects | Tablero Kanban de seguimiento |
 
 ---
 
-## 👥 Desarrolladores
+## Desarrolladores
 
 - **Adrian Naum** (legajo)
 - **Valentina Lesspade** (legajo)
@@ -45,7 +45,7 @@ El sistema impide situaciones inconsistentes como reservar un recurso inexistent
 
 ---
 
-## 📅 Información del proyecto
+## Información del proyecto
 
 - **Inicio de desarrollo:** 16/10/2026
 - **Ciclo lectivo:** 2026
@@ -55,7 +55,7 @@ El sistema impide situaciones inconsistentes como reservar un recurso inexistent
 
 ---
 
-## 📂 Estructura del repositorio
+## Estructura del repositorio
 
 ```
 final-algoritmos/
@@ -81,15 +81,15 @@ final-algoritmos/
 
 ---
 
-## 🚀 Cómo clonar y ejecutar
+## Cómo clonar y ejecutar
 
 ### Requisitos previos
 
-- 🟣 [.NET Framework 4.7.2+](https://dotnet.microsoft.com/)
-- 🗄️ [MySQL Server 8.0+](https://dev.mysql.com/downloads/mysql/)
-- 🔧 [Visual Studio 2022](https://visualstudio.microsoft.com/) con workload de desarrollo de escritorio
-- 🔌 [MySQL Workbench](https://dev.mysql.com/downloads/workbench/) para gestionar la base
-- 🐙 [Git](https://git-scm.com/)
+- .NET 8.0 SDK
+- MySQL Server 8.0 o superior
+- Visual Studio 2022 con workload ".NET desktop development"
+- MySQL Workbench
+- Git
 
 ### Clonar el repositorio
 
@@ -111,25 +111,19 @@ cd final-algoritmos
 3. Compilar la solución (`Ctrl + Shift + B`)
 4. Ejecutar con `F5`
 
-> ⚠️ **Nota:** mientras no esté implementada la Etapa 6 (configuración externa), la cadena de conexión se configura directamente en la clase `ConexionBD`.
+> Nota: mientras no esté implementada la Etapa 6 (configuración externa), la cadena de conexión se configura directamente en la clase `ConexionBD`.
 
 ---
 
-## 📚 Documentación
+## Documentación
 
-- 📄 [Roadmap completo](./.github/ROADMAP.md) — plan de trabajo por etapas
-- 📂 [Documentación técnica](./Docs/) — DER, diagrama de clases, decisiones de diseño
-- 📋 [Consignas del TP](./Consignas/) — requerimientos originales de la cátedra
-- 🐛 [Issues abiertos](https://github.com/adrianbeep/final-algoritmos/issues) — sub-tareas en curso
+- [Roadmap completo](./.github/ROADMAP.md) — plan de trabajo por etapas
+- [Documentación técnica](./Docs/) — DER, diagrama de clases, decisiones de diseño
+- [Consignas del TP](./Consignas/) — requerimientos originales de la cátedra
+- [Issues abiertos](https://github.com/adrianbeep/final-algoritmos/issues) — sub-tareas en curso
 
 ---
 
-## 📄 Licencia
+## Licencia
 
 Este proyecto está bajo la licencia MIT. Ver el archivo [LICENSE](./LICENSE) para más detalles.
-
----
-
-<p align="center">
-  Hecho con ☕ y 🧉 por los integrantes del grupo — Instituto Argentino de la Empresa · 2026
-</p>

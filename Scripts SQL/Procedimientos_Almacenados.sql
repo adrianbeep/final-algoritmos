@@ -213,3 +213,138 @@ BEGIN
 END //
 
 DELIMITER ;
+
+/*
+===========================================
+PROCEDIMIENTOS ALMACENADOS RESERVAS
+===========================================
+*/
+DELIMITER //
+
+CREATE PROCEDURE sp_alta_reserva(
+	in p_id_cliente int,
+    in p_id_recurso int,
+    in p_fecha_inicio datetime,
+    in p_fecha_fin datetime,
+    in p_total_reserva decimal(10,2)
+)
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM clientes WHERE id = p_id_cliente) THEN
+		SIGNAL SQLSTATE '45000'
+			SET MESSAGE_TEXT = 'El cliente no existe';
+    END IF;
+    
+    IF NOT EXISTS (SELECT 1 FROM recursos WHERE id = p_id_recurso) THEN
+		SIGNAL SQLSTATE '45000'
+			SET MESSAGE_TEXT = 'El recurso no existe';
+    END IF;
+    
+    IF EXISTS (SELECT 1 FROM recursos WHERE id = p_id_recurso AND estado != 'Disponible') THEN
+		SIGNAL SQLSTATE '45000'
+			SET MESSAGE_TEXT = 'El recurso no esta disponible';
+    END IF;
+    
+    IF p_fecha_inicio >= p_fecha_fin THEN
+		SIGNAL SQLSTATE '45000'
+			SET MESSAGE_TEXT = 'La fecha de inicio debe ser anterior a la fecha de fin';
+    END IF;
+    
+    /*
+		Esto valida que no exista una reserva de un recurso en estado confirmada
+        no choque con la fecha ingresada por parametro
+    */
+    IF EXISTS (
+		SELECT 
+			1 
+		FROM 
+			reservas 
+		WHERE 
+			id_recurso = p_id_recurso 
+		AND estado_reserva = 'Confirmada'
+        AND fecha_inicio <= p_fecha_fin
+        AND fecha_fin >= p_fecha_inicio
+	) THEN
+		SIGNAL SQLSTATE '45000'
+			SET MESSAGE_TEXT = 'El recurso no esta disponible en la fecha ingresada';
+    END IF;
+    
+	INSERT INTO reservas(id_cliente, id_recurso, fecha_inicio, fecha_fin, estado_reserva, total_reserva)
+	VALUES (p_id_cliente, p_id_recurso, p_fecha_inicio, p_fecha_fin, 'Confirmada', p_total_reserva);
+    
+END //
+
+CREATE PROCEDURE sp_modificar_reserva(
+	in p_id_reserva int,
+    in p_id_recurso int,
+    in p_fecha_inicio datetime,
+    in p_fecha_fin datetime,
+    in p_total_reserva decimal(10,2)
+)
+BEGIN
+	IF NOT EXISTS (SELECT 1 FROM reservas WHERE id = p_id_reserva AND estado_reserva = 'Confirmada') THEN
+		SIGNAL SQLSTATE '45000'
+			SET MESSAGE_TEXT = 'La reserva no existe o no se puede modificar';
+	END IF;
+
+    IF NOT EXISTS (SELECT 1 FROM recursos WHERE id = p_id_recurso) THEN
+		SIGNAL SQLSTATE '45000'
+			SET MESSAGE_TEXT = 'El recurso no existe';
+    END IF;
+    
+    IF EXISTS (SELECT 1 FROM recursos WHERE id = p_id_recurso AND estado != 'Disponible') THEN
+		SIGNAL SQLSTATE '45000'
+			SET MESSAGE_TEXT = 'El recurso no esta disponible';
+    END IF;
+    
+    IF p_fecha_inicio >= p_fecha_fin THEN
+		SIGNAL SQLSTATE '45000'
+			SET MESSAGE_TEXT = 'La fecha de inicio debe ser anterior a la fecha de fin';
+    END IF;
+    
+    /*
+		Esto valida que no exista una reserva de un recurso en estado confirmada
+        no choque con la fecha ingresada por parametro
+    */
+    IF EXISTS (
+		SELECT 
+			1 
+		FROM 
+			reservas 
+		WHERE 
+			id_recurso = p_id_recurso 
+		AND estado_reserva = 'Confirmada'
+        AND fecha_inicio <= p_fecha_fin
+        AND fecha_fin >= p_fecha_inicio
+        AND id != p_id_reserva
+	) THEN
+		SIGNAL SQLSTATE '45000'
+			SET MESSAGE_TEXT = 'El recurso no esta disponible en la fecha ingresada';
+    END IF;
+    
+    UPDATE reservas
+    SET
+		id_recurso = p_id_recurso,
+        fecha_inicio = p_fecha_inicio,
+        fecha_fin = p_fecha_fin,
+        total_reserva = p_total_reserva
+	WHERE
+		id = p_id_reserva;
+END //
+
+CREATE PROCEDURE sp_cancelar_reserva(
+	in p_id_reserva int
+)
+BEGIN
+	IF NOT EXISTS (SELECT 1 FROM reservas WHERE id = p_id_reserva AND estado_reserva = 'Confirmada') THEN
+		SIGNAL SQLSTATE '45000'
+			SET MESSAGE_TEXT = 'La reserva no existe o ya esta cancelada';
+    END IF;
+    
+    UPDATE reservas
+	SET
+		estado_reserva = 'Cancelada'
+    WHERE
+		id = p_id_reserva;
+END //
+
+DELIMITER ;

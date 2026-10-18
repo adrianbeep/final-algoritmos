@@ -53,8 +53,8 @@ Roadmap de trabajo del proyecto integrador. Cada etapa corresponde a un hito del
 - [ ] `fn_total_clientes()` — total de clientes registrados
 - [ ] `fn_reservas_por_finalizar()` — reservas que aún no terminaron
 - [ ] `fn_reservas_hoy()` — reservas del día actual
-- [ ] `fn_recursos_disponibles()` — recursos libres en este momento
-- [ ] `fn_recursos_reservados()` — recursos con reserva activa en este momento
+- [ ] `fn_recursos_disponibles()` — recursos en estado `Disponible` (inventario bookable)
+- [ ] `fn_recursos_reservados_hoy()` — recursos distintos con al menos una reserva hoy
 
 ### Trigger
 - [ ] Un trigger de auditoría sobre una operación importante (ej: alta o cancelación de reserva)
@@ -110,7 +110,7 @@ Roadmap de trabajo del proyecto integrador. Cada etapa corresponde a un hito del
 
 - [ ] Clase centralizada `ConexionBD` con la cadena de conexión
 - [ ] Ningún formulario repite la cadena de conexión
-- [ ] Consumo de los 5 procedimientos almacenados desde los formularios
+- [ ] Consumo de los 7 procedimientos almacenados desde los formularios
 - [ ] Consumo de las 2 vistas en los listados
 - [ ] Consumo de las 5 funciones almacenadas desde el dashboard
 - [ ] Parámetros bindeados correctamente (sin concatenación SQL)

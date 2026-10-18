@@ -1,3 +1,4 @@
+DROP DATABASE IF EXISTS coworking;
 CREATE DATABASE coworking;
 
 USE coworking;
@@ -7,7 +8,7 @@ USE coworking;
 TABLAS
 ===================================================
 */
-
+DROP TABLE IF EXISTS clientes;
 CREATE TABLE clientes(
 	id int auto_increment primary key,
     nombre varchar(100) not null,
@@ -17,12 +18,13 @@ CREATE TABLE clientes(
     email varchar(50) not null unique
 );
 
+DROP TABLE IF EXISTS tipo_recursos;
 CREATE TABLE tipo_recursos(
 	id int auto_increment primary key,
     nombre_tipo_recurso varchar(100) not null,
     descripcion text
 );
-
+DROP TABLE IF EXISTS recursos;
 CREATE TABLE recursos(
 	id int auto_increment primary key,
     id_tipo_recurso int not null,
@@ -41,6 +43,7 @@ CREATE TABLE recursos(
     Aparte, el Procedimiento Almacenado va a tener que usar Transaction porque debe insertar en 'recursos'
     y en 'recursos_detalle'
 */
+DROP TABLE IF EXISTS recursos_detalle;
 CREATE TABLE recursos_detalle(
 	id_recurso int not null primary key,
     capacidad_personas int null,
@@ -51,6 +54,7 @@ CREATE TABLE recursos_detalle(
     foreign key(id_recurso) references recursos(id)
 );
 
+DROP TABLE IF EXISTS reservas;
 CREATE TABLE reservas(
 	id int auto_increment primary key,
     id_cliente int not null,
@@ -62,6 +66,15 @@ CREATE TABLE reservas(
     
     foreign key(id_cliente) references clientes(id),
     foreign key(id_recurso) references recursos(id)
+);
+
+DROP TABLE IF EXISTS auditoria_reservas;
+CREATE TABLE auditoria_reservas(
+	id int auto_increment primary key,
+    id_reserva int not null,
+    accion enum('INSERT', 'CANCEL'),
+    fecha_accion datetime not null,
+    detalle text
 );
 
 /*

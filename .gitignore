@@ -13,6 +13,7 @@ out/
 # ============================================
 # Archivos generados por Visual Studio
 # ============================================
+.vs/
 *.user
 *.userosscache
 *.sln.docstates

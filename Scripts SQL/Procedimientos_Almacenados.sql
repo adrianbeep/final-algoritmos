@@ -5,7 +5,7 @@ PROCEDIMIENTOS ALMACENADOS CLIENTES
 */
 
 DELIMITER //
-
+DROP PROCEDURE IF EXISTS sp_alta_cliente;
 CREATE PROCEDURE sp_alta_cliente(
 	in p_nombre varchar(100),
     in p_apellido varchar(100),
@@ -31,6 +31,7 @@ BEGIN
 		(p_nombre, p_apellido, p_dni, p_telefono, p_email);
 END //
 
+DROP PROCEDURE IF EXISTS sp_modificar_cliente;
 CREATE PROCEDURE sp_modificar_cliente(
 	in p_id int,
     in p_nombre varchar(100),
@@ -80,7 +81,7 @@ PROCEDIMIENTOS ALMACENADOS RECURSOS
 */
 
 DELIMITER //
-
+DROP PROCEDURE IF EXISTS sp_alta_recurso;
 CREATE PROCEDURE sp_alta_recurso(
 	in p_id_tipo_recurso int,
     in p_nombre varchar(100),
@@ -141,6 +142,7 @@ BEGIN
     COMMIT;
 END //
 
+DROP PROCEDURE IF EXISTS sp_modificar_recurso;
 CREATE PROCEDURE sp_modificar_recurso(
 	in p_id_recurso int,
     in p_nombre varchar(100),
@@ -220,7 +222,7 @@ PROCEDIMIENTOS ALMACENADOS RESERVAS
 ===========================================
 */
 DELIMITER //
-
+DROP PROCEDURE IF EXISTS sp_alta_reserva;
 CREATE PROCEDURE sp_alta_reserva(
 	in p_id_cliente int,
     in p_id_recurso int,
@@ -273,6 +275,7 @@ BEGIN
     
 END //
 
+DROP PROCEDURE IF EXISTS sp_modificar_reserva;
 CREATE PROCEDURE sp_modificar_reserva(
 	in p_id_reserva int,
     in p_id_recurso int,
@@ -331,6 +334,7 @@ BEGIN
 		id = p_id_reserva;
 END //
 
+DROP PROCEDURE IF EXISTS sp_cancelar_reserva;
 CREATE PROCEDURE sp_cancelar_reserva(
 	in p_id_reserva int
 )

@@ -6,6 +6,10 @@ namespace SistemaCoworking.Interfaces;
 
 public interface IReservable
 {
-    public  bool PuedeReservarse(dateTime fechaInicio, DateTime fechaFin);
-    
+    public  bool PuedeReservarse(DateTime fechaInicio, DateTime fechaFin);
+
+    public decimal CalcularCosto(int dias);
+
+
+
 }

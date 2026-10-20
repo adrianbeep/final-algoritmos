@@ -9,8 +9,8 @@ public class Sala : Recurso
     public int CapacidadPersonas { get; set; }
     public bool TieneProyector { get; set; }
 
-    public Sala(int id, int idTipoRecurso, string nombre, string ubicacion, EstadoRecurso estado, decimal precioDia, int capacidadPersonas, bool tieneProyector)
-        : base(id, idTipoRecurso, nombre, ubicacion, estado, precioDia)
+    public Sala(int id, int idTipoRecurso, string nombre, string ubicacion, decimal precioDia, int capacidadPersonas, bool tieneProyector)
+        : base(id, idTipoRecurso, nombre, ubicacion, precioDia)
     {
         CapacidadPersonas = capacidadPersonas;
         TieneProyector = tieneProyector;

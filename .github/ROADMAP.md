@@ -34,16 +34,19 @@ Roadmap de trabajo del proyecto integrador. Cada etapa corresponde a un hito del
 - [ ] `sp_alta_recurso`
 - [ ] `sp_modificar_recurso`
 - [ ] `sp_alta_reserva`
-- [ ] `sp_cancelar_modificar_reserva`
+- [ ] `sp_modificar_reserva`
+- [ ] `sp_cancelar_reserva`
 
 > **Nota:** `tipo_recursos` no tiene SP porque sus valores son fijos y se cargan en el script de inicialización. La catedra no exige CRUD sobre tipos.
 
-### Transactions y Handlers en SP de reservas
-- [ ] `sp_alta_reserva` con `START TRANSACTION` y `COMMIT`
-- [ ] `sp_alta_reserva` con `DECLARE EXIT HANDLER FOR SQLEXCEPTION` que ejecuta `ROLLBACK` y `RESIGNAL`
-- [ ] `sp_cancelar_modificar_reserva` con `START TRANSACTION` y `COMMIT`
-- [ ] `sp_cancelar_modificar_reserva` con `DECLARE EXIT HANDLER FOR SQLEXCEPTION` que ejecuta `ROLLBACK` y `RESIGNAL`
-- [ ] Justificación: alta y cancelación de reserva tocan varias tablas; si algo falla a mitad, no debe quedar inconsistente
+### Transactions y Handlers en SP de recursos
+- [ ] `sp_alta_recurso` con `START TRANSACTION` y `COMMIT`
+- [ ] `sp_alta_recurso` con `DECLARE EXIT HANDLER FOR SQLEXCEPTION` que ejecuta `ROLLBACK` y `RESIGNAL`
+- [ ] `sp_modificar_recurso` con `START TRANSACTION` y `COMMIT`
+- [ ] `sp_modificar_recurso` con `DECLARE EXIT HANDLER FOR SQLEXCEPTION` que ejecuta `ROLLBACK` y `RESIGNAL`
+- [ ] Justificación: el alta y la modificación de recurso escriben en dos tablas (`recursos` + `recursos_detalle`); si algo falla a mitad, no debe quedar inconsistente
+
+> **Nota:** los SP de reservas (`sp_alta_reserva`, `sp_modificar_reserva`, `sp_cancelar_reserva`) no llevan transaction porque escriben en una sola tabla. Sus validaciones de negocio igual levantan `SIGNAL SQLSTATE '45000'`.
 
 ### Vistas
 - [ ] `vw_reservas_completas` — JOIN de `reservas + clientes + recursos + tipo_recursos`. Usada en el DataGridView de Reservas para mostrar nombre del cliente, nombre del recurso y tipo en una sola consulta
@@ -101,7 +104,7 @@ Roadmap de trabajo del proyecto integrador. Cada etapa corresponde a un hito del
 - [ ] Tarjeta: Total clientes (consume `fn_total_clientes`)
 - [ ] Tarjeta: Reservas por finalizar (consume `fn_reservas_por_finalizar`)
 - [ ] Tarjeta: Reservas hoy (consume `fn_reservas_hoy`)
-- [ ] Tarjeta: % de ocupación actual (consume `fn_recursos_disponibles` y `fn_recursos_reservados`)
+- [ ] Tarjeta: % de ocupación actual (consume `fn_recursos_disponibles` y `fn_recursos_reservados_hoy`)
 - [ ] Accesos directos a las acciones más comunes (nueva reserva, alta cliente, alta recurso)
 
 ---
@@ -110,11 +113,13 @@ Roadmap de trabajo del proyecto integrador. Cada etapa corresponde a un hito del
 
 - [ ] Clase centralizada `ConexionBD` con la cadena de conexión
 - [ ] Ningún formulario repite la cadena de conexión
-- [ ] Consumo de los 7 procedimientos almacenados desde los formularios
+- [ ] Capa DAO en `Datos/` que encapsula todo el acceso a datos
+- [ ] Consumo de los 7 procedimientos almacenados desde los DAO
 - [ ] Consumo de las 2 vistas en los listados
 - [ ] Consumo de las 5 funciones almacenadas desde el dashboard
 - [ ] Parámetros bindeados correctamente (sin concatenación SQL)
-- [ ] Flujo: `Form → lógica → ConexionBD → MySQL`
+- [ ] Cero SQL embebido fuera de `Datos/`
+- [ ] Flujo: `Form → lógica → DAO → ConexionBD → MySQL`
 
 ---
 
@@ -129,13 +134,14 @@ Roadmap de trabajo del proyecto integrador. Cada etapa corresponde a un hito del
 
 ---
 
-## Etapa 5 — Organización del acceso a datos (DAO)
+## Etapa 5 — Organización de la capa de acceso a datos
 
-- [ ] Crear `ClienteDAO`
-- [ ] Crear `RecursoDAO`
-- [ ] Crear `ReservaDAO`
-- [ ] Crear `TipoRecursoDAO` con método de solo lectura (`ObtenerTodos()`) para cargar el ComboBox en el form de Recursos
-- [ ] Retirar de los formularios el código directo de acceso a MySQL
+> La capa DAO se crea en la Etapa 3. Esta etapa la consolida y la reutiliza.
+
+- [ ] Extraer un DAO base con el comportamiento común (abrir conexión, ejecutar, mapear, dispose)
+- [ ] Unificar el manejo de conexión y recursos en un solo lugar
+- [ ] Evaluar un factory o pool de conexiones si el volumen lo justifica
+- [ ] `TipoRecursoDAO` mantiene `ObtenerTodos()` de solo lectura para el ComboBox de Recursos
 - [ ] Lógica de dominio separada de la interfaz
 - [ ] Flujo final: `Form → lógica → DAO → ConexionBD → MySQL`
 
@@ -182,16 +188,22 @@ Roadmap de trabajo del proyecto integrador. Cada etapa corresponde a un hito del
 
 ## Dependencias entre etapas
 
+Las etapas son **agrupamientos de contenido**, no una secuencia bloqueante. Los módulos del
+sistema no colisionan entre sí, asi que se puede avanzar en paralelo sobre distintas partes
+(por ejemplo, el dashboard mientras se wirea el ABM de clientes). Lo que no se puede es
+cerrar una etapa dejando sus entregables a medias: si algo quedo pendiente de una etapa
+anterior, se cierra en la siguiente y queda explicitado en su checklist.
+
 ```
 Etapa 1 (Base de datos)
         ↓
 Etapa 2 (POO + Interfaz)
         ↓
-Etapa 3 (Integración)
+Etapa 3 (Integración: ConexionBD + capa DAO)
         ↓
-Etapa 4 (Manejo de errores)
+Etapa 4 (Manejo de errores + wiring pendiente)
         ↓
-Etapa 5 (DAO)
+Etapa 5 (Consolidación de la capa de acceso a datos)
         ↓
 Etapa 6 (JSON + Config)
 ```

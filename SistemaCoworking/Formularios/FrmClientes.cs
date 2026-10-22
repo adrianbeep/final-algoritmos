@@ -58,37 +58,35 @@ public partial class FrmClientes : Form
         if (col is not DataGridViewButtonColumn) return;
 
         DataGridViewRow fila = dgvClientes.Rows[e.RowIndex];
-        Cliente c = new Cliente(
-            Convert.ToInt32(fila.Cells["colId"].Value),
-            Convert.ToString(fila.Cells["colNombre"].Value),
-            Convert.ToString(fila.Cells["colApellido"].Value),
-            Convert.ToInt32(fila.Cells["colDni"].Value),
-            Convert.ToString(fila.Cells["colTelefono"].Value),
-            Convert.ToString(fila.Cells["colEmail"].Value)
-        );
+        Cliente c =
+            _clienteDAO.ObtenerPorId(
+                Convert.ToInt32(fila.Cells["colId"].Value)
+            );
 
         AbrirModalUsuario(c);
     }
 
+    //Edicion
     private void AbrirModalUsuario(Cliente c)
     {
-        ClienteModalControl modal = new ClienteModalControl(c);
+        ClienteModalControl modal = new ClienteModalControl(c, _clienteDAO);
         modal.Closed += (s, args) =>
         {
             ModalOverlay.Close(_modalOverlay);
-            if (modal.Saved)
+            if (modal.Guardado)
                 CargarDataGridViewClientes(dgvClientes); // refrescar solo si guardó
         };
         ModalOverlay.Show(_modalOverlay, modal);
     }
 
+    //Insercion
     private void AbrirModalUsuario()
     {
-        ClienteModalControl modal = new ClienteModalControl();
+        ClienteModalControl modal = new ClienteModalControl(_clienteDAO);
         modal.Closed += (s, args) =>
         {
             ModalOverlay.Close(_modalOverlay);
-            if (modal.Saved)
+            if (modal.Guardado)
                 CargarDataGridViewClientes(dgvClientes); // refrescar solo si guardó
         };
         ModalOverlay.Show(_modalOverlay, modal);

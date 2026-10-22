@@ -1,123 +1,219 @@
-﻿using System;
-using System.Drawing;
-using System.Drawing.Drawing2D;
-using System.Windows.Forms;
+using SistemaCoworking.Datos;
 using SistemaCoworking.Herramientas;
 using SistemaCoworking.Modelos;
+using System;
+using System.Drawing;
+using System.Drawing.Drawing2D;
+using System.Text.RegularExpressions;
+using System.Windows.Forms;
 
-namespace SistemaCoworking.Formularios.UserControls
+namespace SistemaCoworking.Formularios.UserControls;
+
+public partial class ClienteModalControl : UserControl
 {
-    public partial class ClienteModalControl : UserControl
+    public event EventHandler? Closed;
+    public bool Guardado { get; private set; } = false;
+    private bool Insertar { get; set; } = true;
+
+    private ClienteDAO ClienteDAO;
+
+    //Constructor para Edicion
+    public ClienteModalControl(Cliente cliente, ClienteDAO clienteDAO)
     {
-        public event EventHandler? Closed;
-        public bool Saved { get; private set; } = false;
+        InitializeComponent();
+        AplicarEstiloCard();
+        ConfigurarTxt();
 
-        //Constructor para Edicion
-        public ClienteModalControl(Cliente cliente)
-        {
-            InitializeComponent();
-            AplicarEstiloCard();
-            ConfigurarTxt();
+        Insertar = false;
 
-            lblCrear.Text = "Editar";
+        lblCrear.Text = "Editar";
+        Label1.BackColor = Color.Transparent;
+        Label1.ForeColor = Color.FromArgb(80, 80, 80);
+        Label1.Font = new Font("Segoe UI", 9F);
 
-            ButtonConfiguration.ConfigPrimary(btnGuardar);
-            ButtonConfiguration.ConfigSecondary(btnCancelar);
+        ButtonConfiguration.ConfigPrimary(btnGuardar);
+        ButtonConfiguration.ConfigSecondary(btnCancelar);
 
-            CargarCliente(cliente);
-        }
+        ClienteDAO = clienteDAO;
 
-        //Constructor para Insercion
-        public ClienteModalControl()
-        {
-            InitializeComponent();
-            AplicarEstiloCard();
-            ConfigurarTxt();
+        CargarCliente(cliente);
+    }
 
-            lblCrear.Text = "Crear";
-            Label1.Visible = false;
-            lblId.Visible = false;
+    //Constructor para Insercion
+    public ClienteModalControl(ClienteDAO clienteDAO)
+    {
+        InitializeComponent();
+        AplicarEstiloCard();
+        ConfigurarTxt();
 
-            ButtonConfiguration.ConfigPrimary(btnGuardar);
-            ButtonConfiguration.ConfigSecondary(btnCancelar);
-        }
+        Insertar = true;
 
-        private void AplicarEstiloCard()
-        {
-            // Fondo opaco: sin esto el UserControl es transparente
-            // y se ve el overlay gris a traves del modal.
-            this.BackColor = Color.White;
+        lblCrear.Text = "Crear";
+        Label1.Visible = false;
+        lblId.Visible = false;
 
-            // Esquinas redondeadas
+        ClienteDAO = clienteDAO;
+
+        ButtonConfiguration.ConfigPrimary(btnGuardar);
+        ButtonConfiguration.ConfigSecondary(btnCancelar);
+    }
+
+    private void AplicarEstiloCard()
+    {
+        // Fondo opaco: sin esto el UserControl es transparente
+        // y se ve el overlay gris a traves del modal.
+        this.BackColor = Color.White;
+
+        // Esquinas redondeadas
+        AplicarRegionRedondeada();
+
+        // Tipografia consistente
+        this.Font = new Font("Segoe UI", 9F);
+        this.ForeColor = Color.FromArgb(40, 40, 40);
+    }
+
+    private void AplicarRegionRedondeada()
+    {
+        int radio = 14;
+        int diametro = radio * 2;
+
+        var path = new GraphicsPath();
+        path.AddArc(0, 0, diametro, diametro, 180, 90);
+        path.AddArc(this.Width - diametro, 0, diametro, diametro, 270, 90);
+        path.AddArc(this.Width - diametro, this.Height - diametro, diametro, diametro, 0, 90);
+        path.AddArc(0, this.Height - diametro, diametro, diametro, 90, 90);
+        path.CloseFigure();
+
+        this.Region?.Dispose();
+        this.Region = new Region(path);
+        path.Dispose();
+    }
+
+    protected override void OnResize(EventArgs e)
+    {
+        base.OnResize(e);
+        if (this.Width > 0 && this.Height > 0)
             AplicarRegionRedondeada();
+    }
 
-            // Tipografia consistente
-            this.Font = new Font("Segoe UI", 9F);
-            this.ForeColor = Color.FromArgb(40, 40, 40);
+    private void CargarCliente(Cliente c)
+    {
+        lblId.Text = Convert.ToString(c.Id);
+        txtNombre.Value = Convert.ToString(c.Nombre);
+        txtApellido.Value = Convert.ToString(c.Apellido);
+        txtDni.Value = Convert.ToString(c.Dni);
+        txtTelefono.Value = Convert.ToString(c.Telefono);
+        txtEmail.Value = Convert.ToString(c.Email);
+    }
 
-            // Labels: fondo transparente para que se fundan con el card
-            foreach (Label lbl in new[] { Label1, Label2, label3, label4, label5, label6 })
-            {
-                lbl.BackColor = Color.Transparent;
-                lbl.ForeColor = Color.FromArgb(90, 90, 90);
-                lbl.Font = new Font("Segoe UI", 9F);
-            }
-        }
+    //=================================
+    //BOTONES
+    //=================================
+    private void btnGuardar_Click(object sender, EventArgs e)
+    {
+        //OfType<T> permite filtrar por el control
+        //que necesito recorrer
+        foreach (TextControl txt in this.Controls.OfType<TextControl>())
+            txt.LimpiarError();
 
-        private void AplicarRegionRedondeada()
+        bool errores = false;
+
+        string nombre = txtNombre.Value.Trim();
+        if (string.IsNullOrEmpty(nombre))
         {
-            int radio = 14;
-            int diametro = radio * 2;
-
-            var path = new GraphicsPath();
-            path.AddArc(0, 0, diametro, diametro, 180, 90);
-            path.AddArc(this.Width - diametro, 0, diametro, diametro, 270, 90);
-            path.AddArc(this.Width - diametro, this.Height - diametro, diametro, diametro, 0, 90);
-            path.AddArc(0, this.Height - diametro, diametro, diametro, 90, 90);
-            path.CloseFigure();
-
-            this.Region?.Dispose();
-            this.Region = new Region(path);
-            path.Dispose();
+            errores = true;
+            txtNombre.MostrarError("Ingrese el nombre");
         }
 
-        protected override void OnResize(EventArgs e)
+        if (nombre.Length > 100)
         {
-            base.OnResize(e);
-            if (this.Width > 0 && this.Height > 0)
-                AplicarRegionRedondeada();
+            errores = true;
+            txtNombre.MostrarError("Ingrese un nombre menor a cien caracteres");
         }
 
-        private void CargarCliente(Cliente c)
+        string apellido = txtApellido.Value.Trim();
+        if (string.IsNullOrEmpty(apellido))
         {
-            lblId.Text = Convert.ToString(c.Id);
-            txtNombre.Text = Convert.ToString(c.Nombre);
-            txtApellido.Text = Convert.ToString(c.Apellido);
-            txtDni.Text = Convert.ToString(c.Dni);
-            txtTelefono.Text = Convert.ToString(c.Telefono);
-            txtEmail.Text = Convert.ToString(c.Email);
+            errores = true;
+            txtApellido.MostrarError("Ingrese el apellido");
         }
 
-        private void ConfigurarTxt()
+        if (apellido.Length > 100)
         {
-            InputConfiguration.Configuration(pnBarraNombre, txtNombre, "Juan", Color.White);
-            InputConfiguration.Configuration(pnBarraApellido, txtApellido, "Perez", Color.White);
-            InputConfiguration.Configuration(pnBarraDni, txtDni, "123456789", Color.White);
-            InputConfiguration.Configuration(pnBarraTelefono, txtTelefono, "+542231234956", Color.White);
-            InputConfiguration.Configuration(pnBarraEmail, txtEmail, "juanperez@gmail.com", Color.White);
+            errores = true;
+            txtApellido.MostrarError("Ingrese un apellido menor a cien caracteres");
         }
 
-        private void btnGuardar_Click(object sender, EventArgs e)
+        if (!int.TryParse(txtDni.Value, out int dni))
         {
-            // Acá va la lógica de guardado real (llamar al DAO.Actualizar)
-            Saved = true;
-            Closed?.Invoke(this, EventArgs.Empty);
+            errores = true;
+            txtDni.MostrarError("Ingrese caracteres numericos");
         }
 
-        private void btnCancelar_Click(object sender, EventArgs e)
+        string telefono = txtTelefono.Value.Trim();
+        if (string.IsNullOrEmpty(telefono))
         {
-            Saved = false;
-            Closed?.Invoke(this, EventArgs.Empty);
+            errores = true;
+            txtTelefono.MostrarError("Ingrese un telefono");
         }
+
+        string email = txtEmail.Value.Trim();
+        var emailPattern = @"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$";
+        if (string.IsNullOrEmpty(email))
+        {
+            errores = true;
+            txtEmail.MostrarError("Ingrese un email");
+        }
+        else if (email.Length > 50)
+        {
+            errores = true;
+            txtEmail.MostrarError("Ingrese un email menor a cincuenta caracteres");
+        }
+        else if (!Regex.IsMatch(email, emailPattern))
+        {
+            errores = true;
+            txtEmail.MostrarError("Email con formato invalido");
+        }
+
+        if (errores)
+            return;
+
+        //lblId.Visible siempre que se entra para insertar
+        //esta en false
+        if (lblId.Visible == false)
+        {
+            ClienteDAO.Insertar(nombre, apellido, dni, telefono, email);
+        }
+        else
+        {
+            Cliente c = 
+                new Cliente(int.Parse(lblId.Text), nombre, apellido, dni, telefono, email);
+            
+            ClienteDAO.Modificar(c);
+        }
+
+        Guardado = true;
+        Closed?.Invoke(this, EventArgs.Empty);
+    }
+
+    private void btnCancelar_Click(object sender, EventArgs e)
+    {
+        Guardado = false;
+        Closed?.Invoke(this, EventArgs.Empty);
+    }
+
+    private void ConfigurarTxt()
+    {
+        txtNombre.Placeholder = "Juan"; txtNombre.LblText = "Nombre";
+        txtApellido.Placeholder = "Perez"; txtApellido.LblText = "Apellido";
+        txtDni.Placeholder = "123456789"; txtDni.LblText = "Dni";
+        txtTelefono.Placeholder = "542231234956"; txtTelefono.LblText = "Telefono";
+        txtEmail.Placeholder = "juanperez@gmail.com"; txtEmail.LblText = "Email";
+    }
+
+    private void pBoxCerrar_Click(object sender, EventArgs e)
+    {
+        Guardado = false;
+        Closed?.Invoke(this, EventArgs.Empty);
     }
 }

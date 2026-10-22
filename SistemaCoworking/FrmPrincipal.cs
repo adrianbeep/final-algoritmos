@@ -1,4 +1,5 @@
 using SistemaCoworking.Formularios;
+using SistemaCoworking.Herramientas;
 using System.Drawing.Text;
 
 namespace SistemaCoworking;
@@ -25,6 +26,7 @@ public partial class FrmPrincipal : Form
     //private Color btnBGColor = ;
     private Form _formActivo = null;
     private Button _botonActivo = null;
+    private Form _overlay = null;
 
     //==============================
     //EVENTOS FORMULARIO
@@ -32,10 +34,14 @@ public partial class FrmPrincipal : Form
     public FrmPrincipal()
     {
         InitializeComponent();
-    }
 
-    private void FrmPrincipal_Load(object sender, EventArgs e)
-    {
+        // pnModal del Designer ya no se usa: el velo real es una ventana propia
+        // con Opacity (ver ModalOverlay). Un Panel hijo no compone con sus
+        // hermanos y se ve gris opaco.
+        pnForms.Controls.Remove(pnModal);
+
+        _overlay = ModalOverlay.Configure(this, opacidad: 0.55);
+
         CargarFormularioAPanel(new FrmDashboard(), btnDashboard);
     }
 
@@ -125,7 +131,7 @@ public partial class FrmPrincipal : Form
 
     private void btnClientes_Click(object sender, EventArgs e)
     {
-        CargarFormularioAPanel(new FrmClientes(), btnClientes);
+        CargarFormularioAPanel(new FrmClientes(_overlay), btnClientes);
     }
 
     private void btnRecursos_Click(object sender, EventArgs e)

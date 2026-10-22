@@ -125,17 +125,6 @@
         VAAAAABJRU5ErkJggg==
 </value>
   </data>
-  <data name="btnReservas.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
-    <value>
-        iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAL
-        EAAACxABrSO9dQAAARhJREFUSEvtlDFOAkEUhgmFBQ3RzgtQeQXDJusBaEyw4QZWJnoACjyBja0NUJBQ
-        QkErHQ2JBWhhpSE0WBo/85J/NzPTmNm1Ur5ksjvvzT//232ZqVT2/A+AKrDid/gEOqFBQ8klcFtyvAH9
-        0OBcBjMvUQBgAKzDYFcGr16iAMAN8AUcucGxDCxR8xSRAGfaK3WDL8CHEieeIhKrXIVeZ4G6AkMZtJzF
-        CTABpj8MW5M4unXeaOBUG7f1vCpo0HR01uhVNrnUxsfABrjLFhbFazRwD7wr8WjVhIJYrMEqOrXJ3D5T
-        iQfgORTEAhzmjQa2csuwo34QimLR1dO3lwvnmI9k0tN/LDOe8kY7rnYn7YIvKsPCM9jzN/kGCKWW39VT
-        m6YAAAAASUVORK5CYII=
-</value>
-  </data>
   <data name="btnDashboard.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAL
@@ -149,7 +138,7 @@
   <data name="btnClientes.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAL
-        EAAACxABrSO9dQAAAQRJREFUSEvd1U0uBFEUhuEOCasgvQfmDJBgwH5ITG3BTFsN1tAD5szE3+SRI1UV
+        DAAACwwBP0AiyAAAAQRJREFUSEvd1U0uBFEUhuEOCasgvQfmDJBgwH5ITG3BTFsN1tAD5szE3+SRI1UV
         deT2VTo94J1U7j3vd07qJ7dGo38FHg3nDbc4zP2+EXbeq4EV7OAOB7ne4zcDWpohN3m/x5wD4k5e836P
         eQYE1XxJwBKu8ITLWGcnKOU7SgK2v3w1wVZ2glK+oyTgOA04yk5QyneUBKzjpWn+jLXsBKV8xywBmzjD
         Rq61zMp/UhUqVPMlAWOc46K5jrMTlPIdWcAyTvHePP+WWJ9EPfmDB0xS48wk+YMHTHPHxDT5wwYMpZqv
@@ -159,12 +148,23 @@
   <data name="btnRecursos.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAL
-        EAAACxABrSO9dQAAARpJREFUSEvtk0FKA0EQRRP0BFln412yD26FiG6yDtlkE4JIFiKYc3gHt+opkkO4
+        DAAACwwBP0AiyAAAARpJREFUSEvtk0FKA0EQRRP0BFln412yD26FiG6yDtlkE4JIFiKYc3gHt+opkkO4
         N3lSoWZofnc6ZRBB8EHBdFX9X0NPTafzz3cAxsAHdXbAG9BT/VHc/B14qMSjD5qo/iguvNO8Eu3LiAqj
         fRlRYbQvIypM+4CNnxvW2t8CbIGl5lOAczda+PlWluBGNS2+flEGrhkBsyRG6ttiuw1M/U1e3Uifl425
         a9bJUOPwFaXYHVu3Pp8M0AVWgT+5hmmfzEv9bcClNz0X/l4Nw65N86Y1hupvAxZePNOa4n3ZOpvWa/sN
         02L4nt3kRbanieLwUwbU+JEBuUmt9hsD7CNvNV8C+HSjQ8xVY6IL4FrzJYCrwoo2cQ/0VfN3+QIkSta0
         BRC6EQAAAABJRU5ErkJggg==
+</value>
+  </data>
+  <data name="btnReservas.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAL
+        DAAACwwBP0AiyAAAARhJREFUSEvtlDFOAkEUhgmFBQ3RzgtQeQXDJusBaEyw4QZWJnoACjyBja0NUJBQ
+        QkErHQ2JBWhhpSE0WBo/85J/NzPTmNm1Ur5ksjvvzT//232ZqVT2/A+AKrDid/gEOqFBQ8klcFtyvAH9
+        0OBcBjMvUQBgAKzDYFcGr16iAMAN8AUcucGxDCxR8xSRAGfaK3WDL8CHEieeIhKrXIVeZ4G6AkMZtJzF
+        CTABpj8MW5M4unXeaOBUG7f1vCpo0HR01uhVNrnUxsfABrjLFhbFazRwD7wr8WjVhIJYrMEqOrXJ3D5T
+        iQfgORTEAhzmjQa2csuwo34QimLR1dO3lwvnmI9k0tN/LDOe8kY7rnYn7YIvKsPCM9jzN/kGCKWW39VT
+        m6YAAAAASUVORK5CYII=
 </value>
   </data>
   <metadata name="sidebarTransicion.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">

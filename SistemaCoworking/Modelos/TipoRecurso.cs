@@ -17,5 +17,4 @@ public class TipoRecurso
         Nombre = nombre;
         Descripcion = descripcion;
     }
-
 }

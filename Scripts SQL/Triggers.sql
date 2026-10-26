@@ -5,8 +5,11 @@ TRIGGERS
 */
 -- MySql limita los triggers a una accion, por ej sql server permite hacer un trigger
 -- para insert y para update.
-DELIMITER //
 DROP TRIGGER IF EXISTS trg_auditoria_reservas_insert;
+DROP TRIGGER IF EXISTS trg_auditoria_reservas_update;
+
+DELIMITER //
+
 CREATE TRIGGER trg_auditoria_reservas_insert
 AFTER INSERT ON reservas -- indica que se activa despues de un insert en tabla reservas
 FOR EACH ROW -- por cada fila sino el default es por sentencia,
@@ -26,7 +29,6 @@ BEGIN
 		);
 END //
 
-DROP TRIGGER IF EXISTS trg_auditoria_reservas_update;
 CREATE TRIGGER trg_auditoria_reservas_update
 AFTER UPDATE ON reservas
 FOR EACH ROW

@@ -3,9 +3,11 @@
 PROCEDIMIENTOS ALMACENADOS CLIENTES
 ===========================================
 */
+DROP PROCEDURE IF EXISTS sp_alta_cliente;
+DROP PROCEDURE IF EXISTS sp_modificar_cliente;
 
 DELIMITER //
-DROP PROCEDURE IF EXISTS sp_alta_cliente;
+
 CREATE PROCEDURE sp_alta_cliente(
 	in p_nombre varchar(100),
     in p_apellido varchar(100),
@@ -31,7 +33,7 @@ BEGIN
 		(p_nombre, p_apellido, p_dni, p_telefono, p_email);
 END //
 
-DROP PROCEDURE IF EXISTS sp_modificar_cliente;
+
 CREATE PROCEDURE sp_modificar_cliente(
 	in p_id int,
     in p_nombre varchar(100),
@@ -79,14 +81,17 @@ DELIMITER ;
 PROCEDIMIENTOS ALMACENADOS RECURSOS
 ===========================================
 */
+DROP PROCEDURE IF EXISTS sp_alta_recurso;
+DROP PROCEDURE IF EXISTS sp_modificar_recurso;
 
 DELIMITER //
-DROP PROCEDURE IF EXISTS sp_alta_recurso;
+
 CREATE PROCEDURE sp_alta_recurso(
 	in p_id_tipo_recurso int,
     in p_nombre varchar(100),
     in p_estado enum('Disponible', 'En Mantenimiento', 'Inhabilitado'),
     in p_ubicacion varchar(100),
+    in p_costo decimal(10,2),
     in p_precio_dia decimal(10,2),
     in p_capacidad_personas int,
     in p_tiene_proyector bool,
@@ -132,9 +137,9 @@ BEGIN
     END IF;
     
     START TRANSACTION;
-		INSERT INTO recursos(id_tipo_recurso, nombre, estado, ubicacion, precio_dia)
+		INSERT INTO recursos(id_tipo_recurso, nombre, estado, ubicacion, costo, precio_dia)
         VALUES
-			(p_id_tipo_recurso, p_nombre, p_estado, p_ubicacion, p_precio_dia);
+			(p_id_tipo_recurso, p_nombre, p_estado, p_ubicacion, p_costo, p_precio_dia);
             
 		INSERT INTO recursos_detalle(id_recurso, capacidad_personas, tiene_proyector, numero_monitor, metros_cuadrados)
         VALUES
@@ -142,12 +147,12 @@ BEGIN
     COMMIT;
 END //
 
-DROP PROCEDURE IF EXISTS sp_modificar_recurso;
 CREATE PROCEDURE sp_modificar_recurso(
 	in p_id_recurso int,
     in p_nombre varchar(100),
     in p_estado enum('Disponible', 'En Mantenimiento', 'Inhabilitado'),
     in p_ubicacion varchar(100),
+    in p_costo decimal(10,2),
     in p_precio_dia decimal(10,2),
     in p_capacidad_personas int,
     in p_tiene_proyector bool,
@@ -221,8 +226,12 @@ DELIMITER ;
 PROCEDIMIENTOS ALMACENADOS RESERVAS
 ===========================================
 */
-DELIMITER //
 DROP PROCEDURE IF EXISTS sp_alta_reserva;
+DROP PROCEDURE IF EXISTS sp_modificar_reserva;
+DROP PROCEDURE IF EXISTS sp_cancelar_reserva;
+
+DELIMITER //
+
 CREATE PROCEDURE sp_alta_reserva(
 	in p_id_cliente int,
     in p_id_recurso int,
@@ -275,7 +284,6 @@ BEGIN
     
 END //
 
-DROP PROCEDURE IF EXISTS sp_modificar_reserva;
 CREATE PROCEDURE sp_modificar_reserva(
 	in p_id_reserva int,
     in p_id_recurso int,
@@ -334,7 +342,6 @@ BEGIN
 		id = p_id_reserva;
 END //
 
-DROP PROCEDURE IF EXISTS sp_cancelar_reserva;
 CREATE PROCEDURE sp_cancelar_reserva(
 	in p_id_reserva int
 )

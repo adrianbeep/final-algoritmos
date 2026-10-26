@@ -24,6 +24,7 @@ CREATE TABLE tipo_recursos(
     nombre_tipo_recurso varchar(100) not null,
     descripcion text
 );
+
 DROP TABLE IF EXISTS recursos;
 CREATE TABLE recursos(
 	id int auto_increment primary key,
@@ -31,6 +32,7 @@ CREATE TABLE recursos(
     nombre varchar(100) not null,
     estado enum('Disponible', 'En Mantenimiento', 'Inhabilitado') default 'Disponible',
     ubicacion varchar(100) not null,
+    costo decimal(10,2) not null check(costo > 0), -- Añadimos costo para poder hacer el calculo del precio dia diferenciado por tipo_recurso en C#
     precio_dia decimal(10,2) not null check(precio_dia > 0),
     
     foreign key(id_tipo_recurso) references tipo_recursos(id)

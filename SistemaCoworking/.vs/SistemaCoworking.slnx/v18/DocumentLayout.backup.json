@@ -1,0 +1,161 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\santi\\OneDrive\\Documentos\\GitHub\\final-algoritmos\\SistemaCoworking\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{72D6CF94-FC18-967C-AF98-C8046746D713}|SistemaCoworking.csproj|c:\\users\\santi\\onedrive\\documentos\\github\\final-algoritmos\\sistemacoworking\\modelos\\sala.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{72D6CF94-FC18-967C-AF98-C8046746D713}|SistemaCoworking.csproj|solutionrelative:modelos\\sala.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{72D6CF94-FC18-967C-AF98-C8046746D713}|SistemaCoworking.csproj|c:\\users\\santi\\onedrive\\documentos\\github\\final-algoritmos\\sistemacoworking\\modelos\\tiporecurso.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{72D6CF94-FC18-967C-AF98-C8046746D713}|SistemaCoworking.csproj|solutionrelative:modelos\\tiporecurso.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{72D6CF94-FC18-967C-AF98-C8046746D713}|SistemaCoworking.csproj|c:\\users\\santi\\onedrive\\documentos\\github\\final-algoritmos\\sistemacoworking\\modelos\\reserva.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{72D6CF94-FC18-967C-AF98-C8046746D713}|SistemaCoworking.csproj|solutionrelative:modelos\\reserva.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{72D6CF94-FC18-967C-AF98-C8046746D713}|SistemaCoworking.csproj|c:\\users\\santi\\onedrive\\documentos\\github\\final-algoritmos\\sistemacoworking\\modelos\\recurso.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{72D6CF94-FC18-967C-AF98-C8046746D713}|SistemaCoworking.csproj|solutionrelative:modelos\\recurso.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{72D6CF94-FC18-967C-AF98-C8046746D713}|SistemaCoworking.csproj|c:\\users\\santi\\onedrive\\documentos\\github\\final-algoritmos\\sistemacoworking\\modelos\\puestotrabajo.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{72D6CF94-FC18-967C-AF98-C8046746D713}|SistemaCoworking.csproj|solutionrelative:modelos\\puestotrabajo.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{72D6CF94-FC18-967C-AF98-C8046746D713}|SistemaCoworking.csproj|c:\\users\\santi\\onedrive\\documentos\\github\\final-algoritmos\\sistemacoworking\\modelos\\oficinaprivada.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{72D6CF94-FC18-967C-AF98-C8046746D713}|SistemaCoworking.csproj|solutionrelative:modelos\\oficinaprivada.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{72D6CF94-FC18-967C-AF98-C8046746D713}|SistemaCoworking.csproj|c:\\users\\santi\\onedrive\\documentos\\github\\final-algoritmos\\sistemacoworking\\modelos\\cliente.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{72D6CF94-FC18-967C-AF98-C8046746D713}|SistemaCoworking.csproj|solutionrelative:modelos\\cliente.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{72D6CF94-FC18-967C-AF98-C8046746D713}|SistemaCoworking.csproj|c:\\users\\santi\\onedrive\\documentos\\github\\final-algoritmos\\sistemacoworking\\interfaces\\ireservable.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{72D6CF94-FC18-967C-AF98-C8046746D713}|SistemaCoworking.csproj|solutionrelative:interfaces\\ireservable.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 7,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "Reserva.cs",
+              "DocumentMoniker": "C:\\Users\\santi\\OneDrive\\Documentos\\GitHub\\final-algoritmos\\SistemaCoworking\\Modelos\\Reserva.cs",
+              "RelativeDocumentMoniker": "Modelos\\Reserva.cs",
+              "ToolTip": "C:\\Users\\santi\\OneDrive\\Documentos\\GitHub\\final-algoritmos\\SistemaCoworking\\Modelos\\Reserva.cs",
+              "RelativeToolTip": "Modelos\\Reserva.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-10-20T22:11:22.224Z",
+              "IsPinned": true,
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "Cliente.cs",
+              "DocumentMoniker": "C:\\Users\\santi\\OneDrive\\Documentos\\GitHub\\final-algoritmos\\SistemaCoworking\\Modelos\\Cliente.cs",
+              "RelativeDocumentMoniker": "Modelos\\Cliente.cs",
+              "ToolTip": "C:\\Users\\santi\\OneDrive\\Documentos\\GitHub\\final-algoritmos\\SistemaCoworking\\Modelos\\Cliente.cs",
+              "RelativeToolTip": "Modelos\\Cliente.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-10-20T23:09:27.687Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "IReservable.cs",
+              "DocumentMoniker": "C:\\Users\\santi\\OneDrive\\Documentos\\GitHub\\final-algoritmos\\SistemaCoworking\\Interfaces\\IReservable.cs",
+              "RelativeDocumentMoniker": "Interfaces\\IReservable.cs",
+              "ToolTip": "C:\\Users\\santi\\OneDrive\\Documentos\\GitHub\\final-algoritmos\\SistemaCoworking\\Interfaces\\IReservable.cs",
+              "RelativeToolTip": "Interfaces\\IReservable.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAuwA4AAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-10-20T22:13:31.583Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "OficinaPrivada.cs",
+              "DocumentMoniker": "C:\\Users\\santi\\OneDrive\\Documentos\\GitHub\\final-algoritmos\\SistemaCoworking\\Modelos\\OficinaPrivada.cs",
+              "RelativeDocumentMoniker": "Modelos\\OficinaPrivada.cs",
+              "ToolTip": "C:\\Users\\santi\\OneDrive\\Documentos\\GitHub\\final-algoritmos\\SistemaCoworking\\Modelos\\OficinaPrivada.cs",
+              "RelativeToolTip": "Modelos\\OficinaPrivada.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAkwBgAAAAFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-10-20T22:13:26.851Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "PuestoTrabajo.cs",
+              "DocumentMoniker": "C:\\Users\\santi\\OneDrive\\Documentos\\GitHub\\final-algoritmos\\SistemaCoworking\\Modelos\\PuestoTrabajo.cs",
+              "RelativeDocumentMoniker": "Modelos\\PuestoTrabajo.cs",
+              "ToolTip": "C:\\Users\\santi\\OneDrive\\Documentos\\GitHub\\final-algoritmos\\SistemaCoworking\\Modelos\\PuestoTrabajo.cs",
+              "RelativeToolTip": "Modelos\\PuestoTrabajo.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABQAAAAJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-10-20T22:13:25.652Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "TipoRecurso.cs",
+              "DocumentMoniker": "C:\\Users\\santi\\OneDrive\\Documentos\\GitHub\\final-algoritmos\\SistemaCoworking\\Modelos\\TipoRecurso.cs",
+              "RelativeDocumentMoniker": "Modelos\\TipoRecurso.cs",
+              "ToolTip": "C:\\Users\\santi\\OneDrive\\Documentos\\GitHub\\final-algoritmos\\SistemaCoworking\\Modelos\\TipoRecurso.cs",
+              "RelativeToolTip": "Modelos\\TipoRecurso.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABMAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-10-20T22:13:22.834Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{3ae79031-e1bc-11d0-8f78-00a0c9110057}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Sala.cs",
+              "DocumentMoniker": "C:\\Users\\santi\\OneDrive\\Documentos\\GitHub\\final-algoritmos\\SistemaCoworking\\Modelos\\Sala.cs",
+              "RelativeDocumentMoniker": "Modelos\\Sala.cs",
+              "ToolTip": "C:\\Users\\santi\\OneDrive\\Documentos\\GitHub\\final-algoritmos\\SistemaCoworking\\Modelos\\Sala.cs",
+              "RelativeToolTip": "Modelos\\Sala.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAAsAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-10-20T22:11:28.132Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "Recurso.cs",
+              "DocumentMoniker": "C:\\Users\\santi\\OneDrive\\Documentos\\GitHub\\final-algoritmos\\SistemaCoworking\\Modelos\\Recurso.cs",
+              "RelativeDocumentMoniker": "Modelos\\Recurso.cs",
+              "ToolTip": "C:\\Users\\santi\\OneDrive\\Documentos\\GitHub\\final-algoritmos\\SistemaCoworking\\Modelos\\Recurso.cs",
+              "RelativeToolTip": "Modelos\\Recurso.cs",
+              "ViewState": "AgIAABkAAAAAAAAAAAAcwA0AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-10-20T22:11:06.232Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

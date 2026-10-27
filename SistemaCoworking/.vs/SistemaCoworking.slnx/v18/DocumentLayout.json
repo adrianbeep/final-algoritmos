@@ -1,0 +1,92 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\santi\\OneDrive\\Documentos\\GitHub\\final-algoritmos\\SistemaCoworking\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{72D6CF94-FC18-967C-AF98-C8046746D713}|SistemaCoworking.csproj|c:\\users\\santi\\onedrive\\documentos\\github\\final-algoritmos\\sistemacoworking\\datos\\recursodao.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{72D6CF94-FC18-967C-AF98-C8046746D713}|SistemaCoworking.csproj|solutionrelative:datos\\recursodao.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{72D6CF94-FC18-967C-AF98-C8046746D713}|SistemaCoworking.csproj|c:\\users\\santi\\onedrive\\documentos\\github\\final-algoritmos\\sistemacoworking\\datos\\tiporecursodao.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{72D6CF94-FC18-967C-AF98-C8046746D713}|SistemaCoworking.csproj|solutionrelative:datos\\tiporecursodao.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{72D6CF94-FC18-967C-AF98-C8046746D713}|SistemaCoworking.csproj|c:\\users\\santi\\onedrive\\documentos\\github\\final-algoritmos\\sistemacoworking\\datos\\clientedao.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{72D6CF94-FC18-967C-AF98-C8046746D713}|SistemaCoworking.csproj|solutionrelative:datos\\clientedao.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{72D6CF94-FC18-967C-AF98-C8046746D713}|SistemaCoworking.csproj|c:\\users\\santi\\onedrive\\documentos\\github\\final-algoritmos\\sistemacoworking\\datos\\conexionbd.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{72D6CF94-FC18-967C-AF98-C8046746D713}|SistemaCoworking.csproj|solutionrelative:datos\\conexionbd.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 1,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "TipoRecursoDAO.cs",
+              "DocumentMoniker": "C:\\Users\\santi\\OneDrive\\Documentos\\GitHub\\final-algoritmos\\SistemaCoworking\\Datos\\TipoRecursoDAO.cs",
+              "RelativeDocumentMoniker": "Datos\\TipoRecursoDAO.cs",
+              "ToolTip": "C:\\Users\\santi\\OneDrive\\Documentos\\GitHub\\final-algoritmos\\SistemaCoworking\\Datos\\TipoRecursoDAO.cs",
+              "RelativeToolTip": "Datos\\TipoRecursoDAO.cs",
+              "ViewState": "AgIAAAwAAAAAAAAAAAAYwBsAAAA5AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-10-26T14:46:15.998Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "RecursoDAO.cs",
+              "DocumentMoniker": "C:\\Users\\santi\\OneDrive\\Documentos\\GitHub\\final-algoritmos\\SistemaCoworking\\Datos\\RecursoDAO.cs",
+              "RelativeDocumentMoniker": "Datos\\RecursoDAO.cs",
+              "ToolTip": "C:\\Users\\santi\\OneDrive\\Documentos\\GitHub\\final-algoritmos\\SistemaCoworking\\Datos\\RecursoDAO.cs",
+              "RelativeToolTip": "Datos\\RecursoDAO.cs",
+              "ViewState": "AgIAAAMAAAAAAAAAAAAuwBAAAABAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-10-26T14:46:01.408Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{3ae79031-e1bc-11d0-8f78-00a0c9110057}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "ClienteDAO.cs",
+              "DocumentMoniker": "C:\\Users\\santi\\OneDrive\\Documentos\\GitHub\\final-algoritmos\\SistemaCoworking\\Datos\\ClienteDAO.cs",
+              "RelativeDocumentMoniker": "Datos\\ClienteDAO.cs",
+              "ToolTip": "C:\\Users\\santi\\OneDrive\\Documentos\\GitHub\\final-algoritmos\\SistemaCoworking\\Datos\\ClienteDAO.cs",
+              "RelativeToolTip": "Datos\\ClienteDAO.cs",
+              "ViewState": "AgIAADMAAAAAAAAAAAAYwAcAAAACAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-10-26T14:30:27Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "ConexionBD.cs",
+              "DocumentMoniker": "C:\\Users\\santi\\OneDrive\\Documentos\\GitHub\\final-algoritmos\\SistemaCoworking\\Datos\\ConexionBD.cs",
+              "RelativeDocumentMoniker": "Datos\\ConexionBD.cs",
+              "ToolTip": "C:\\Users\\santi\\OneDrive\\Documentos\\GitHub\\final-algoritmos\\SistemaCoworking\\Datos\\ConexionBD.cs",
+              "RelativeToolTip": "Datos\\ConexionBD.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-10-23T22:15:13.097Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -34,7 +34,11 @@ public abstract class Recurso : IReservable
         Estado = EstadoRecurso.Disponible;
     }
 
-    public  abstract decimal CalcularPrecio();
+    /// <summary>
+    /// Precio por dia del recurso. Cada tipo implementa sus propias reglas de
+    /// descuento y recargo sobre el costo base.
+    /// </summary>
+    public abstract decimal CalcularPrecio();
 
     public virtual bool PuedeReservarse(DateTime fechaInicio, DateTime fechaFin)
     {

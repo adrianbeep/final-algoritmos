@@ -6,6 +6,9 @@ namespace SistemaCoworking.Modelos;
 
 public class Sala : Recurso
 {
+    // Reglas de negocio del precio diario de la sala.
+    private const decimal RecargoProyector = 0.25m;
+
     public int CapacidadPersonas { get; set; }
     public bool TieneProyector { get; set; }
 
@@ -16,9 +19,18 @@ public class Sala : Recurso
         TieneProyector = tieneProyector;
     }
 
+    /// <summary>
+    /// Precio por dia de la sala. Parte del costo base y suma un recargo del
+    /// 25% si la sala incluye proyector.
+    /// </summary>
     public override decimal CalcularPrecio()
     {
-        
+        decimal precio = Costo;
+
+        if (TieneProyector)
+            precio *= 1m + RecargoProyector;
+
+        return Math.Round(precio, 2);
     }
 }
 

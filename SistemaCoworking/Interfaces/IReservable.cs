@@ -8,8 +8,5 @@ public interface IReservable
 {
     public  bool PuedeReservarse(DateTime fechaInicio, DateTime fechaFin);
 
-    public decimal CalcularCosto(int dias);
-
-
-
+    public decimal CalcularPrecio();
 }

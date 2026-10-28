@@ -14,13 +14,8 @@ public class OficinaPrivada : Recurso
         MetrosCuadrados = metrosCuadrados;
     }
 
-    public override decimal CalcularCosto(int dias)
+    public override decimal CalcularPrecio()
     {
-        decimal costoBase = PrecioDia * dias * 1.1m; // 10% adicional para oficinas privadas
-        if (MetrosCuadrados > 20)
-        {
-            costoBase += 30 * dias; 
-        }
-        return costoBase;
+        
     }
 }

@@ -34,7 +34,7 @@ public abstract class Recurso : IReservable
         Estado = EstadoRecurso.Disponible;
     }
 
-    public  abstract decimal CalcularCosto(int dias);
+    public  abstract decimal CalcularPrecio();
 
     public virtual bool PuedeReservarse(DateTime fechaInicio, DateTime fechaFin)
     {

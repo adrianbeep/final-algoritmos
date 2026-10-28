@@ -14,13 +14,8 @@ public class PuestoTrabajo : Recurso
         NumeroMonitor = numeroMonitor;
     }
 
-    public override decimal CalcularCosto(int dias)
+    public override decimal CalcularPrecio()
     {
-        decimal costoBase = PrecioDia * dias;
-        if (NumeroMonitor > 1)
-        {
-            costoBase += 20 * dias;
-        }
-        return costoBase;
+        
     }
 }

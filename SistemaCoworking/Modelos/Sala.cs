@@ -16,14 +16,9 @@ public class Sala : Recurso
         TieneProyector = tieneProyector;
     }
 
-    public override decimal CalcularCosto(int dias)
+    public override decimal CalcularPrecio()
     {
-        decimal costoBase = PrecioDia * dias;
-        if (TieneProyector)
-        {
-            costoBase += 50 * dias; 
-        }
-        return costoBase;
+        
     }
 }
 

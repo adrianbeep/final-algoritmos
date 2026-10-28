@@ -117,70 +117,48 @@ public partial class ClienteModalControl : UserControl
             txt.LimpiarError();
 
         bool errores = false;
+        string? error;
 
         string nombre = txtNombre.Value.Trim();
-        if (string.IsNullOrEmpty(nombre))
+        if (!Cliente.ValidarNombre(nombre, out error))
         {
             errores = true;
-            txtNombre.MostrarError("Ingrese el nombre");
-        }
-
-        if (nombre.Length > 100)
-        {
-            errores = true;
-            txtNombre.MostrarError("Ingrese un nombre menor a cien caracteres");
+            txtNombre.MostrarError(error);
         }
 
         string apellido = txtApellido.Value.Trim();
-        if (string.IsNullOrEmpty(apellido))
+        if (!Cliente.ValidarApellido(apellido, out error))
         {
             errores = true;
-            txtApellido.MostrarError("Ingrese el apellido");
+            txtApellido.MostrarError(error);
         }
 
-        if (apellido.Length > 100)
+        if (!Cliente.ValidarDni(txtDni.Value.Trim(), out error))
         {
             errores = true;
-            txtApellido.MostrarError("Ingrese un apellido menor a cien caracteres");
-        }
-
-        if (!int.TryParse(txtDni.Value, out int dni))
-        {
-            errores = true;
-            txtDni.MostrarError("Ingrese caracteres numericos");
+            txtDni.MostrarError(error);
         }
 
         string telefono = txtTelefono.Value.Trim();
-        if (string.IsNullOrEmpty(telefono))
+        if (!Cliente.ValidarTelefono(telefono, out error))
         {
             errores = true;
-            txtTelefono.MostrarError("Ingrese un telefono");
+            txtTelefono.MostrarError(error);
         }
 
         string email = txtEmail.Value.Trim();
-        var emailPattern = @"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$";
-        if (string.IsNullOrEmpty(email))
+        if (!Cliente.ValidarEmail(email, out error))
         {
             errores = true;
-            txtEmail.MostrarError("Ingrese un email");
-        }
-        else if (email.Length > 50)
-        {
-            errores = true;
-            txtEmail.MostrarError("Ingrese un email menor a cincuenta caracteres");
-        }
-        else if (!Regex.IsMatch(email, emailPattern))
-        {
-            errores = true;
-            txtEmail.MostrarError("Email con formato invalido");
+            txtEmail.MostrarError(error);
         }
 
         if (errores)
             return;
 
-        //lblId.Visible siempre que se entra para insertar
-        //esta en false
-        if (lblId.Visible == false)
+        int dni = int.Parse(txtDni.Value.Trim());
+
+        if (Insertar)
         {
             ClienteDAO.Insertar(nombre, apellido, dni, telefono, email);
         }

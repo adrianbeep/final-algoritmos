@@ -55,6 +55,7 @@
             // 
             // btnGuardar
             // 
+            btnGuardar.Anchor = AnchorStyles.Bottom;
             btnGuardar.Location = new Point(21, 367);
             btnGuardar.Name = "btnGuardar";
             btnGuardar.Size = new Size(160, 45);
@@ -65,6 +66,7 @@
             // 
             // btnCancelar
             // 
+            btnCancelar.Anchor = AnchorStyles.Bottom;
             btnCancelar.Location = new Point(255, 367);
             btnCancelar.Name = "btnCancelar";
             btnCancelar.Size = new Size(160, 45);

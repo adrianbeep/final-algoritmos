@@ -94,7 +94,7 @@ public class Cliente
 
         if (telefono.Length > 30)
         {
-            mensajeError = "Ingrese un telefono mayor a 30 caracteres.";
+            mensajeError = "Ingrese un telefono menor a 30 caracteres.";
             return false;
         }
 
@@ -104,13 +104,6 @@ public class Cliente
 
     public static bool ValidarEmail(string email, out string? mensajeError)
     {
-        var emailPattern = @"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$";
-        if (!Regex.IsMatch(email, emailPattern))
-        {
-            mensajeError = "Formato de email invalido.";
-            return false;
-        }
-
         if (string.IsNullOrEmpty(email))
         {
             mensajeError = "Ingrese un email.";
@@ -120,6 +113,13 @@ public class Cliente
         if (email.Length > 50)
         {
             mensajeError = "Ingrese un email menor a 50 caracteres.";
+            return false;
+        }
+
+        var emailPattern = @"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$";
+        if (!Regex.IsMatch(email, emailPattern))
+        {
+            mensajeError = "Formato de email invalido.";
             return false;
         }
 

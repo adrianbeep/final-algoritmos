@@ -89,7 +89,7 @@ DELIMITER //
 CREATE PROCEDURE sp_alta_recurso(
 	in p_id_tipo_recurso int,
     in p_nombre varchar(100),
-    in p_estado enum('Disponible', 'En Mantenimiento', 'Inhabilitado'),
+    in p_estado enum('Disponible', 'EnMantenimiento', 'Inhabilitado'),
     in p_ubicacion varchar(100),
     in p_costo decimal(10,2),
     in p_precio_dia decimal(10,2),
@@ -150,7 +150,7 @@ END //
 CREATE PROCEDURE sp_modificar_recurso(
 	in p_id_recurso int,
     in p_nombre varchar(100),
-    in p_estado enum('Disponible', 'En Mantenimiento', 'Inhabilitado'),
+    in p_estado enum('Disponible', 'EnMantenimiento', 'Inhabilitado'),
     in p_ubicacion varchar(100),
     in p_costo decimal(10,2),
     in p_precio_dia decimal(10,2),

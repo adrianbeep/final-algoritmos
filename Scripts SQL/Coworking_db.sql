@@ -30,7 +30,7 @@ CREATE TABLE recursos(
 	id int auto_increment primary key,
     id_tipo_recurso int not null,
     nombre varchar(100) not null,
-    estado enum('Disponible', 'En Mantenimiento', 'Inhabilitado') default 'Disponible',
+    estado enum('Disponible', 'EnMantenimiento', 'Inhabilitado') default 'Disponible',
     ubicacion varchar(100) not null,
     costo decimal(10,2) not null check(costo > 0), -- Añadimos costo para poder hacer el calculo del precio dia diferenciado por tipo_recurso en C#
     precio_dia decimal(10,2) not null check(precio_dia > 0),
@@ -100,21 +100,21 @@ INSERT INTO tipo_recursos (nombre_tipo_recurso, descripcion) VALUES
 ('OficinaPrivada', 'Oficinas privadas cerradas para equipos pequenos');
 
 /* Recursos: Salas (tipo_recurso = 1) */
-INSERT INTO recursos (id_tipo_recurso, nombre, estado, ubicacion, precio_dia) VALUES
-(1, 'Sala A', 'Disponible', 'Planta baja', 5000.00),
-(1, 'Sala B', 'Disponible', 'Planta baja', 4500.00),
-(1, 'Sala C', 'En Mantenimiento', 'Primer piso', 5500.00);
+INSERT INTO recursos (id_tipo_recurso, nombre, estado, ubicacion, costo, precio_dia) VALUES
+(1, 'Sala A', 'Disponible', 'Planta baja', 4000.00, 5000.00),
+(1, 'Sala B', 'Disponible', 'Planta baja', 4500.00, 4500.00),
+(1, 'Sala C', 'EnMantenimiento', 'Primer piso', 4400.00, 5500.00);
 
 /* Recursos: Puestos de trabajo (tipo_recurso = 2) */
-INSERT INTO recursos (id_tipo_recurso, nombre, estado, ubicacion, precio_dia) VALUES
-(2, 'Puesto 1', 'Disponible', 'Coworking principal', 1500.00),
-(2, 'Puesto 2', 'Disponible', 'Coworking principal', 1500.00),
-(2, 'Puesto 3', 'Disponible', 'Area silenciosa', 1800.00);
+INSERT INTO recursos (id_tipo_recurso, nombre, estado, ubicacion, costo, precio_dia) VALUES
+(2, 'Puesto 1', 'Disponible', 'Coworking principal', 1500.00, 1500.00),
+(2, 'Puesto 2', 'Disponible', 'Coworking principal', 1363.64, 1500.00),
+(2, 'Puesto 3', 'Disponible', 'Area silenciosa', 1800.00, 1800.00);
 
 /* Recursos: Oficinas privadas (tipo_recurso = 3) */
-INSERT INTO recursos (id_tipo_recurso, nombre, estado, ubicacion, precio_dia) VALUES
-(3, 'Oficina 101', 'Disponible', 'Segundo piso', 12000.00),
-(3, 'Oficina 102', 'Inhabilitado', 'Segundo piso', 15000.00);
+INSERT INTO recursos (id_tipo_recurso, nombre, estado, ubicacion, costo, precio_dia) VALUES
+(3, 'Oficina 101', 'Disponible', 'Segundo piso', 10000.00, 12000.00),
+(3, 'Oficina 102', 'Inhabilitado', 'Segundo piso', 12500.00, 15000.00);
 
 /* Detalle de Salas (recursos 1, 2, 3) */
 INSERT INTO recursos_detalle (id_recurso, capacidad_personas, tiene_proyector) VALUES

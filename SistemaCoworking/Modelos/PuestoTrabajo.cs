@@ -11,8 +11,8 @@ public class PuestoTrabajo : Recurso
 
     public int NumeroMonitor { get; set; }
 
-    public PuestoTrabajo(int id, int idTipoRecurso, string nombre, string ubicacion,decimal costo, decimal precioDia, int numeroMonitor)
-        : base(id, idTipoRecurso, nombre, ubicacion, costo, precioDia)
+    public PuestoTrabajo(int id, int idTipoRecurso, string nombre, string ubicacion,decimal costo, decimal precioDia, int numeroMonitor, EstadoRecurso estado)
+        : base(id, idTipoRecurso, nombre, ubicacion, costo, precioDia, estado)
     {
         NumeroMonitor = numeroMonitor;
     }

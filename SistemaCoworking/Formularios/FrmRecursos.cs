@@ -1,4 +1,6 @@
-﻿using System;
+﻿using SistemaCoworking.Datos;
+using SistemaCoworking.Herramientas;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -10,8 +12,30 @@ namespace SistemaCoworking.Formularios;
 
 public partial class FrmRecursos : Form
 {
-    public FrmRecursos()
+    private RecursoDAO _recursoDAO = new RecursoDAO();
+    private readonly Form _modalOverlay;
+
+    public FrmRecursos(Form? modalOverlay = null)
     {
         InitializeComponent();
+        _modalOverlay = modalOverlay ?? new Form { Opacity = 0 };
+
+        DataGridViewConfiguration.ConfigDGV(dgvRecursos);
+        CargarDataGridViewRecursos(dgvRecursos);
+    }
+
+    private void CargarDataGridViewRecursos(DataGridView dgv)
+    {
+        try
+        {
+            dgv.DataSource = null;
+            dgv.DataSource = _recursoDAO.ObtenerTodos();
+            dgv.ClearSelection();
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show("Error al cargar recursos: " + ex.Message,
+                            "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
     }
 }

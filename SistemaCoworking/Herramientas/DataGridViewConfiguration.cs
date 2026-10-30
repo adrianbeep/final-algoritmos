@@ -30,6 +30,7 @@ public static class DataGridViewConfiguration
         dgv.AllowUserToResizeRows = false;
         dgv.AllowUserToResizeColumns = false;
         dgv.AutoGenerateColumns = false;
+        dgv.AllowUserToAddRows = false;
 
         // Headers
         dgv.EnableHeadersVisualStyles = false;

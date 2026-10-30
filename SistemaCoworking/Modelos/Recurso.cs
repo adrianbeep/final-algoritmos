@@ -15,15 +15,15 @@ public abstract class Recurso : IReservable
     public enum EstadoRecurso
     {
         Disponible,
-        Ocupado,
-        Mantenimiento
+        EnMantenimiento,
+        Inhabilitado
     }
     public EstadoRecurso Estado { get; set; }
     public decimal Costo { get; set; }
     public decimal PrecioDia { get; set; }
 
 
-    public Recurso(int  id, int idTipoRecurso, string nombre, string ubicacion, decimal costo, decimal precioDia)
+    public Recurso(int  id, int idTipoRecurso, string nombre, string ubicacion, decimal costo, decimal precioDia, EstadoRecurso estado)
     {
         Id = id;
         IdTipoRecurso = idTipoRecurso;
@@ -31,7 +31,7 @@ public abstract class Recurso : IReservable
         Ubicacion = ubicacion;
         Costo = costo;
         PrecioDia = precioDia;
-        Estado = EstadoRecurso.Disponible;
+        Estado = estado;
     }
 
     /// <summary>

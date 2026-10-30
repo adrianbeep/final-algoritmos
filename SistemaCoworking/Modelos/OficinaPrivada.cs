@@ -12,8 +12,8 @@ public class OficinaPrivada : Recurso
 
     public decimal MetrosCuadrados { get; set; }
 
-    public OficinaPrivada(int id, int idTipoRecurso, string nombre, string ubicacion,decimal costo, decimal precioDia, decimal metrosCuadrados)
-        : base(id, idTipoRecurso, nombre, ubicacion,costo , precioDia)
+    public OficinaPrivada(int id, int idTipoRecurso, string nombre, string ubicacion,decimal costo, decimal precioDia, decimal metrosCuadrados, EstadoRecurso estado)
+        : base(id, idTipoRecurso, nombre, ubicacion,costo , precioDia, estado)
     {
         MetrosCuadrados = metrosCuadrados;
     }

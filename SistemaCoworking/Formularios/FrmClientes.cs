@@ -58,37 +58,50 @@ public partial class FrmClientes : Form
         if (col is not DataGridViewButtonColumn) return;
 
         DataGridViewRow fila = dgvClientes.Rows[e.RowIndex];
-        Cliente c =
+        Cliente? c =
             _clienteDAO.ObtenerPorId(
                 Convert.ToInt32(fila.Cells["colId"].Value)
             );
 
+        if (c is null)
+        {
+            MessageBox.Show("No se encontro el cliente.",
+                            "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            return;
+        }
+
         AbrirModalUsuario(c);
     }
 
-    //Edicion
-    private void AbrirModalUsuario(Cliente c)
+    //Sin cliente es alta, con cliente es edicion
+    private void AbrirModalUsuario(Cliente? cliente = null)
     {
-        ClienteModalControl modal = new ClienteModalControl(c, _clienteDAO);
-        modal.Closed += (s, args) =>
-        {
-            ModalOverlay.Close(_modalOverlay);
-            if (modal.Guardado)
-                CargarDataGridViewClientes(dgvClientes); // refrescar solo si guardó
-        };
-        ModalOverlay.Show(_modalOverlay, modal);
-    }
+        ClienteModalControl modal = new ClienteModalControl(cliente);
 
-    //Insercion
-    private void AbrirModalUsuario()
-    {
-        ClienteModalControl modal = new ClienteModalControl(_clienteDAO);
         modal.Closed += (s, args) =>
         {
             ModalOverlay.Close(_modalOverlay);
-            if (modal.Guardado)
-                CargarDataGridViewClientes(dgvClientes); // refrescar solo si guardó
         };
+
+        modal.Aceptado += (s, c) =>
+        {
+            if (modal.EsNuevo)
+            {
+                _clienteDAO.Insertar(
+                    c.Nombre,
+                    c.Apellido,
+                    c.Dni,
+                    c.Telefono,
+                    c.Email);
+            }
+            else
+            {
+                _clienteDAO.Modificar(c);
+            }
+
+            CargarDataGridViewClientes(dgvClientes); // refrescar la grilla
+        };
+
         ModalOverlay.Show(_modalOverlay, modal);
     }
 

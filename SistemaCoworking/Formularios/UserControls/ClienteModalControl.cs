@@ -1,4 +1,3 @@
-using SistemaCoworking.Datos;
 using SistemaCoworking.Herramientas;
 using SistemaCoworking.Modelos;
 using System;
@@ -12,50 +11,42 @@ namespace SistemaCoworking.Formularios.UserControls;
 public partial class ClienteModalControl : UserControl
 {
     public event EventHandler? Closed;
-    public bool Guardado { get; private set; } = false;
-    private bool Insertar { get; set; } = true;
 
-    private ClienteDAO ClienteDAO;
+    //El modal entrega el cliente y el form decide si lo inserta o lo modifica
+    public event EventHandler<Cliente>? Aceptado;
 
-    //Constructor para Edicion
-    public ClienteModalControl(Cliente cliente, ClienteDAO clienteDAO)
+    //Si es null el modal es de alta, si no es de edicion
+    private readonly Cliente? _cliente;
+
+    public bool EsNuevo => _cliente is null;
+
+    //Con cliente es edicion, sin cliente es alta
+    public ClienteModalControl(Cliente? cliente = null)
     {
         InitializeComponent();
         AplicarEstiloCard();
         ConfigurarTxt();
 
-        Insertar = false;
-
-        lblCrear.Text = "Editar";
-        Label1.BackColor = Color.Transparent;
-        Label1.ForeColor = Color.FromArgb(80, 80, 80);
-        Label1.Font = new Font("Segoe UI", 9F);
-
         ButtonConfiguration.ConfigPrimary(btnGuardar);
         ButtonConfiguration.ConfigSecondary(btnCancelar);
 
-        ClienteDAO = clienteDAO;
+        _cliente = cliente;
 
-        CargarCliente(cliente);
-    }
+        if (cliente is null)
+        {
+            lblCrear.Text = "Crear";
+            Label1.Visible = false;
+            lblId.Visible = false;
+        }
+        else
+        {
+            lblCrear.Text = "Editar";
+            Label1.BackColor = Color.Transparent;
+            Label1.ForeColor = Color.FromArgb(80, 80, 80);
+            Label1.Font = new Font("Segoe UI", 9F);
 
-    //Constructor para Insercion
-    public ClienteModalControl(ClienteDAO clienteDAO)
-    {
-        InitializeComponent();
-        AplicarEstiloCard();
-        ConfigurarTxt();
-
-        Insertar = true;
-
-        lblCrear.Text = "Crear";
-        Label1.Visible = false;
-        lblId.Visible = false;
-
-        ClienteDAO = clienteDAO;
-
-        ButtonConfiguration.ConfigPrimary(btnGuardar);
-        ButtonConfiguration.ConfigSecondary(btnCancelar);
+            CargarCliente(cliente);
+        }
     }
 
     private void AplicarEstiloCard()
@@ -158,25 +149,17 @@ public partial class ClienteModalControl : UserControl
 
         int dni = int.Parse(txtDni.Value.Trim());
 
-        if (Insertar)
-        {
-            ClienteDAO.Insertar(nombre, apellido, dni, telefono, email);
-        }
-        else
-        {
-            Cliente c = 
-                new Cliente(int.Parse(lblId.Text), nombre, apellido, dni, telefono, email);
-            
-            ClienteDAO.Modificar(c);
-        }
+        //El id 0 es el de un cliente que todavia no esta persistido
+        int id = _cliente?.Id ?? 0;
 
-        Guardado = true;
+        Cliente cliente = new Cliente(id, nombre, apellido, dni, telefono, email);
+
+        Aceptado?.Invoke(this, cliente);
         Closed?.Invoke(this, EventArgs.Empty);
     }
 
     private void btnCancelar_Click(object sender, EventArgs e)
     {
-        Guardado = false;
         Closed?.Invoke(this, EventArgs.Empty);
     }
 
@@ -191,7 +174,6 @@ public partial class ClienteModalControl : UserControl
 
     private void pBoxCerrar_Click(object sender, EventArgs e)
     {
-        Guardado = false;
         Closed?.Invoke(this, EventArgs.Empty);
     }
 }

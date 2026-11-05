@@ -21,9 +21,17 @@ CREATE TABLE clientes(
 DROP TABLE IF EXISTS tipo_recursos;
 CREATE TABLE tipo_recursos(
 	id int auto_increment primary key,
-    nombre_tipo_recurso varchar(100) not null,
+    -- UNIQUE: nombre_tipo_recurso es un contrato de codigo (lo comparan los
+    -- procedimientos almacenados y RecursoFactory), asi que la base no puede
+    -- dejar dos filas con el mismo tipo de recurso.
+    nombre_tipo_recurso varchar(100) not null unique,
     descripcion text
 );
+
+/*
+	Si la base ya existe y no queres recrearla, el UNIQUE se agrega con:
+	ALTER TABLE tipo_recursos ADD CONSTRAINT uq_tipo_recursos_nombre UNIQUE (nombre_tipo_recurso);
+*/
 
 DROP TABLE IF EXISTS recursos;
 CREATE TABLE recursos(

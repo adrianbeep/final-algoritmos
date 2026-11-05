@@ -15,7 +15,7 @@ erDiagram
 
     tipo_recursos {
         int id PK
-        varchar nombre_tipo_recurso
+        varchar nombre_tipo_recurso UK
         text descripcion
     }
 

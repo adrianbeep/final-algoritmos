@@ -26,9 +26,9 @@ El sistema impide situaciones inconsistentes como reservar un recurso inexistent
 |---|---|
 | C# | Lenguaje principal |
 | Windows Forms | Framework de interfaz gráfica |
-| .NET 8.0 | Runtime |
+| .NET 10.0 | Runtime |
 | MySQL | Base de datos relacional |
-| Visual Studio 2022 | IDE de desarrollo |
+| Visual Studio 2026 | IDE de desarrollo |
 | MySql.Data | Conector de base de datos |
 | Git + GitHub | Control de versiones |
 | GitHub Projects | Tablero Kanban de seguimiento |
@@ -38,7 +38,7 @@ El sistema impide situaciones inconsistentes como reservar un recurso inexistent
 ## Desarrolladores
 
 - **Adrian Naum**
-- **Valentina Lesspade**
+- **Valentina Lespade**
 - **Santiago Castillo**
 
 **Docente a cargo:** Prof. Lic. Adrián Aroca
@@ -76,7 +76,7 @@ final-algoritmos/
 ├── Scripts SQL/                    Scripts de base de datos
 │   └── Coworking_db.sql
 └── SistemaCoworking/               Proyecto C# (Windows Forms)
-    └── [archivos del .sln y el proyecto]
+    └── [archivos del .slnx y el proyecto]
 ```
 
 ---
@@ -85,11 +85,13 @@ final-algoritmos/
 
 ### Requisitos previos
 
-- .NET 8.0 SDK
+- .NET 10.0 SDK
 - MySQL Server 8.0 o superior
-- Visual Studio 2022 con workload ".NET desktop development"
+- Visual Studio 2026 con workload ".NET desktop development"
 - MySQL Workbench
 - Git
+
+> **Nota:** el proyecto apunta a `net10.0-windows` y la solution es un `.slnx`, el formato que genera Visual Studio 2026. Visual Studio 2022 no abre un `.slnx` ni compila contra .NET 10. Si tenés VS 2022, actualizá a VS 2026, o compilé con el SDK de .NET 10 desde la terminal: `dotnet build SistemaCoworking/SistemaCoworking.csproj`.
 
 ### Clonar el repositorio
 
@@ -106,8 +108,8 @@ cd final-algoritmos
 
 ### Abrir el proyecto
 
-1. Abrir Visual Studio 2022
-2. Abrir la solución: `SistemaCoworking/SistemaCoworking.sln`
+1. Abrir Visual Studio 2026
+2. Abrir la solución: `SistemaCoworking/SistemaCoworking.slnx`
 3. Compilar la solución (`Ctrl + Shift + B`)
 4. Ejecutar con `F5`
 

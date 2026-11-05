@@ -16,6 +16,7 @@ Este archivo es documentación técnica del proyecto: sirve para la entrega, par
 | D-002 | [Extender `recursos` con una tabla de detalle 1:1](#d-002--los-atributos-especificos-de-cada-tipo-viven-en-una-tabla-de-extensión-11-recursos_detalle) | 17/10/2026 | Aceptada |
 | D-003 | [El precio diario es un valor derivado, no un dato guardado](#d-003--el-precio-diario-es-un-valor-derivado-no-un-dato-guardado) | 04/11/2026 | Aceptada |
 | D-004 | [`tipo_recursos` es un catálogo fijo, de solo lectura](#d-004--tipo_recursos-es-un-catálogo-fijo-de-solo-lectura-desde-la-aplicación) | 17/10/2026 | Aceptada |
+| D-005 | [La fábrica de recursos vive en el dominio](#d-005--la-fábrica-de-recursos-vive-en-el-dominio-no-en-la-capa-de-datos) | 04/11/2026 | Aceptada |
 
 ---
 
@@ -261,3 +262,69 @@ La cátedra tampoco exige CRUD sobre tipos: el ROADMAP lo deja asentado de forma
 - `SistemaCoworking/Modelos/TipoRecurso.cs`
 - `Scripts SQL/Procedimientos_Almacenados.sql` — validación por tipo en `sp_alta_recurso` y `sp_modificar_recurso`
 - `.github/ROADMAP.md` — nota de que `tipo_recursos` no tiene procedimientos almacenados
+
+---
+
+## D-005 — La fábrica de recursos vive en el dominio, no en la capa de datos
+
+**Fecha:** 04/11/2026
+**Estado:** Aceptada
+**Ámbito:** Modelo de dominio + capa de datos
+
+### Contexto
+
+Hay **dos caminos** para obtener un `Recurso` concreto, y los dos toman exactamente la misma decisión: *qué clase corresponde a qué tipo*.
+
+| Camino | Origen | Destino |
+|---|---|---|
+| Desde la base | el DAO lee una fila | `Sala`, `PuestoTrabajo` u `OficinaPrivada` |
+| Desde el formulario | el `RecursoModalControl` toma lo que tipeó el usuario | las mismas tres clases |
+
+Ese conocimiento tiene que estar en **un solo lugar**. Si está duplicado, un cuarto tipo obliga a tocar los dos, y es cuestión de tiempo que uno se olvide.
+
+La pregunta es **dónde** vive ese lugar. La primera implementación lo puso en `RecursoDAO.Construir`, con un `switch` sobre `nombre_tipo_recurso`. Eso dejaba la fábrica **en la capa de datos**, y el segundo camino se quedaba sin acceso: el modal no podía usarla sin depender del DAO, que es justo lo que la decisión ya tomada para Clientes evita —*"el modal de clientes no depende del DAO"*.
+
+El síntoma es concreto: **el `Recurso` que entrega el modal no tenía origen**. El formulario de Recursos no podía armar el objeto sin escribir su propio `switch`, es decir, duplicando el conocimiento en la capa de interfaz, que es el peor lugar posible para que viva.
+
+### Decisión
+
+**La fábrica vive en el dominio**, en `SistemaCoworking/Modelos/RecursoFactory.cs`, como clase estática con un único método `Crear(...)`:
+
+- Recibe el nombre del tipo, los **datos comunes** (id, idTipoRecurso, nombre, ubicación, costo, estado) y los **datos específicos del tipo como opcionales** (`capacidadPersonas`, `tieneProyector`, `numeroMonitor`, `metrosCuadrados`).
+- **Es el único lugar del sistema que sabe qué tipo se construye con qué clase.**
+- **Valida el dato obligatorio del tipo** al construir: si el tipo es `Sala` y no viene `capacidadPersonas`, lanza `InvalidOperationException` con un mensaje claro. Si el tipo no existe, también lanza.
+- **No conoce la regla de precio**: esa vive en `CalcularPrecio()`, que es polimorfismo del modelo (D-003). La fábrica solo decide **qué clase** se construye.
+- `RecursoDAO` dejó de instanciar clases concretas: ahora llama a `RecursoFactory.Crear(...)`.
+- En toda la cadena se respeta la diferencia entre **"no aplica"** (null) y **"vale cero"**: los helpers de lectura del DAO devuelven `null` en vez de `0` cuando la columna viene en NULL, porque la fábrica necesita distinguir las dos cosas.
+
+### Alternativas descartadas
+
+- **Dejar la fábrica dentro del DAO.** Se descartó porque rompe la simetría de la arquitectura: el formulario queda obligado a depender de la capa de datos para construir un objeto de dominio, que es exactamente lo que el modal de Clientes evita. Y habilita el camino peor —un `switch` propio en el modal— que duplica el conocimiento.
+- **Método estático de fábrica sobre la clase abstracta `Recurso`** (`Recurso.Crear(...)`). Se descartó porque mezcla la construcción con la clase que describe el comportamiento: `Recurso` quedaría con la responsabilidad de saber instanciar sus propias subclases. Es una alternativa válida, pero la clase aparte deja el propósito explícito y el archivo se lee solo.
+- **Que cada clase concreta se construya a sí misma**, con un registro de factories por tipo. Se descartó por complejidad desproporcionada para tres tipos fijos: un diccionario agrega indirección y un punto de falla más (registrar el factory) a cambio de nada.
+- **Que el modal arme la clase concreta con su propio `switch`.** Se descartó: duplicaría el conocimiento de "qué tipo es qué clase" en la capa de interfaz.
+
+### Consecuencias
+
+**A favor:**
+
+- Los dos caminos de creación usan la **misma** fábrica: un cuarto tipo se agrega en un solo lugar.
+- La capa de datos **no instancia** clases concretas. `RecursoDAO` dejó de hacer `new Sala(...)`, `new PuestoTrabajo(...)` y `new OficinaPrivada(...)`.
+- El modal de Recursos puede armar el `Recurso` **sin tocar la capa de datos**.
+- La invariante "una `Sala` siempre tiene capacidad" se verifica **al construir el objeto**, no recién cuando se escribe en la base.
+- La regla de precio sigue en un solo lugar: `CalcularPrecio()`.
+
+**En contra (y cómo se mitiga):**
+
+- **La fábrica recibe once parámetros**, de los cuales cuatro son opcionales. Es el precio de que los datos específicos de cada tipo no compartan forma. Se acepta: los tipos son fijos y el conjunto de datos es estable.
+- **El despacho sigue siendo sobre el string del tipo.** `RecursoFactory.Crear("Sala", ...)` depende de que el string coincida exactamente: un error de tipeo se detecta en runtime, con `InvalidOperationException`, no al compilar. Despachar por `id` no es mejor —los ids son mágicos y el nombre es el que se muestra y se documenta.
+- **Queda un acoplamiento residual del DAO con las clases concretas.** `Insertar` y `Modificar` tienen que extraer del objeto los datos específicos del tipo para mandarlos al procedimiento almacenado, y lo hacen con un `switch` sobre el tipo concreto. Es un acoplamiento de otro nivel que el de la fábrica: la capa de datos mapea el objeto a los parámetros de un SP cuya firma la define la estructura de la tabla, que ya replica la jerarquía de tipos (D-002).
+  - Mejora posible: que cada clase exponga sus datos específicos en una forma común y el DAO no tenga que conocer las clases concretas. Queda pendiente de decidir.
+- **La validación del dato obligatorio del tipo vive en tres capas**: la UI (mensaje al usuario), la fábrica (al construir el objeto) y el procedimiento almacenado (al escribir, con `SIGNAL SQLSTATE '45000'`). No es duplicación: cada capa protege su frontera, y las tres son exigidas por el diseño en capas que el proyecto ya manifiesta.
+
+### Referencias
+
+- `SistemaCoworking/Modelos/RecursoFactory.cs` — la fábrica
+- `SistemaCoworking/Datos/RecursoDAO.cs` — la capa de datos la usa y ya no crea clases concretas
+- `SistemaCoworking/Formularios/UserControls/RecursoModalControl.cs` — el formulario la usa para armar el recurso
+- `SistemaCoworking/Modelos/Recurso.cs`, `Sala.cs`, `PuestoTrabajo.cs`, `OficinaPrivada.cs` — la jerarquía y la regla de precio

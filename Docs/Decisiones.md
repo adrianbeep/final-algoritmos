@@ -252,8 +252,7 @@ La cátedra tampoco exige CRUD sobre tipos: el ROADMAP lo deja asentado de forma
 **En contra (y cómo se mitiga):**
 
 - **Agregar un tipo nuevo no es una operación de datos, es un cambio de diseño**: nueva clase derivada, columnas nuevas en `recursos_detalle`, una rama más en `RecursoFactory.Crear` y las validaciones del SP. Es el costo directo de que el tipo sea comportamiento.
-- **El `nombre_tipo_recurso` es un contrato de código, no una restricción de la base.** El schema declara `nombre_tipo_recurso varchar(100) not null` pero **sin `UNIQUE`**, y ese nombre se compara en los procedimientos almacenados (`IF v_tipo = 'Sala'`) y en `RecursoFactory.Crear`. Si el seed llegara a tener dos filas con `Sala`, la fábrica tomaría la primera sin avisar y el SP validaría mal.
-  - Mejora pendiente: agregar `UNIQUE` sobre `tipo_recursos.nombre_tipo_recurso`.
+- **El `nombre_tipo_recurso` es un contrato de código, y la base lo restringe.** Ese nombre se compara en los procedimientos almacenados (`IF v_tipo = 'Sala'`) y en `RecursoFactory.Crear`, así que la tabla declara `nombre_tipo_recurso varchar(100) not null unique`: la base no puede dejar dos filas con el mismo tipo. Con esa restricción, un seed duplicado hace fallar el `INSERT` en vez de dejar que la fábrica tome la primera fila sin avisar y el SP valide mal.
 - **El despacho por tipo es sobre string.** `RecursoFactory.Crear` compara contra `Sala`, `PuestoTrabajo` y `OficinaPrivada`, y el `default` lanza `InvalidOperationException`. Un error de tipeo en el seed no se detecta al compilar, sino en runtime.
 
 ### Referencias

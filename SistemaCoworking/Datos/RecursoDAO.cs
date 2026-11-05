@@ -64,14 +64,14 @@ public class RecursoDAO
                 {
                     if (lector.Read())
                     {
-                        r = Construir(
+                        r = RecursoFactory.Crear(
                             Convert.ToString(lector["nombre_tipo_recurso"])!,
                             Convert.ToInt32(lector["id"]),
                             Convert.ToInt32(lector["id_tipo_recurso"]),
                             Convert.ToString(lector["nombre"])!,
-                            Enum.Parse<Recurso.EstadoRecurso>(Convert.ToString(lector["estado"])!),
                             Convert.ToString(lector["ubicacion"])!,
                             Convert.ToDecimal(lector["costo"]),
+                            Enum.Parse<Recurso.EstadoRecurso>(Convert.ToString(lector["estado"])!),
                             LeerInt(lector["capacidad_personas"]),
                             LeerBool(lector["tiene_proyector"]),
                             LeerInt(lector["numero_monitor"]),
@@ -271,32 +271,12 @@ public class RecursoDAO
         }
     }
 
-    private static Recurso Construir(
-        string tipoRecurso,
-        int id, 
-        int idTipoRecurso, 
-        string nombre, 
-        Recurso.EstadoRecurso estado,
-        string ubicacion,
-        decimal costo,
-        int capacidadPersonas,
-        bool tieneProyector,
-        int numeroMonitor,
-        decimal metrosCuadrados
-    )
-    {
-        switch (tipoRecurso)
-        {
-            case "Sala":            return new Sala(id, idTipoRecurso, nombre, ubicacion, costo, capacidadPersonas, tieneProyector, estado);
-            case "PuestoTrabajo":   return new PuestoTrabajo(id, idTipoRecurso, nombre, ubicacion, costo, numeroMonitor, estado);
-            case "OficinaPrivada":  return new OficinaPrivada(id, idTipoRecurso, nombre, ubicacion, costo, metrosCuadrados, estado);
-            default: throw new InvalidOperationException($"Tipo de recurso desconocido: '{tipoRecurso}'");
-        }
-    }
+    // Los datos especificos del tipo llegan como null cuando la columna no
+    // aplica a ese tipo. No se convierten a 0: la fabrica necesita distinguir
+    // "no aplica" de "vale cero".
+    private static int? LeerInt(object valor) => valor is DBNull ? null : Convert.ToInt32(valor);
 
-    private static int LeerInt(object valor) => valor is DBNull ? 0 : Convert.ToInt32(valor);
+    private static bool? LeerBool(object valor) => valor is DBNull ? null : Convert.ToBoolean(valor);
 
-    private static bool LeerBool(object valor) => valor is DBNull ? false : Convert.ToBoolean(valor);
-
-    private static decimal LeerDecimal(object valor) => valor is DBNull ? 0m : Convert.ToDecimal(valor);
+    private static decimal? LeerDecimal(object valor) => valor is DBNull ? null : Convert.ToDecimal(valor);
 }

@@ -11,6 +11,12 @@ public class PuestoTrabajo : Recurso
 
     public int NumeroMonitor { get; set; }
 
+    /// <summary>
+    /// Datos especificos del puesto de trabajo. Los de los otros tipos van en null.
+    /// </summary>
+    public override DetalleTipo Detalle =>
+        new DetalleTipo(numeroMonitor: NumeroMonitor);
+
     public PuestoTrabajo(int id, int idTipoRecurso, string nombre, string ubicacion, decimal costo, int numeroMonitor, EstadoRecurso estado)
         : base(id, idTipoRecurso, nombre, ubicacion, costo, estado)
     {

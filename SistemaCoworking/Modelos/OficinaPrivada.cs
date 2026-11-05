@@ -12,6 +12,35 @@ public class OficinaPrivada : Recurso
 
     public decimal MetrosCuadrados { get; set; }
 
+    /// <summary>
+    /// Datos especificos de la oficina privada. Los de los otros tipos van en null.
+    /// </summary>
+    public override DetalleTipo Detalle =>
+        new DetalleTipo(metrosCuadrados: MetrosCuadrados);
+
+    /// <summary>
+    /// Valida los metros cuadrados. La columna metros_cuadrados de la base es
+    /// entera, asi que un valor con decimales no se puede guardar sin perder
+    /// precision: se rechaza en vez de truncar en silencio.
+    /// </summary>
+    public static bool ValidarMetrosCuadrados(decimal metros, out string? mensajeError)
+    {
+        if (metros <= 0)
+        {
+            mensajeError = "Ingrese los metros cuadrados.";
+            return false;
+        }
+
+        if (metros != decimal.Truncate(metros))
+        {
+            mensajeError = "Los metros cuadrados deben ser un numero entero.";
+            return false;
+        }
+
+        mensajeError = null;
+        return true;
+    }
+
     public OficinaPrivada(int id, int idTipoRecurso, string nombre, string ubicacion, decimal costo, decimal metrosCuadrados, EstadoRecurso estado)
         : base(id, idTipoRecurso, nombre, ubicacion, costo, estado)
     {

@@ -89,27 +89,6 @@ public class RecursoDAO
 
     public void Insertar(Recurso recurso)
     {
-        object capacidadPersonas = DBNull.Value;
-        object tieneProyector = DBNull.Value;
-        object numeroMonitor = DBNull.Value;
-        object metrosCuadrados = DBNull.Value;
-
-        switch (recurso)
-        {
-            case Sala sala:
-                capacidadPersonas = sala.CapacidadPersonas;
-                tieneProyector = sala.TieneProyector;
-                break;
-
-            case PuestoTrabajo puestoTrabajo:
-                numeroMonitor = puestoTrabajo.NumeroMonitor;
-                break;
-
-            case OficinaPrivada oficinaPrivada:
-                metrosCuadrados = Convert.ToInt32(oficinaPrivada.MetrosCuadrados);
-                break;
-        }
-
         using (MySqlConnection conexion =
             ConexionBD.CrearConexion())
         {
@@ -155,25 +134,7 @@ public class RecursoDAO
                     recurso.CalcularPrecio()
                 );
 
-                comando.Parameters.AddWithValue(
-                    "p_capacidad_personas",
-                    capacidadPersonas
-                );
-
-                comando.Parameters.AddWithValue(
-                    "p_tiene_proyector",
-                    tieneProyector
-                );
-
-                comando.Parameters.AddWithValue(
-                    "p_numero_monitor",
-                    numeroMonitor
-                );
-
-                comando.Parameters.AddWithValue(
-                    "p_metros_cuadrados",
-                    metrosCuadrados
-                );
+                AgregarParametrosDetalle(comando, recurso.Detalle);
 
                 comando.ExecuteNonQuery();
             }
@@ -182,27 +143,6 @@ public class RecursoDAO
 
     public void Modificar(Recurso recurso)
     {
-        object capacidadPersonas = DBNull.Value;
-        object tieneProyector = DBNull.Value;
-        object numeroMonitor = DBNull.Value;
-        object metrosCuadrados = DBNull.Value;
-
-        switch (recurso)
-        {
-            case Sala sala:
-                capacidadPersonas = sala.CapacidadPersonas;
-                tieneProyector = sala.TieneProyector;
-                break;
-
-            case PuestoTrabajo puestoTrabajo:
-                numeroMonitor = puestoTrabajo.NumeroMonitor;
-                break;
-
-            case OficinaPrivada oficinaPrivada:
-                metrosCuadrados = Convert.ToInt32(oficinaPrivada.MetrosCuadrados);
-                break;
-        }
-
         using (MySqlConnection conexion =
             ConexionBD.CrearConexion())
         {
@@ -246,29 +186,46 @@ public class RecursoDAO
                     recurso.CalcularPrecio()
                 );
 
-                comando.Parameters.AddWithValue(
-                    "p_capacidad_personas",
-                    capacidadPersonas
-                );
-
-                comando.Parameters.AddWithValue(
-                    "p_tiene_proyector",
-                    tieneProyector
-                );
-
-                comando.Parameters.AddWithValue(
-                    "p_numero_monitor",
-                    numeroMonitor
-                );
-
-                comando.Parameters.AddWithValue(
-                    "p_metros_cuadrados",
-                    metrosCuadrados
-                );
+                AgregarParametrosDetalle(comando, recurso.Detalle);
 
                 comando.ExecuteNonQuery();
             }
         }
+    }
+
+    /// <summary>
+    /// Agrega los parametros del detalle del tipo. El DAO no sabe que clases
+    /// concretas existen: solo escribe lo que el recurso declara, y las
+    /// columnas que no aplican al tipo van en NULL.
+    /// </summary>
+    private static void AgregarParametrosDetalle(
+        MySqlCommand comando,
+        DetalleTipo detalle)
+    {
+        comando.Parameters.AddWithValue(
+            "p_capacidad_personas",
+            (object?)detalle.CapacidadPersonas ?? DBNull.Value
+        );
+
+        comando.Parameters.AddWithValue(
+            "p_tiene_proyector",
+            (object?)detalle.TieneProyector ?? DBNull.Value
+        );
+
+        comando.Parameters.AddWithValue(
+            "p_numero_monitor",
+            (object?)detalle.NumeroMonitor ?? DBNull.Value
+        );
+
+        // El dominio maneja los metros como decimal y la columna es entera.
+        // La conversion es de la capa de datos, y es exacta porque la fabrica
+        // no deja pasar valores con decimales.
+        comando.Parameters.AddWithValue(
+            "p_metros_cuadrados",
+            detalle.MetrosCuadrados.HasValue
+                ? Convert.ToInt32(detalle.MetrosCuadrados.Value)
+                : (object)DBNull.Value
+        );
     }
 
     // Los datos especificos del tipo llegan como null cuando la columna no

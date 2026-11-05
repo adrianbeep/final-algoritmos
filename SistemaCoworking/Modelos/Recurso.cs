@@ -29,6 +29,14 @@ public abstract class Recurso : IReservable
     /// </summary>
     public decimal PrecioDia => CalcularPrecio();
 
+    /// <summary>
+    /// Datos especificos del tipo, con la forma que espera la base. Por
+    /// defecto no hay datos especificos; cada clase derivada devuelve los
+    /// suyos. Es lo que permite que la capa de datos mande los parametros del
+    /// detalle al procedimiento almacenado sin conocer las clases concretas.
+    /// </summary>
+    public virtual DetalleTipo Detalle => new DetalleTipo();
+
 
     public Recurso(int  id, int idTipoRecurso, string nombre, string ubicacion, decimal costo, EstadoRecurso estado)
     {

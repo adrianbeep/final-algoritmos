@@ -73,6 +73,12 @@ public static class RecursoFactory
                         "Una OficinaPrivada requiere los metros cuadrados.");
                 }
 
+                if (metrosCuadrados.Value != decimal.Truncate(metrosCuadrados.Value))
+                {
+                    throw new InvalidOperationException(
+                        "Los metros cuadrados deben ser un numero entero: la columna metros_cuadrados es entera.");
+                }
+
                 return new OficinaPrivada(
                     id, idTipoRecurso, nombre, ubicacion, costo,
                     metrosCuadrados.Value, estado);

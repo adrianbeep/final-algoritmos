@@ -12,6 +12,14 @@ public class Sala : Recurso
     public int CapacidadPersonas { get; set; }
     public bool TieneProyector { get; set; }
 
+    /// <summary>
+    /// Datos especificos de la sala. Los de los otros tipos van en null.
+    /// </summary>
+    public override DetalleTipo Detalle =>
+        new DetalleTipo(
+            capacidadPersonas: CapacidadPersonas,
+            tieneProyector: TieneProyector);
+
     public Sala(int id, int idTipoRecurso, string nombre, string ubicacion, decimal costo, int capacidadPersonas, bool tieneProyector, EstadoRecurso estado)
         : base(id, idTipoRecurso, nombre, ubicacion, costo, estado)
     {

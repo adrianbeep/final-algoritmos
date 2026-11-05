@@ -17,6 +17,7 @@ Este archivo es documentación técnica del proyecto: sirve para la entrega, par
 | D-003 | [El precio diario es un valor derivado, no un dato guardado](#d-003--el-precio-diario-es-un-valor-derivado-no-un-dato-guardado) | 04/11/2026 | Aceptada |
 | D-004 | [`tipo_recursos` es un catálogo fijo, de solo lectura](#d-004--tipo_recursos-es-un-catálogo-fijo-de-solo-lectura-desde-la-aplicación) | 17/10/2026 | Aceptada |
 | D-005 | [La fábrica de recursos vive en el dominio](#d-005--la-fábrica-de-recursos-vive-en-el-dominio-no-en-la-capa-de-datos) | 04/11/2026 | Aceptada |
+| D-006 | [Cada recurso declara sus propios datos de tipo](#d-006--cada-recurso-declara-sus-propios-datos-de-tipo) | 04/11/2026 | Aceptada |
 
 ---
 
@@ -113,7 +114,7 @@ Los atributos comunes viven en `recursos`. Los atributos específicos de cada ti
 
 - **Todas las columnas de detalle dentro de `recursos`** (tabla única con columnas NULLable). Se descartó porque agrega un `ALTER TABLE` sobre la tabla más consultada del sistema cada vez que aparece un tipo nuevo, mezcla atributos comunes con específicos y multiplica los NULLs en todas las filas.
 - **Una tabla por tipo** (`salas`, `puestos_trabajo`, `oficinas_privadas`) con `recursos.id_tipo_recurso` como discriminador (*Table Per Type*). Se descartó porque obliga a que toda consulta que junta recurso con detalle sea un `LEFT JOIN` de tres tablas, y porque `reservas` y la validación de superposiciones pasarían a depender del discriminador. El modelo pedido por la cátedra se resuelve con una sola extensión.
-- **Guardar los atributos específicos en una columna JSON**. Se descartó porque no es consultable ni indexable, y porque elTP pide modelado relacional.
+- **Guardar los atributos específicos en una columna JSON**. Se descartó porque no es consultable ni indexable, y porque el TP pide modelado relacional.
 
 ### Consecuencias
 
@@ -121,7 +122,7 @@ Los atributos comunes viven en `recursos`. Los atributos específicos de cada ti
 
 - La jerarquía POO queda reflejada en la base: `Recurso` abstracta ↔ `recursos` + `recursos_detalle`.
 - La FK de `reservas` sigue apuntando a **una sola tabla**. Ni el control de superposiciones ni los listados necesitan saber el tipo del recurso.
-- Un único `JOIN` (`recursos + recursos_detalle + tipo_recursos`) devuelve el recurso completo, y es el que usa el DAO para reconstruir la jerarquía en C#.
+- Un único `JOIN` (`recursos + recursos_detalle + tipo_recursos`) devuelve el recurso completo, y es el que usa la capa de datos para reconstruir la jerarquía en C# (D-005).
 - Agregar un cuarto tipo es `INSERT` en `tipo_recursos` más columnas en `recursos_detalle`: **no toca `recursos`, ni `reservas`, ni el código de reservas**.
 
 **En contra (y cómo se mitiga):**
@@ -230,7 +231,7 @@ La cátedra tampoco exige CRUD sobre tipos: el ROADMAP lo deja asentado de forma
 - **No hay procedimientos almacenados para esta tabla**: ni alta, ni modificación, ni baja.
 - `TipoRecursoDAO` expone **una sola operación**, `ObtenerTodos()`, que sirve para cargar el ComboBox de tipo del formulario de Recursos.
 - La FK `recursos.id_tipo_recurso` conserva la integridad referencial: ningún recurso puede apuntar a un tipo inexistente.
-- `nombre_tipo_recurso` es el **contrato** que usan tanto los procedimientos almacenados (para validar los campos obligatorios del tipo) como el DAO (para reconstruir la jerarquía de clases).
+- `nombre_tipo_recurso` es el **contrato** que usan tanto los procedimientos almacenados (para validar los campos obligatorios del tipo) como `RecursoFactory` (para reconstruir la jerarquía de clases, D-005).
 
 ### Alternativas descartadas
 
@@ -250,10 +251,10 @@ La cátedra tampoco exige CRUD sobre tipos: el ROADMAP lo deja asentado de forma
 
 **En contra (y cómo se mitiga):**
 
-- **Agregar un tipo nuevo no es una operación de datos, es un cambio de diseño**: nueva clase derivada, columnas nuevas en `recursos_detalle`, una rama más en el `switch` del DAO y las validaciones del SP. Es el costo directo de que el tipo sea comportamiento.
-- **El `nombre_tipo_recurso` es un contrato de código, no una restricción de la base.** El schema declara `nombre_tipo_recurso varchar(100) not null` pero **sin `UNIQUE`**, y ese nombre se compara en los procedimientos almacenados (`IF v_tipo = 'Sala'`) y en el `switch` del DAO. Si el seed llegara a tener dos filas con `Sala`, el `switch` tomaría la primera sin avisar y el SP validaría mal.
+- **Agregar un tipo nuevo no es una operación de datos, es un cambio de diseño**: nueva clase derivada, columnas nuevas en `recursos_detalle`, una rama más en `RecursoFactory.Crear` y las validaciones del SP. Es el costo directo de que el tipo sea comportamiento.
+- **El `nombre_tipo_recurso` es un contrato de código, no una restricción de la base.** El schema declara `nombre_tipo_recurso varchar(100) not null` pero **sin `UNIQUE`**, y ese nombre se compara en los procedimientos almacenados (`IF v_tipo = 'Sala'`) y en `RecursoFactory.Crear`. Si el seed llegara a tener dos filas con `Sala`, la fábrica tomaría la primera sin avisar y el SP validaría mal.
   - Mejora pendiente: agregar `UNIQUE` sobre `tipo_recursos.nombre_tipo_recurso`.
-- **El `switch` del DAO es sobre string.** `Construir` compara contra `Sala`, `PuestoTrabajo` y `OficinaPrivada`, y el `default` lanza `InvalidOperationException`. Un error de tipeo en el seed no se detecta al compilar, sino en runtime.
+- **El despacho por tipo es sobre string.** `RecursoFactory.Crear` compara contra `Sala`, `PuestoTrabajo` y `OficinaPrivada`, y el `default` lanza `InvalidOperationException`. Un error de tipeo en el seed no se detecta al compilar, sino en runtime.
 
 ### Referencias
 
@@ -319,7 +320,7 @@ El síntoma es concreto: **el `Recurso` que entrega el modal no tenía origen**.
 - **La fábrica recibe once parámetros**, de los cuales cuatro son opcionales. Es el precio de que los datos específicos de cada tipo no compartan forma. Se acepta: los tipos son fijos y el conjunto de datos es estable.
 - **El despacho sigue siendo sobre el string del tipo.** `RecursoFactory.Crear("Sala", ...)` depende de que el string coincida exactamente: un error de tipeo se detecta en runtime, con `InvalidOperationException`, no al compilar. Despachar por `id` no es mejor —los ids son mágicos y el nombre es el que se muestra y se documenta.
 - **Queda un acoplamiento residual del DAO con las clases concretas.** `Insertar` y `Modificar` tienen que extraer del objeto los datos específicos del tipo para mandarlos al procedimiento almacenado, y lo hacen con un `switch` sobre el tipo concreto. Es un acoplamiento de otro nivel que el de la fábrica: la capa de datos mapea el objeto a los parámetros de un SP cuya firma la define la estructura de la tabla, que ya replica la jerarquía de tipos (D-002).
-  - Mejora posible: que cada clase exponga sus datos específicos en una forma común y el DAO no tenga que conocer las clases concretas. Queda pendiente de decidir.
+  - **Resuelto en D-006**: cada clase expone sus datos específicos en una forma común y el DAO dejó de conocer las clases concretas.
 - **La validación del dato obligatorio del tipo vive en tres capas**: la UI (mensaje al usuario), la fábrica (al construir el objeto) y el procedimiento almacenado (al escribir, con `SIGNAL SQLSTATE '45000'`). No es duplicación: cada capa protege su frontera, y las tres son exigidas por el diseño en capas que el proyecto ya manifiesta.
 
 ### Referencias
@@ -328,3 +329,78 @@ El síntoma es concreto: **el `Recurso` que entrega el modal no tenía origen**.
 - `SistemaCoworking/Datos/RecursoDAO.cs` — la capa de datos la usa y ya no crea clases concretas
 - `SistemaCoworking/Formularios/UserControls/RecursoModalControl.cs` — el formulario la usa para armar el recurso
 - `SistemaCoworking/Modelos/Recurso.cs`, `Sala.cs`, `PuestoTrabajo.cs`, `OficinaPrivada.cs` — la jerarquía y la regla de precio
+
+---
+
+## D-006 — Cada recurso declara sus propios datos de tipo
+
+**Fecha:** 04/11/2026
+**Estado:** Aceptada
+**Ámbito:** Modelo de dominio + capa de datos
+
+### Contexto
+
+Con la fábrica en el dominio (D-005), `RecursoDAO` ya no creaba clases concretas. Pero le quedaba un **segundo acoplamiento**: `Insertar` y `Modificar` tenían que extraer del recurso los datos específicos del tipo para mandarlos como parámetros al procedimiento almacenado, y lo hacían con un `switch` sobre la clase concreta:
+
+```csharp
+switch (recurso)
+{
+    case Sala sala:             capacidadPersonas = sala.CapacidadPersonas; ...
+    case PuestoTrabajo puesto:  numeroMonitor = puesto.NumeroMonitor; ...
+    case OficinaPrivada of:     metrosCuadrados = Convert.ToInt32(of.MetrosCuadrados); ...
+}
+```
+
+El efecto era concreto: **agregar un cuarto tipo obligaba a tocar la capa de datos**. El conocimiento de "qué datos tiene cada tipo" estaba duplicado —en la clase que los tiene y en el DAO que los busca— y el DAO es el peor lugar para esa copia: su trabajo es hablar SQL, no conocer la jerarquía de clases.
+
+Ese `switch` además **escondía un problema de precisión**. `OficinaPrivada.MetrosCuadrados` es `decimal` en el modelo y la columna `metros_cuadrados` es `int`. El DAO lo resolvía con un `Convert.ToInt32` que **truncaba en silencio**: quien cargaba 25,7 m² terminaba con 25 guardados, sin ningún aviso.
+
+### Decisión
+
+**Cada recurso declara sus propios datos de tipo**, con una proyección:
+
+- `DetalleTipo` es un contenedor con los cuatro datos específicos en forma opcional: `CapacidadPersonas`, `TieneProyector`, `NumeroMonitor`, `MetrosCuadrados`. Las columnas que no aplican al tipo van en `null`.
+- `Recurso` expone `public virtual DetalleTipo Detalle => new DetalleTipo();`: por defecto no hay datos específicos.
+- Cada clase derivada **overridea** `Detalle` y devuelve solo los suyos:
+
+| Clase | `Detalle` devuelve |
+|---|---|
+| `Sala` | capacidad de personas y tiene proyector |
+| `PuestoTrabajo` | cantidad de monitores |
+| `OficinaPrivada` | metros cuadrados |
+
+- El DAO llama a `AgregarParametrosDetalle(comando, recurso.Detalle)` y **no nombra ninguna clase concreta**. La conversión de `decimal` a `int` de los metros queda en el DAO, que es la capa que conoce la forma de la columna.
+- **Los metros con decimales se rechazan en vez de truncar**: `OficinaPrivada.ValidarMetrosCuadrados` lo valida para la interfaz, y `RecursoFactory` lanza `InvalidOperationException` si el valor no es entero.
+
+### Alternativas descartadas
+
+- **Truncar los metros en silencio**, que es lo que hacía el `Convert.ToInt32`. Se descartó porque es pérdida de datos sin aviso: el usuario carga 25,7 m², el sistema guarda 25 y nadie se entera. La diferencia entre el modelo (`decimal`) y la columna (`int`) se resuelve rechazando el valor, no degradándolo.
+- **Mover el `switch` al dominio**, por ejemplo a un `RecursoDetalle.De(recurso)`. Se descartó porque solo mueve el conocimiento: el DAO dejaría de conocer las clases, pero el dominio tendría un `switch` que contradice el polimorfismo que ya se usó para el precio (D-003). La opción virtual no tiene `switch`: cada clase declara lo suyo.
+- **Que cada clase escriba su propio procedimiento almacenado** (Active Record). Se descartó porque invierte la dependencia: el dominio pasaría a depender de `MySql.Data`, y se rompería el flujo `Form → lógica → DAO → ConexionBD → MySQL`.
+- **Mandar el detalle como JSON al procedimiento almacenado.** Se descartó porque pierde el tipado de los parámetros, y la cátedra pide procedimientos con parámetros declarados.
+- **Cambiar la columna `metros_cuadrados` a `decimal`.** Se descartó como alternativa cerrada: la columna es parte del modelo que definieron las consignas y el DER. Si alguna vez hace falta precisión decimal, es un cambio de modelo y no un arreglo de código.
+
+### Consecuencias
+
+**A favor:**
+
+- **La capa de datos no nombra ninguna clase concreta.** `RecursoDAO` no importa `Sala`, `PuestoTrabajo` ni `OficinaPrivada`.
+- **Agregar un tipo nuevo toca dos archivos de código** —la clase nueva con su `Detalle` y la fábrica— y **ninguno de la capa de datos**.
+- Cada clase es dueña de sus datos: "qué tiene una Sala" se responde en `Sala`.
+- Los datos del tipo dejan de duplicarse: la proyección se calcula al vuelo y no se guarda.
+- Los metros con decimales ya no se pierden en silencio.
+
+**En contra (y cómo se mitiga):**
+
+- **Suma un tipo al dominio** (`DetalleTipo`) que hay que explicar en la defensa. Es el precio de que la capa de datos no conozca la jerarquía.
+- **El dominio replica la forma ancha de la tabla**: `DetalleTipo` tiene cuatro campos porque `recursos_detalle` tiene cuatro columnas. No es un problema nuevo —la forma ancha ya se aceptó en D-002— pero ahora está replicada en dos lugares.
+- **`Detalle` es una proyección duplicada**: `Sala.CapacidadPersonas` sigue siendo la fuente y `Detalle` la copia. Si alguien modificara el `Detalle` esperando que cambie el recurso, no va a pasar. Por eso `Detalle` es de solo lectura y se calcula en cada acceso.
+- **La diferencia de precisión entre el modelo y la columna no se resuelve**: el dominio maneja `decimal` y la columna `int`. Se rechaza el valor fraccionario, pero el modelo sigue siendo más preciso que la base.
+
+### Referencias
+
+- `SistemaCoworking/Modelos/DetalleTipo.cs` — la proyección
+- `SistemaCoworking/Modelos/Recurso.cs` — `Detalle` virtual
+- `SistemaCoworking/Modelos/Sala.cs`, `PuestoTrabajo.cs`, `OficinaPrivada.cs` — cada una declara los suyos
+- `SistemaCoworking/Datos/RecursoDAO.cs` — `AgregarParametrosDetalle`
+- `SistemaCoworking/Modelos/RecursoFactory.cs` — el rechazo de los metros fraccionarios

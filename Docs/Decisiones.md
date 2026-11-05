@@ -15,6 +15,7 @@ Este archivo es documentación técnica del proyecto: sirve para la entrega, par
 | D-001 | [Descomponer el sistema en issues de GitHub](#d-001--descomponer-el-sistema-en-issues-de-github) | 02/11/2026 | Aceptada |
 | D-002 | [Extender `recursos` con una tabla de detalle 1:1](#d-002--los-atributos-especificos-de-cada-tipo-viven-en-una-tabla-de-extensión-11-recursos_detalle) | 17/10/2026 | Aceptada |
 | D-003 | [El precio diario es un valor derivado, no un dato guardado](#d-003--el-precio-diario-es-un-valor-derivado-no-un-dato-guardado) | 04/11/2026 | Aceptada |
+| D-004 | [`tipo_recursos` es un catálogo fijo, de solo lectura](#d-004--tipo_recursos-es-un-catálogo-fijo-de-solo-lectura-desde-la-aplicación) | 17/10/2026 | Aceptada |
 
 ---
 
@@ -196,3 +197,67 @@ A esto se sumaba que `CalcularPrecio()` **no tenía un solo call site** en toda 
 - `SistemaCoworking/Datos/RecursoDAO.cs` — las dos vías de escritura
 - `Scripts SQL/Procedimientos_Almacenados.sql` — `sp_alta_recurso`, `sp_modificar_recurso`
 - `Scripts SQL/Coworking_db.sql` — columnas `costo` y `precio_dia`
+
+---
+
+## D-004 — `tipo_recursos` es un catálogo fijo, de solo lectura desde la aplicación
+
+**Fecha:** 17/10/2026 (decidida) · 04/11/2026 (documentada)
+**Estado:** Aceptada
+**Ámbito:** Base de datos — modelo relacional
+
+### Contexto
+
+El dominio tiene tres tipos de recurso, y cada uno arrastra **comportamiento**, no solo datos:
+
+| Tipo | Clase derivada | Columnas propias | Regla de precio |
+|---|---|---|---|
+| Sala | `Sala` | `capacidad_personas`, `tiene_proyector` | +25% con proyector |
+| PuestoTrabajo | `PuestoTrabajo` | `numero_monitor` | +10% por monitor adicional |
+| OficinaPrivada | `OficinaPrivada` | `metros_cuadrados` | +20% si supera los 20 m² |
+
+Eso obliga a decidir una cosa que parece de datos pero no lo es: **¿`tipo_recursos` es una tabla administrable, con su propio CRUD, o es un catálogo fijo?** La diferencia importa: si el operador pudiera inventar un tipo desde la pantalla, el sistema no sabría qué clase instanciar, qué columnas mostrar ni con qué regla calcular el precio.
+
+La cátedra tampoco exige CRUD sobre tipos: el ROADMAP lo deja asentado de forma explícita ("`tipo_recursos` no tiene SP porque sus valores son fijos y se cargan en el script de inicialización. La cátedra no exige CRUD sobre tipos").
+
+### Decisión
+
+`tipo_recursos` es un **catálogo fijo, sembrado en el script de inicialización y de solo lectura desde la aplicación**:
+
+- La tabla tiene tres columnas: `id` (PK autoincremental), `nombre_tipo_recurso` (not null) y `descripcion` (informativa).
+- Los valores se cargan en `Coworking_db.sql`: `Sala`, `PuestoTrabajo`, `OficinaPrivada`.
+- **No hay procedimientos almacenados para esta tabla**: ni alta, ni modificación, ni baja.
+- `TipoRecursoDAO` expone **una sola operación**, `ObtenerTodos()`, que sirve para cargar el ComboBox de tipo del formulario de Recursos.
+- La FK `recursos.id_tipo_recurso` conserva la integridad referencial: ningún recurso puede apuntar a un tipo inexistente.
+- `nombre_tipo_recurso` es el **contrato** que usan tanto los procedimientos almacenados (para validar los campos obligatorios del tipo) como el DAO (para reconstruir la jerarquía de clases).
+
+### Alternativas descartadas
+
+- **CRUD completo sobre `tipo_recursos` desde la aplicación.** Se descartó porque un tipo no es un dato de negocio que el operador pueda inventar: es una clase derivada, un juego de columnas en `recursos_detalle` y una regla de precio. Un tipo creado desde la UI no tendría clase, ni columnas, ni regla, y el sistema no sabría ni cómo mostrarlo ni cuánto cobrar. El catálogo lo determina el diseño, no los datos.
+- **Guardar el tipo como ENUM en `recursos.id_tipo_recurso`**, en lugar de una tabla. Se descartó por tres razones. La primera: el proyecto **ya usa ENUM donde corresponde** (`recursos.estado`, `reservas.estado_reserva`) — valores de estado, que no cargan comportamiento. El tipo de recurso sí lo carga, y esa es exactamente la diferencia. La segunda: un ENUM exige un `ALTER TABLE` para agregar un tipo y no tiene dónde guardar la descripción. La tercera: la tabla da integridad referencial de verdad.
+- **Eliminar la tabla y guardar el nombre del tipo directamente en `recursos`.** Se descartó porque se pierde la integridad referencial (el nombre se repetiría en cada recurso y en cada JOIN) y se pierde la descripción.
+
+### Consecuencias
+
+**A favor:**
+
+- El catálogo y la jerarquía de clases quedan alineados: cada fila tiene su clase derivada, sus columnas y su regla de precio.
+- `TipoRecursoDAO` tiene una sola responsabilidad —leer— y su API lo refleja: un único método.
+- **No existe ningún camino de escritura** que pueda dejar la base desalineada del código.
+- La integridad referencial se mantiene: `recursos.id_tipo_recurso` no puede apuntar a un tipo inexistente.
+- Los procedimientos almacenados pueden ramificar sobre `nombre_tipo_recurso` para validar los campos obligatorios de cada tipo.
+
+**En contra (y cómo se mitiga):**
+
+- **Agregar un tipo nuevo no es una operación de datos, es un cambio de diseño**: nueva clase derivada, columnas nuevas en `recursos_detalle`, una rama más en el `switch` del DAO y las validaciones del SP. Es el costo directo de que el tipo sea comportamiento.
+- **El `nombre_tipo_recurso` es un contrato de código, no una restricción de la base.** El schema declara `nombre_tipo_recurso varchar(100) not null` pero **sin `UNIQUE`**, y ese nombre se compara en los procedimientos almacenados (`IF v_tipo = 'Sala'`) y en el `switch` del DAO. Si el seed llegara a tener dos filas con `Sala`, el `switch` tomaría la primera sin avisar y el SP validaría mal.
+  - Mejora pendiente: agregar `UNIQUE` sobre `tipo_recursos.nombre_tipo_recurso`.
+- **El `switch` del DAO es sobre string.** `Construir` compara contra `Sala`, `PuestoTrabajo` y `OficinaPrivada`, y el `default` lanza `InvalidOperationException`. Un error de tipeo en el seed no se detecta al compilar, sino en runtime.
+
+### Referencias
+
+- `Scripts SQL/Coworking_db.sql` — creación y seed de `tipo_recursos`
+- `SistemaCoworking/Datos/TipoRecursoDAO.cs` — la única operación de lectura
+- `SistemaCoworking/Modelos/TipoRecurso.cs`
+- `Scripts SQL/Procedimientos_Almacenados.sql` — validación por tipo en `sp_alta_recurso` y `sp_modificar_recurso`
+- `.github/ROADMAP.md` — nota de que `tipo_recursos` no tiene procedimientos almacenados

@@ -20,17 +20,23 @@ public abstract class Recurso : IReservable
     }
     public EstadoRecurso Estado { get; set; }
     public decimal Costo { get; set; }
-    public decimal PrecioDia { get; set; }
+
+    /// <summary>
+    /// Precio por dia del recurso. Es un valor DERIVADO y no un dato guardado:
+    /// la unica fuente de verdad es <see cref="CalcularPrecio"/>, que aplica el
+    /// recargo propio de cada tipo sobre <see cref="Costo"/>. Guardarlo como
+    /// atributo permitia que el precio quedara desincronizado del costo base.
+    /// </summary>
+    public decimal PrecioDia => CalcularPrecio();
 
 
-    public Recurso(int  id, int idTipoRecurso, string nombre, string ubicacion, decimal costo, decimal precioDia, EstadoRecurso estado)
+    public Recurso(int  id, int idTipoRecurso, string nombre, string ubicacion, decimal costo, EstadoRecurso estado)
     {
         Id = id;
         IdTipoRecurso = idTipoRecurso;
         Nombre = nombre;
         Ubicacion = ubicacion;
         Costo = costo;
-        PrecioDia = precioDia;
         Estado = estado;
     }
 

@@ -43,7 +43,7 @@ public class RecursoDAO
             conexion.Open();
 
             string sql =
-                "SELECT r.id, r.id_tipo_recurso, r.nombre, r.estado, r.ubicacion, r.costo, r.precio_dia, " +
+                "SELECT r.id, r.id_tipo_recurso, r.nombre, r.estado, r.ubicacion, r.costo, " +
                 "tr.nombre_tipo_recurso, " +
                 "rd.capacidad_personas, rd.tiene_proyector, rd.numero_monitor, rd.metros_cuadrados " +
                 "FROM recursos r " +
@@ -72,7 +72,6 @@ public class RecursoDAO
                             Enum.Parse<Recurso.EstadoRecurso>(Convert.ToString(lector["estado"])!),
                             Convert.ToString(lector["ubicacion"])!,
                             Convert.ToDecimal(lector["costo"]),
-                            Convert.ToDecimal(lector["precio_dia"]),
                             LeerInt(lector["capacidad_personas"]),
                             LeerBool(lector["tiene_proyector"]),
                             LeerInt(lector["numero_monitor"]),
@@ -88,18 +87,29 @@ public class RecursoDAO
     }
 
 
-    public void Insertar(
-        int idTipoRecurso,
-        string nombre,
-        Recurso.EstadoRecurso estado,
-        string ubicacion,
-        decimal costo,
-        decimal precioDia,
-        int? capacidadPersonas,
-        bool? tieneProyector,
-        int? numeroMonitor,
-        int? metrosCuadrados)
+    public void Insertar(Recurso recurso)
     {
+        object capacidadPersonas = DBNull.Value;
+        object tieneProyector = DBNull.Value;
+        object numeroMonitor = DBNull.Value;
+        object metrosCuadrados = DBNull.Value;
+
+        switch (recurso)
+        {
+            case Sala sala:
+                capacidadPersonas = sala.CapacidadPersonas;
+                tieneProyector = sala.TieneProyector;
+                break;
+
+            case PuestoTrabajo puestoTrabajo:
+                numeroMonitor = puestoTrabajo.NumeroMonitor;
+                break;
+
+            case OficinaPrivada oficinaPrivada:
+                metrosCuadrados = Convert.ToInt32(oficinaPrivada.MetrosCuadrados);
+                break;
+        }
+
         using (MySqlConnection conexion =
             ConexionBD.CrearConexion())
         {
@@ -115,52 +125,54 @@ public class RecursoDAO
 
                 comando.Parameters.AddWithValue(
                     "p_id_tipo_recurso",
-                    idTipoRecurso
+                    recurso.IdTipoRecurso
                 );
 
                 comando.Parameters.AddWithValue(
                     "p_nombre",
-                    nombre
+                    recurso.Nombre
                 );
 
                 comando.Parameters.AddWithValue(
                     "p_estado",
-                    estado.ToString()
+                    recurso.Estado.ToString()
                 );
 
                 comando.Parameters.AddWithValue(
                     "p_ubicacion",
-                    ubicacion
+                    recurso.Ubicacion
                 );
 
                 comando.Parameters.AddWithValue(
                     "p_costo",
-                    costo
+                    recurso.Costo
                 );
 
+                // El precio diario no se pasa como dato: sale de CalcularPrecio(),
+                // que es la unica fuente de verdad de la regla de precio por tipo.
                 comando.Parameters.AddWithValue(
                     "p_precio_dia",
-                    precioDia
+                    recurso.CalcularPrecio()
                 );
 
                 comando.Parameters.AddWithValue(
                     "p_capacidad_personas",
-                    (object?)capacidadPersonas ?? DBNull.Value
+                    capacidadPersonas
                 );
 
                 comando.Parameters.AddWithValue(
                     "p_tiene_proyector",
-                    (object?)tieneProyector ?? DBNull.Value
+                    tieneProyector
                 );
 
                 comando.Parameters.AddWithValue(
                     "p_numero_monitor",
-                    (object?)numeroMonitor ?? DBNull.Value
+                    numeroMonitor
                 );
 
                 comando.Parameters.AddWithValue(
                     "p_metros_cuadrados",
-                    (object?)metrosCuadrados ?? DBNull.Value
+                    metrosCuadrados
                 );
 
                 comando.ExecuteNonQuery();
@@ -231,7 +243,7 @@ public class RecursoDAO
 
                 comando.Parameters.AddWithValue(
                     "p_precio_dia",
-                    recurso.PrecioDia
+                    recurso.CalcularPrecio()
                 );
 
                 comando.Parameters.AddWithValue(
@@ -267,7 +279,6 @@ public class RecursoDAO
         Recurso.EstadoRecurso estado,
         string ubicacion,
         decimal costo,
-        decimal precioDia,
         int capacidadPersonas,
         bool tieneProyector,
         int numeroMonitor,
@@ -276,9 +287,9 @@ public class RecursoDAO
     {
         switch (tipoRecurso)
         {
-            case "Sala":            return new Sala(id, idTipoRecurso, nombre, ubicacion, costo, precioDia, capacidadPersonas, tieneProyector, estado);
-            case "PuestoTrabajo":   return new PuestoTrabajo(id, idTipoRecurso, nombre, ubicacion, costo, precioDia, numeroMonitor, estado);
-            case "OficinaPrivada":  return new OficinaPrivada(id, idTipoRecurso, nombre, ubicacion, costo, precioDia, metrosCuadrados, estado);
+            case "Sala":            return new Sala(id, idTipoRecurso, nombre, ubicacion, costo, capacidadPersonas, tieneProyector, estado);
+            case "PuestoTrabajo":   return new PuestoTrabajo(id, idTipoRecurso, nombre, ubicacion, costo, numeroMonitor, estado);
+            case "OficinaPrivada":  return new OficinaPrivada(id, idTipoRecurso, nombre, ubicacion, costo, metrosCuadrados, estado);
             default: throw new InvalidOperationException($"Tipo de recurso desconocido: '{tipoRecurso}'");
         }
     }

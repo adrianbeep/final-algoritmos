@@ -204,6 +204,7 @@ BEGIN
             nombre = p_nombre,
             estado = p_estado,
             ubicacion = p_ubicacion,
+            costo = p_costo,
             precio_dia = p_precio_dia
         WHERE
 			id = p_id_recurso;

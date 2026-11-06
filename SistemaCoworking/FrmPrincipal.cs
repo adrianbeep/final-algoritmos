@@ -136,7 +136,7 @@ public partial class FrmPrincipal : Form
 
     private void btnRecursos_Click(object sender, EventArgs e)
     {
-        CargarFormularioAPanel(new FrmRecursos(), btnRecursos);
+        CargarFormularioAPanel(new FrmRecursos(_overlay), btnRecursos);
     }
 
     private void btnReservas_Click(object sender, EventArgs e)

@@ -30,7 +30,7 @@
         {
             panel1 = new Panel();
             panel5 = new Panel();
-            btnCrearCliente = new Button();
+            btnCrearRecurso = new Button();
             panel2 = new Panel();
             panel3 = new Panel();
             panel4 = new Panel();
@@ -58,21 +58,22 @@
             // 
             // panel5
             // 
-            panel5.Controls.Add(btnCrearCliente);
+            panel5.Controls.Add(btnCrearRecurso);
             panel5.Dock = DockStyle.Right;
             panel5.Location = new Point(643, 0);
             panel5.Name = "panel5";
             panel5.Size = new Size(157, 70);
             panel5.TabIndex = 1;
             // 
-            // btnCrearCliente
+            // btnCrearRecurso
             // 
-            btnCrearCliente.Location = new Point(17, 12);
-            btnCrearCliente.Name = "btnCrearCliente";
-            btnCrearCliente.Size = new Size(128, 37);
-            btnCrearCliente.TabIndex = 0;
-            btnCrearCliente.Text = "Nuevo";
-            btnCrearCliente.UseVisualStyleBackColor = true;
+            btnCrearRecurso.Location = new Point(17, 12);
+            btnCrearRecurso.Name = "btnCrearRecurso";
+            btnCrearRecurso.Size = new Size(128, 37);
+            btnCrearRecurso.TabIndex = 0;
+            btnCrearRecurso.Text = "Nuevo";
+            btnCrearRecurso.UseVisualStyleBackColor = true;
+            btnCrearRecurso.Click += btnCrearRecurso_Click;
             // 
             // panel2
             // 
@@ -116,6 +117,7 @@
             dgvRecursos.RowHeadersWidth = 51;
             dgvRecursos.Size = new Size(730, 310);
             dgvRecursos.TabIndex = 5;
+            dgvRecursos.CellContentClick += dgvRecursos_CellContentClick;
             // 
             // colId
             // 
@@ -205,7 +207,7 @@
 
         private Panel panel1;
         private Panel panel5;
-        private Button btnCrearCliente;
+        private Button btnCrearRecurso;
         private Panel panel2;
         private Panel panel3;
         private Panel panel4;

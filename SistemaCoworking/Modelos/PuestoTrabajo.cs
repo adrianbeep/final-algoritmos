@@ -12,6 +12,21 @@ public class PuestoTrabajo : Recurso
     public int NumeroMonitor { get; set; }
 
     /// <summary>
+    /// Valida la cantidad de monitores del puesto de trabajo.
+    /// </summary>
+    public static bool ValidarMonitores(int monitores, out string? mensajeError)
+    {
+        if (monitores <= 0)
+        {
+            mensajeError = "La cantidad de monitores debe ser mayor a cero.";
+            return false;
+        }
+
+        mensajeError = null;
+        return true;
+    }
+
+    /// <summary>
     /// Datos especificos del puesto de trabajo. Los de los otros tipos van en null.
     /// </summary>
     public override DetalleTipo Detalle =>

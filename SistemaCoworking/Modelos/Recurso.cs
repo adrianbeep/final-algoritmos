@@ -88,6 +88,27 @@ public abstract class Recurso : IReservable
     }
 
     /// <summary>
+    /// Valida la ubicacion del recurso.
+    /// </summary>
+    public static bool ValidarUbicacion(string ubicacion, out string? mensajeError)
+    {
+        if (string.IsNullOrEmpty(ubicacion))
+        {
+            mensajeError = "Ingrese la ubicacion.";
+            return false;
+        }
+
+        if (ubicacion.Length > 100)
+        {
+            mensajeError = "Ingrese una ubicacion menor a 100 caracteres";
+            return false;
+        }
+
+        mensajeError = null;
+        return true;
+    }
+
+    /// <summary>
     /// Convierte el texto del campo de costo a decimal.
     ///
     /// Se saca el separador de miles de la cultura y se parsea con el

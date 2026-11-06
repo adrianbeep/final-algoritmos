@@ -19,6 +19,12 @@ namespace SistemaCoworking.Formularios.UserControls
         private string _value;
         private string _lblText;
 
+        // Handlers del filtro de entrada. Se guardan para poder sacarlos si
+        // el campo se reconfigura: si no, el filtro se aplicaria dos veces.
+        private KeyPressEventHandler? _filtroTecla;
+        private EventHandler? _filtroPegado;
+        private bool _saneando;
+
         // https://learn.microsoft.com/es-es/dotnet/desktop/winforms/compiler-messages/wfo1000
         // el [DefaultValue("")] es porque me tiraba el error de arriba
 
@@ -56,6 +62,82 @@ namespace SistemaCoworking.Formularios.UserControls
                 _lblText = value;
                 lbl.Text = value;
             }
+        }
+
+        /// <summary>
+        /// Cantidad maxima de caracteres. Mismo nombre que el TextBox de WinForms.
+        /// </summary>
+        [DefaultValue(32767)]
+        public int MaxLength
+        {
+            get => txt.MaxLength;
+            set => txt.MaxLength = value;
+        }
+
+        /// <summary>
+        /// Configura la etiqueta, el placeholder y que caracteres se pueden
+        /// ingresar. Es lo unico que hay que llamar para dejar el campo listo.
+        ///
+        /// El filtro no muestra errores: si el caracter no corresponde, la tecla
+        /// no entra. Los errores de valor los reporta la validacion del modelo
+        /// al guardar.
+        /// </summary>
+        public void Configurar(
+            string etiqueta,
+            string placeholder,
+            TipoEntrada tipo = TipoEntrada.Texto)
+        {
+            LblText = etiqueta;
+            Placeholder = placeholder;
+
+            // Si el campo ya estaba configurado, se sacan los handlers
+            // anteriores antes de poner los nuevos.
+            if (_filtroTecla is not null)
+                txt.KeyPress -= _filtroTecla;
+
+            if (_filtroPegado is not null)
+                txt.TextChanged -= _filtroPegado;
+
+            _filtroTecla = (s, e) =>
+            {
+                // Las teclas de control (borrar, enter, flechas) siempre pasan.
+                if (char.IsControl(e.KeyChar))
+                    return;
+
+                if (!InputConfiguration.EsEntradaValida(e.KeyChar, txt.Text, tipo))
+                    e.Handled = true;
+            };
+
+            txt.KeyPress += _filtroTecla;
+
+            // Pegar no dispara KeyPress, asi que lo que entra por el
+            // portapapeles se revisa aparte.
+            _filtroPegado = (s, e) => SanearTexto(tipo);
+
+            txt.TextChanged += _filtroPegado;
+        }
+
+        /// <summary>
+        /// Saca del texto los caracteres que no corresponden al tipo de entrada
+        /// y deja el cursor donde estaba.
+        /// </summary>
+        private void SanearTexto(TipoEntrada tipo)
+        {
+            if (_saneando)
+                return;
+
+            string limpio = InputConfiguration.Sanear(txt.Text, tipo);
+
+            if (limpio == txt.Text)
+                return;
+
+            _saneando = true;
+
+            int posicion = txt.SelectionStart;
+            txt.Text = limpio;
+            txt.SelectionStart = Math.Min(posicion, limpio.Length);
+
+            _saneando = false;
         }
 
         // Constructor para VisualStudio

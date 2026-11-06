@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Text;
 using SistemaCoworking.Interfaces;
 
@@ -79,6 +80,53 @@ public abstract class Recurso : IReservable
         if (nombre.Length > 100)
         {
             mensajeError = "Ingrese un nombre menor a 100 caracteres";
+            return false;
+        }
+
+        mensajeError = null;
+        return true;
+    }
+
+    /// <summary>
+    /// Convierte el texto del campo de costo a decimal.
+    ///
+    /// Se saca el separador de miles de la cultura y se parsea con el
+    /// separador decimal de la cultura: en es-AR "1.500" son mil quinientos y
+    /// "1,50" es uno con cincuenta. No se aceptan separadores de miles en el
+    /// numero en si: "1500" es mil quinientos.
+    /// </summary>
+    public static bool TryParseCosto(string texto, out decimal costo)
+    {
+        costo = 0m;
+
+        if (string.IsNullOrWhiteSpace(texto))
+            return false;
+
+        NumberFormatInfo formato = CultureInfo.CurrentCulture.NumberFormat;
+        string normalizado = texto.Trim();
+
+        if (formato.NumberGroupSeparator != formato.NumberDecimalSeparator)
+        {
+            normalizado = normalizado.Replace(
+                formato.NumberGroupSeparator.ToString(),
+                string.Empty);
+        }
+
+        return decimal.TryParse(
+            normalizado,
+            NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingSign,
+            CultureInfo.CurrentCulture,
+            out costo);
+    }
+
+    /// <summary>
+    /// Valida el costo base del recurso.
+    /// </summary>
+    public static bool ValidarCosto(decimal costo, out string? mensajeError)
+    {
+        if (costo <= 0)
+        {
+            mensajeError = "El costo debe ser mayor a cero.";
             return false;
         }
 

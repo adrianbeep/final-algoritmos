@@ -165,11 +165,11 @@ public partial class ClienteModalControl : UserControl
 
     private void ConfigurarTxt()
     {
-        txtNombre.Placeholder = "Juan"; txtNombre.LblText = "Nombre";
-        txtApellido.Placeholder = "Perez"; txtApellido.LblText = "Apellido";
-        txtDni.Placeholder = "123456789"; txtDni.LblText = "Dni";
-        txtTelefono.Placeholder = "542231234956"; txtTelefono.LblText = "Telefono";
-        txtEmail.Placeholder = "juanperez@gmail.com"; txtEmail.LblText = "Email";
+        txtNombre.Configurar("Nombre", "Juan", TipoEntrada.SoloLetras);
+        txtApellido.Configurar("Apellido", "Perez", TipoEntrada.SoloLetras);
+        txtDni.Configurar("Dni", "123456789", TipoEntrada.SoloNumeros);
+        txtTelefono.Configurar("Telefono", "542231234956", TipoEntrada.LetrasYNumeros);
+        txtEmail.Configurar("Email", "juanperez@gmail.com", TipoEntrada.LetrasYNumeros);
     }
 
     private void pBoxCerrar_Click(object sender, EventArgs e)

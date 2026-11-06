@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Drawing;
 using System.Globalization;
 using System.Linq;
@@ -14,7 +14,20 @@ public static class InputConfiguration
     private static readonly Color BordeError = Color.FromArgb(198, 40, 40);
     private static readonly Color PlaceholderColor = Color.FromArgb(150, 150, 150);
     private static readonly Color TextoPrimario = Color.FromArgb(40, 40, 40);
+    private static readonly Color LabelColor = Color.FromArgb(80, 80, 80);
     private static readonly Font InputFont = new Font("Segoe UI", 9.5F);
+    private static readonly Font LabelFont = new Font("Segoe UI", 9F);
+
+    /// <summary>
+    /// Configura el estilo visual uniforme de las etiquetas de campo (labels):
+    /// fuente Segoe UI 9pt, color gris suave (#505050 / 80, 80, 80) y fondo transparente.
+    /// </summary>
+    public static void ConfigLabel(Label lbl)
+    {
+        lbl.BackColor = Color.Transparent;
+        lbl.ForeColor = LabelColor;
+        lbl.Font = LabelFont;
+    }
 
     // Signos que se aceptan en los campos alfanumericos: los que aparecen
     // en un correo, en una ubicacion o en un telefono.

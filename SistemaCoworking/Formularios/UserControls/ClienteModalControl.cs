@@ -41,9 +41,7 @@ public partial class ClienteModalControl : UserControl
         else
         {
             lblCrear.Text = "Editar";
-            Label1.BackColor = Color.Transparent;
-            Label1.ForeColor = Color.FromArgb(80, 80, 80);
-            Label1.Font = new Font("Segoe UI", 9F);
+            InputConfiguration.ConfigLabel(Label1);
 
             CargarCliente(cliente);
         }
@@ -165,11 +163,11 @@ public partial class ClienteModalControl : UserControl
 
     private void ConfigurarTxt()
     {
-        txtNombre.Configurar("Nombre", "Juan", TipoEntrada.SoloLetras);
-        txtApellido.Configurar("Apellido", "Perez", TipoEntrada.SoloLetras);
-        txtDni.Configurar("Dni", "123456789", TipoEntrada.SoloNumeros);
-        txtTelefono.Configurar("Telefono", "542231234956", TipoEntrada.LetrasYNumeros);
-        txtEmail.Configurar("Email", "juanperez@gmail.com", TipoEntrada.LetrasYNumeros);
+        txtNombre.Configurar("Nombre", "Juan", TipoEntrada.SoloLetras, 100);
+        txtApellido.Configurar("Apellido", "Perez", TipoEntrada.SoloLetras, 100);
+        txtDni.Configurar("Dni", "123456789", TipoEntrada.SoloNumeros, 18);
+        txtTelefono.Configurar("Telefono", "542231234956", TipoEntrada.LetrasYNumeros, 30);
+        txtEmail.Configurar("Email", "juanperez@gmail.com", TipoEntrada.LetrasYNumeros, 100);
     }
 
     private void pBoxCerrar_Click(object sender, EventArgs e)

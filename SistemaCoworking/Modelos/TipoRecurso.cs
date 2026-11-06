@@ -17,4 +17,10 @@ public class TipoRecurso
         Nombre = nombre;
         Descripcion = descripcion;
     }
+
+    /// <summary>
+    /// Nombre del tipo. Es lo que se muestra en los combos y en los listados,
+    /// para que no aparezca el nombre de la clase.
+    /// </summary>
+    public override string ToString() => Nombre;
 }

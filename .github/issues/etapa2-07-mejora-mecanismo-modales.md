@@ -79,6 +79,41 @@ El alcance no es solo "arreglar el velo": es dejar el mecanismo en una forma que
 - [ ] La disponibilidad no se resuelve en el modal: el estado del recurso (`Disponible`) se filtra en el combo, y el conflicto de fechas lo rechaza el SP
 - [ ] El modal de Clientes sigue recibiendo la entidad a editar, no la lista: la busca el form
 
+### Migracion de los forms y de los modales
+
+`ModalOverlay` deja de ser una clase estatica con estado global: pasa a ser una **instancia por
+ventana principal**, con la API `new ModalOverlay(owner)` + `Mostrar(modal)` + `Dispose()`.
+Eso rompe los 5 call sites de los forms, que se migran asi:
+
+**`FrmPrincipal`**
+
+- `private Form _overlay = null;` -> `private ModalOverlay _overlay;`
+- `ModalOverlay.Configure(this, opacidad: 0.55)` -> `new ModalOverlay(this, opacidad: 0.55)`
+- Al cerrarse la ventana principal: `_overlay.Dispose()` (el velo se destruye y se desuscriben los
+  handlers de `Resize` y `Move` del owner)
+
+**`FrmClientes` y `FrmRecursos`**
+
+- `private readonly Form _modalOverlay;` -> `private readonly ModalOverlay _modalOverlay;`
+- El constructor deja de aceptar un overlay opcional: el fallback `new Form { Opacity = 0 }` desaparece,
+  porque el overlay ahora es obligatorio
+- El handler de `Closed` que llamaba a `ModalOverlay.Close(...)` se borra: el cierre lo hace el modal
+- `ModalOverlay.Show(_modalOverlay, modal)` -> `if (_modalOverlay.Mostrar(modal) != DialogResult.OK) return;`
+
+**Los UserControl modales**
+
+- `AplicarEstiloCard()` se reemplaza por `ModalConfiguration.AplicarEstilo(this)` +
+  `ModalConfiguration.AplicarRegionRedondeada(this)`
+- Cancelar y la `X` se conectan con `ModalConfiguration.ConectarCierre(this, btnCancelar, pBoxCerrar, ...)`
+- El ESC se conecta con `ModalConfiguration.ConectarEsc(this, ...)`
+- Al guardar, el modal arma la entidad, la deja en una propiedad publica `Entidad` y cierra con
+  `ModalConfiguration.CerrarModal(this, DialogResult.OK)`
+- Los eventos `Aceptado` y `Closed` desaparecen: el resultado viaja en el `DialogResult` y la entidad
+  en la propiedad `Entidad`
+
+Con eso, el form escribe en la base **despues** de que el modal cerro: una excepcion del DAO ya no
+puede dejar el velo clavado.
+
 ### Lo repetido de los forms de listado NO se extrae
 
 La duplicacion del lado de los forms se deja como esta. Se evaluo extraerla a una clase estatica

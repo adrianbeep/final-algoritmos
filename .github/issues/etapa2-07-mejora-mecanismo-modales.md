@@ -79,12 +79,17 @@ El alcance no es solo "arreglar el velo": es dejar el mecanismo en una forma que
 - [ ] La disponibilidad no se resuelve en el modal: el estado del recurso (`Disponible`) se filtra en el combo, y el conflicto de fechas lo rechaza el SP
 - [ ] El modal de Clientes sigue recibiendo la entidad a editar, no la lista: la busca el form
 
-### Lo repetido de los forms de listado sale a una clase estatica
+### Lo repetido de los forms de listado NO se extrae
 
-- [ ] `Herramientas/ListadoConfiguration.cs`: clase estatica, mismo estilo que las demas
-- [ ] Concentra lo que es identico en los forms de listado: la carga de la grilla con su `try/catch`, el filtro de la columna de boton, y la lectura del id de la fila
-- [ ] `FrmClientes` y `FrmRecursos` la usan y quedan con lo que les es propio: que DAO consultan, que modal abren y que persisten
-- [ ] El caso de alta y el de edicion se resuelven sin que el form tenga que preguntar por `EsNuevo`
+La duplicacion del lado de los forms se deja como esta. Se evaluo extraerla a una clase estatica
+y se descarto: la parte que se repite (cargar la grilla, detectar la columna de boton, leer el id)
+son pocas lineas y cada una es trivial, mientras que la que de verdad se repite (abrir el modal,
+cablear los eventos, persistir, refrescar) es distinta en cada form porque cada uno tiene su DAO,
+su modal y su mensaje de error. Ademas, la carga de la grilla no es igual en los dos: `ClienteDAO`
+devuelve `List<Cliente>` y `RecursoDAO` devuelve `DataTable` (unificar eso es de la Etapa 5).
+
+- [ ] `FrmClientes` y `FrmRecursos` conservan su carga de grilla, su deteccion de la columna de accion y su lectura del id, cada uno con su propio DAO y su propio mensaje de error
+
 
 ### Fugas de recursos en la UI
 
@@ -130,7 +135,6 @@ para que no se pierda:
 ## Archivos a crear
 
 - `SistemaCoworking/Herramientas/ModalConfiguration.cs` — la clase estatica con lo repetido de los modales (tarjeta, `Region`, Cancelar, `X`, ESC)
-- `SistemaCoworking/Herramientas/ListadoConfiguration.cs` — la clase estatica con lo repetido de los forms de listado (carga de grilla, columna de boton, id de la fila)
 
 ## Archivos a modificar
 

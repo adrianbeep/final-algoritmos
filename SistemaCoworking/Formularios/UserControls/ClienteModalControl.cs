@@ -1,30 +1,34 @@
 using SistemaCoworking.Herramientas;
 using SistemaCoworking.Modelos;
 using System;
+using System.ComponentModel;
 using System.Drawing;
-using System.Drawing.Drawing2D;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 
 namespace SistemaCoworking.Formularios.UserControls;
 
-public partial class ClienteModalControl : UserControl
+public partial class ClienteModalControl : Form
 {
-    public event EventHandler? Closed;
-
-    //El modal entrega el cliente y el form decide si lo inserta o lo modifica
-    public event EventHandler<Cliente>? Aceptado;
-
     //Si es null el modal es de alta, si no es de edicion
     private readonly Cliente? _cliente;
 
-    public bool EsNuevo => _cliente is null;
+    //El modal entrega el cliente al form, que decide si lo inserta o lo
+    //modifica. El atributo le dice al serializador del diseñador que esta
+    //propiedad no se guarda: sin el, el analizador de WinForms la toma por
+    //error y rompe el build (WFO1000).
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    public Cliente? Entidad { get; set; }
 
     //Con cliente es edicion, sin cliente es alta
     public ClienteModalControl(Cliente? cliente = null)
     {
         InitializeComponent();
-        AplicarEstiloCard();
+
+        // Una sola llamada: estilo de tarjeta, esquinas redondeadas, y el
+        // boton Cancelar, la X y el ESC haciendo lo mismo.
+        ModalConfiguration.ConfigModal(this, btnCancelar, pBoxCerrar);
+
         ConfigurarTxt();
 
         ButtonConfiguration.ConfigPrimary(btnGuardar);
@@ -47,44 +51,6 @@ public partial class ClienteModalControl : UserControl
         }
     }
 
-    private void AplicarEstiloCard()
-    {
-        // Fondo opaco: sin esto el UserControl es transparente
-        // y se ve el overlay gris a traves del modal.
-        this.BackColor = Color.White;
-
-        // Esquinas redondeadas
-        AplicarRegionRedondeada();
-
-        // Tipografia consistente
-        this.Font = new Font("Segoe UI", 9F);
-        this.ForeColor = Color.FromArgb(40, 40, 40);
-    }
-
-    private void AplicarRegionRedondeada()
-    {
-        int radio = 14;
-        int diametro = radio * 2;
-
-        var path = new GraphicsPath();
-        path.AddArc(0, 0, diametro, diametro, 180, 90);
-        path.AddArc(this.Width - diametro, 0, diametro, diametro, 270, 90);
-        path.AddArc(this.Width - diametro, this.Height - diametro, diametro, diametro, 0, 90);
-        path.AddArc(0, this.Height - diametro, diametro, diametro, 90, 90);
-        path.CloseFigure();
-
-        this.Region?.Dispose();
-        this.Region = new Region(path);
-        path.Dispose();
-    }
-
-    protected override void OnResize(EventArgs e)
-    {
-        base.OnResize(e);
-        if (this.Width > 0 && this.Height > 0)
-            AplicarRegionRedondeada();
-    }
-
     private void CargarCliente(Cliente c)
     {
         lblId.Text = Convert.ToString(c.Id);
@@ -102,8 +68,7 @@ public partial class ClienteModalControl : UserControl
     {
         //OfType<T> permite filtrar por el control
         //que necesito recorrer
-        foreach (TextControl txt in this.Controls.OfType<TextControl>())
-            txt.LimpiarError();
+        TextControl.LimpiarErrores(this);
 
         bool errores = false;
         string? error;
@@ -152,13 +117,11 @@ public partial class ClienteModalControl : UserControl
 
         Cliente cliente = new Cliente(id, nombre, apellido, dni, telefono, email);
 
-        Aceptado?.Invoke(this, cliente);
-        Closed?.Invoke(this, EventArgs.Empty);
-    }
-
-    private void btnCancelar_Click(object sender, EventArgs e)
-    {
-        Closed?.Invoke(this, EventArgs.Empty);
+        // El modal entrega la entidad y cierra. El form la persiste DESPUES,
+        // cuando ShowDialog() ya devolvio: si la escritura falla, el modal
+        // ya cerro y la aplicacion no queda bloqueada.
+        Entidad = cliente;
+        ModalConfiguration.CerrarModal(this, DialogResult.OK);
     }
 
     private void ConfigurarTxt()
@@ -168,10 +131,5 @@ public partial class ClienteModalControl : UserControl
         txtDni.Configurar("Dni", "123456789", TipoEntrada.SoloNumeros, 18);
         txtTelefono.Configurar("Telefono", "542231234956", TipoEntrada.LetrasYNumeros, 30);
         txtEmail.Configurar("Email", "juanperez@gmail.com", TipoEntrada.LetrasYNumeros, 100);
-    }
-
-    private void pBoxCerrar_Click(object sender, EventArgs e)
-    {
-        Closed?.Invoke(this, EventArgs.Empty);
     }
 }

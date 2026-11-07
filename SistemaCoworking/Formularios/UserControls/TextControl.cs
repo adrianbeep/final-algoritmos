@@ -191,5 +191,27 @@ namespace SistemaCoworking.Formularios.UserControls
             pBox.Visible = false;
             toolTip.SetToolTip(pBox, "");
         }
+
+        /// <summary>
+        /// Limpia el error de todos los TextControl que hay dentro del
+        /// contenedor, incluidos los que viven dentro de un panel anidado.
+        ///
+        /// Recorre todo el arbol porque los campos especificos de cada tipo
+        /// de recurso (capacidad, monitores, metros) estan dentro de
+        /// paneles: si solo se miraran los hijos directos, el borde de error
+        /// de esos campos nunca se limpiaria.
+        /// </summary>
+        public static void LimpiarErrores(Control contenedor)
+        {
+            foreach (Control control in contenedor.Controls)
+            {
+                if (control is TextControl txt)
+                {
+                    txt.LimpiarError();
+                }
+
+                LimpiarErrores(control);
+            }
+        }
     }
 }

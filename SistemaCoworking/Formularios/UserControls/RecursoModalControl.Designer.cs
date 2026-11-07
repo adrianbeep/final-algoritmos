@@ -67,7 +67,6 @@ namespace SistemaCoworking.Formularios.UserControls
             pBoxCerrar.SizeMode = PictureBoxSizeMode.CenterImage;
             pBoxCerrar.TabIndex = 36;
             pBoxCerrar.TabStop = false;
-            pBoxCerrar.Click += pBoxCerrar_Click;
             // 
             // lblId
             // 
@@ -103,18 +102,17 @@ namespace SistemaCoworking.Formularios.UserControls
             // btnCancelar
             // 
             btnCancelar.Anchor = AnchorStyles.Bottom;
-            btnCancelar.Location = new Point(255, 439);
+            btnCancelar.Location = new Point(256, 443);
             btnCancelar.Name = "btnCancelar";
             btnCancelar.Size = new Size(160, 45);
             btnCancelar.TabIndex = 32;
             btnCancelar.Text = "Cancelar";
             btnCancelar.UseVisualStyleBackColor = true;
-            btnCancelar.Click += btnCancelar_Click;
             // 
             // btnGuardar
             // 
             btnGuardar.Anchor = AnchorStyles.Bottom;
-            btnGuardar.Location = new Point(21, 439);
+            btnGuardar.Location = new Point(21, 443);
             btnGuardar.Name = "btnGuardar";
             btnGuardar.Size = new Size(160, 45);
             btnGuardar.TabIndex = 31;
@@ -288,6 +286,7 @@ namespace SistemaCoworking.Formularios.UserControls
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.White;
+            ClientSize = new Size(440, 500);
             Controls.Add(cmbEstado);
             Controls.Add(cmbTipo);
             Controls.Add(lblPrecio);
@@ -307,8 +306,8 @@ namespace SistemaCoworking.Formularios.UserControls
             Controls.Add(btnGuardar);
             Controls.Add(Label1);
             Controls.Add(pnOficinaPrivada);
+            FormBorderStyle = FormBorderStyle.None;
             Name = "RecursoModalControl";
-            Size = new Size(440, 500);
             ((System.ComponentModel.ISupportInitialize)pBoxCerrar).EndInit();
             pnSala.ResumeLayout(false);
             pnPuestoTrabajo.ResumeLayout(false);

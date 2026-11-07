@@ -15,9 +15,11 @@ namespace SistemaCoworking;
  usar un form embed que es embeber un formulario a un contenedor que herede de la clase
 'Control' como por ejemplo panel, flowlayoutpanel, tablelayoutpanel, etc
  donde podemos abrir un formulario de manera que no usamos el motor del mdi que es un mas pesado
- la otra es usar un usercontrol que es basicamente hermano de un form pero tiene menos caracteristicas
- como por ej, el usercontrol tiene el evento load pero no tiene showdialog, windowstate, evento closed
- 
+ los formularios de cada modulo (FrmClientes, FrmRecursos, FrmReservas) son los
+ que se embeben en el panel. el detalle de una entidad se edita en un modal, que
+ es un Form mas que se abre con ShowDialog(): el modal espera a que se cierre y
+ devuelve DialogResult.OK si el usuario guardo.
+
  usamos form embed y simular que el sistema es un SPA (single page application)
  */
 
@@ -26,7 +28,6 @@ public partial class FrmPrincipal : Form
     //private Color btnBGColor = ;
     private Form _formActivo = null;
     private Button _botonActivo = null;
-    private Form _overlay = null;
 
     //==============================
     //EVENTOS FORMULARIO
@@ -35,12 +36,10 @@ public partial class FrmPrincipal : Form
     {
         InitializeComponent();
 
-        // pnModal del Designer ya no se usa: el velo real es una ventana propia
-        // con Opacity (ver ModalOverlay). Un Panel hijo no compone con sus
-        // hermanos y se ve gris opaco.
+        // pnModal del Designer ya no se usa: los modales son ventanas
+        // propias que se abren con ShowDialog(). Un Panel hijo no compone
+        // con sus hermanos y se ve gris opaco.
         pnForms.Controls.Remove(pnModal);
-
-        _overlay = ModalOverlay.Configure(this, opacidad: 0.55);
 
         CargarFormularioAPanel(new FrmDashboard(), btnDashboard);
     }
@@ -131,12 +130,12 @@ public partial class FrmPrincipal : Form
 
     private void btnClientes_Click(object sender, EventArgs e)
     {
-        CargarFormularioAPanel(new FrmClientes(_overlay), btnClientes);
+        CargarFormularioAPanel(new FrmClientes(), btnClientes);
     }
 
     private void btnRecursos_Click(object sender, EventArgs e)
     {
-        CargarFormularioAPanel(new FrmRecursos(_overlay), btnRecursos);
+        CargarFormularioAPanel(new FrmRecursos(), btnRecursos);
     }
 
     private void btnReservas_Click(object sender, EventArgs e)

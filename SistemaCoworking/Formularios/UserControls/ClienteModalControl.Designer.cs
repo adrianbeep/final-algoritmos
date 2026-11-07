@@ -1,14 +1,14 @@
-ï»¿namespace SistemaCoworking.Formularios.UserControls
+namespace SistemaCoworking.Formularios.UserControls
 {
     partial class ClienteModalControl
     {
         /// <summary> 
-        /// Variable del diseÃ±ador necesaria.
+        /// Variable del diseñador necesaria.
         /// </summary>
         private System.ComponentModel.IContainer components = null;
 
         /// <summary> 
-        /// Limpiar los recursos que se estÃ©n usando.
+        /// Limpiar los recursos que se estén usando.
         /// </summary>
         /// <param name="disposing">true si los recursos administrados se deben desechar; false en caso contrario.</param>
         protected override void Dispose(bool disposing)
@@ -20,11 +20,11 @@
             base.Dispose(disposing);
         }
 
-        #region CÃ³digo generado por el DiseÃ±ador de componentes
+        #region Código generado por el Diseñador de componentes
 
         /// <summary> 
-        /// MÃ©todo necesario para admitir el DiseÃ±ador. No se puede modificar
-        /// el contenido de este mÃ©todo con el editor de cÃ³digo.
+        /// Método necesario para admitir el Diseñador. No se puede modificar
+        /// el contenido de este método con el editor de código.
         /// </summary>
         private void InitializeComponent()
         {
@@ -56,7 +56,7 @@
             // btnGuardar
             // 
             btnGuardar.Anchor = AnchorStyles.Bottom;
-            btnGuardar.Location = new Point(21, 367);
+            btnGuardar.Location = new Point(24, 363);
             btnGuardar.Name = "btnGuardar";
             btnGuardar.Size = new Size(160, 45);
             btnGuardar.TabIndex = 5;
@@ -67,13 +67,12 @@
             // btnCancelar
             // 
             btnCancelar.Anchor = AnchorStyles.Bottom;
-            btnCancelar.Location = new Point(255, 367);
+            btnCancelar.Location = new Point(260, 363);
             btnCancelar.Name = "btnCancelar";
             btnCancelar.Size = new Size(160, 45);
             btnCancelar.TabIndex = 6;
             btnCancelar.Text = "Cancelar";
             btnCancelar.UseVisualStyleBackColor = true;
-            btnCancelar.Click += btnCancelar_Click;
             // 
             // lblCrear
             // 
@@ -160,19 +159,19 @@
             // 
             pBoxCerrar.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             pBoxCerrar.Image = Properties.Resources.icons8_close_24_black;
-            pBoxCerrar.Location = new Point(392, 0);
+            pBoxCerrar.Location = new Point(393, 0);
             pBoxCerrar.Name = "pBoxCerrar";
             pBoxCerrar.Size = new Size(48, 41);
             pBoxCerrar.SizeMode = PictureBoxSizeMode.CenterImage;
             pBoxCerrar.TabIndex = 24;
             pBoxCerrar.TabStop = false;
-            pBoxCerrar.Click += pBoxCerrar_Click;
             // 
             // ClienteModalControl
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.White;
+            ClientSize = new Size(440, 420);
             Controls.Add(pBoxCerrar);
             Controls.Add(txtEmail);
             Controls.Add(txtTelefono);
@@ -185,8 +184,8 @@
             Controls.Add(btnCancelar);
             Controls.Add(btnGuardar);
             Controls.Add(Label1);
+            FormBorderStyle = FormBorderStyle.None;
             Name = "ClienteModalControl";
-            Size = new Size(440, 428);
             ((System.ComponentModel.ISupportInitialize)pBoxCerrar).EndInit();
             ResumeLayout(false);
             PerformLayout();

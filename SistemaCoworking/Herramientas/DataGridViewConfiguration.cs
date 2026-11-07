@@ -17,6 +17,14 @@ public static class DataGridViewConfiguration
     private static readonly Color WarningOrange = Color.FromArgb(255, 159, 28);
     private static readonly Color WarningOrangePress = Color.FromArgb(210, 130, 20);
 
+    // Se comparten una sola vez cada una, como en ButtonConfiguration e
+    // InputConfiguration: cada Font nuevo es un handle de GDI que hay que
+    // liberar. Antes el handler de CellPainting creaba una Font por celda
+    // repintada: esas Fonts nunca se liberaban.
+    private static readonly Font HeaderFont = new Font("Segoe UI Semibold", 10);
+    private static readonly Font CellFont = new Font("Segoe UI", 9);
+    private static readonly Font ButtonFont = new Font("Segoe UI Semibold", 9);
+
     public static void ConfigDGV(DataGridView dgv)
     {
         // Layout
@@ -40,7 +48,7 @@ public static class DataGridViewConfiguration
         {
             BackColor = HeaderDark,
             ForeColor = Color.White,
-            Font = new Font("Segoe UI Semibold", 10),
+            Font = HeaderFont,
             Padding = new Padding(12, 10, 12, 10),
             SelectionBackColor = HeaderDark,
             SelectionForeColor = Color.White,
@@ -50,7 +58,7 @@ public static class DataGridViewConfiguration
         // Celdas
         dgv.DefaultCellStyle = new DataGridViewCellStyle
         {
-            Font = new Font("Segoe UI", 9),
+            Font = CellFont,
             BackColor = Color.White,
             ForeColor = TextPrimary,
             SelectionBackColor = SelectionBlue,
@@ -67,6 +75,9 @@ public static class DataGridViewConfiguration
         StyleActionColumns(dgv);
 
         // Pintar Botones
+        // Se desuscribe antes de suscribir: si se llama dos veces sobre la
+        // misma grilla, el boton se pinta dos veces.
+        dgv.CellPainting -= Dgv_CellPainting;
         dgv.CellPainting += Dgv_CellPainting;
     }
 
@@ -95,12 +106,15 @@ public static class DataGridViewConfiguration
             btn.DefaultCellStyle.SelectionBackColor = esCancelar ? WarningOrangePress : AccentBluePressed;
             btn.DefaultCellStyle.ForeColor = Color.White;
             btn.DefaultCellStyle.SelectionForeColor = Color.White;
-            btn.DefaultCellStyle.Font = new Font("Segoe UI Semibold", 9);
+            btn.DefaultCellStyle.Font = ButtonFont;
             btn.DefaultCellStyle.Padding = new Padding(6, 6, 6, 6);
         }
     }
 
-    private static void Dgv_CellPainting(object sender, DataGridViewCellPaintingEventArgs e)
+    // El sender del delegado es nullable (DataGridViewCellPaintingEventHandler
+    // declara "object? sender"): con "object" el compilador complains (CS8622)
+    // al suscribir y al desuscribir el handler.
+    private static void Dgv_CellPainting(object? sender, DataGridViewCellPaintingEventArgs e)
     {
         if (e.RowIndex < 0) return;
         if (!(sender is DataGridView dgv)) return;
@@ -132,7 +146,7 @@ public static class DataGridViewConfiguration
         var text = e.FormattedValue?.ToString() ?? "";
         TextRenderer.DrawText(
             e.Graphics, text,
-            new Font("Segoe UI Semibold", 9),
+            ButtonFont,
             btnRect, Color.White,
             TextFormatFlags.HorizontalCenter
               | TextFormatFlags.VerticalCenter

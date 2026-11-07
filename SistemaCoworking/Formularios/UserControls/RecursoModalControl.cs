@@ -5,19 +5,13 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
-using System.Drawing.Drawing2D;
 using System.Text;
 using System.Windows.Forms;
 
 namespace SistemaCoworking.Formularios.UserControls;
 
-public partial class RecursoModalControl : UserControl
+public partial class RecursoModalControl : Form
 {
-    public event EventHandler? Closed;
-
-    //El modal entrega el Recurso y el form decide si lo inserta o lo modifica
-    public event EventHandler<Recurso>? Aceptado;
-
     //Si es null el modal es de alta, si no es de edicion
     private readonly Recurso? _recurso;
 
@@ -29,30 +23,23 @@ public partial class RecursoModalControl : UserControl
     //Catalogo de tipos de recurso. Lo pasa el form.
     private readonly List<TipoRecurso> _tipos;
 
-    public bool EsNuevo => _recurso is null;
+    //El modal entrega el recurso al form, que decide si lo inserta o lo
+    //modifica. El atributo le dice al serializador del diseñador que esta
+    //propiedad no se guarda: sin el, el analizador de WinForms la toma por
+    //error y rompe el build (WFO1000).
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    public Recurso? Entidad { get; set; }
 
     //Con cliente es edicion, sin cliente es alta
     public RecursoModalControl(Recurso? recurso = null, List<TipoRecurso>? tipos = null)
     {
         InitializeComponent();
-        AplicarEstiloCard();
-        ConfigurarTxt();
-        ConectarEventos();
 
         // Los tipos los pasa el form: el modal no depende de la capa de datos,
         // igual que el modal de clientes.
         _tipos = tipos ?? new List<TipoRecurso>();
 
-        CargarComboTipoRecurso(cmbTipo);
-        CargarComboEstado(cmbEstado);
-
-        InputConfiguration.ConfigLabel(label2);
-        InputConfiguration.ConfigLabel(label3);
-        InputConfiguration.ConfigLabel(label4);
-
-        CheckBoxConfiguration.Config(chkProyector);
-        ButtonConfiguration.ConfigPrimary(btnGuardar);
-        ButtonConfiguration.ConfigSecondary(btnCancelar);
+        ConfigurarModal();
 
         _recurso = recurso;
 
@@ -71,42 +58,23 @@ public partial class RecursoModalControl : UserControl
         }
     }
 
-    private void AplicarEstiloCard()
+    private void ConfigurarModal()
     {
-        // Fondo opaco: sin esto el UserControl es transparente
-        // y se ve el overlay gris a traves del modal.
-        this.BackColor = Color.White;
+        ConfigurarTxt();
+        ConectarEventos();
 
-        // Esquinas redondeadas
-        AplicarRegionRedondeada();
+        ModalConfiguration.ConfigModal(this, btnCancelar, pBoxCerrar);
 
-        // Tipografia consistente
-        this.Font = new Font("Segoe UI", 9F);
-        this.ForeColor = Color.FromArgb(40, 40, 40);
-    }
+        InputConfiguration.ConfigLabel(label2);
+        InputConfiguration.ConfigLabel(label3);
+        InputConfiguration.ConfigLabel(label4);
 
-    private void AplicarRegionRedondeada()
-    {
-        int radio = 14;
-        int diametro = radio * 2;
+        CheckBoxConfiguration.Config(chkProyector);
+        ButtonConfiguration.ConfigPrimary(btnGuardar);
+        ButtonConfiguration.ConfigSecondary(btnCancelar);
 
-        var path = new GraphicsPath();
-        path.AddArc(0, 0, diametro, diametro, 180, 90);
-        path.AddArc(this.Width - diametro, 0, diametro, diametro, 270, 90);
-        path.AddArc(this.Width - diametro, this.Height - diametro, diametro, diametro, 0, 90);
-        path.AddArc(0, this.Height - diametro, diametro, diametro, 90, 90);
-        path.CloseFigure();
-
-        this.Region?.Dispose();
-        this.Region = new Region(path);
-        path.Dispose();
-    }
-
-    protected override void OnResize(EventArgs e)
-    {
-        base.OnResize(e);
-        if (this.Width > 0 && this.Height > 0)
-            AplicarRegionRedondeada();
+        CargarComboTipoRecurso(cmbTipo);
+        CargarComboEstado(cmbEstado);
     }
 
     private void ConfigurarTxt()
@@ -247,8 +215,7 @@ public partial class RecursoModalControl : UserControl
     {
         //OfType<T> permite filtrar por el control
         //que necesito recorrer
-        foreach (TextControl txt in this.Controls.OfType<TextControl>())
-            txt.LimpiarError();
+        TextControl.LimpiarErrores(this);
 
         bool errores = false;
         string? error;
@@ -352,17 +319,10 @@ public partial class RecursoModalControl : UserControl
         if (recurso is null)
             return;
 
-        Aceptado?.Invoke(this, recurso);
-        Closed?.Invoke(this, EventArgs.Empty);
-    }
-
-    private void btnCancelar_Click(object sender, EventArgs e)
-    {
-        Closed?.Invoke(this, EventArgs.Empty);
-    }
-
-    private void pBoxCerrar_Click(object sender, EventArgs e)
-    {
-        Closed?.Invoke(this, EventArgs.Empty);
+        // El modal entrega la entidad y cierra. El form la persiste DESPUES,
+        // cuando ShowDialog() ya devolvio: si la escritura falla, el modal
+        // ya cerro y la aplicacion no queda bloqueada.
+        Entidad = recurso;
+        ModalConfiguration.CerrarModal(this, DialogResult.OK);
     }
 }

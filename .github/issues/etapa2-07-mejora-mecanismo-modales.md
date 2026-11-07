@@ -68,11 +68,12 @@ pierde es el oscurecido.
 ### Lo repetido de los modales sale a una clase estatica
 
 - [ ] `Herramientas/ModalConfiguration.cs`: clase estatica, al estilo de `ButtonConfiguration`, `InputConfiguration`, `ComboBoxConfiguration`, `DataGridViewConfiguration` y `CheckBoxConfiguration`
-- [ ] La clase estatica concentra: el estilo de tarjeta (fondo, tipografia, `ForeColor`), la `Region` redondeada, el recalculo de la `Region` al redimensionar, y el wiring del boton Cancelar y de la `X`
+- [ ] **Una sola llamada** configura el modal completo: `ModalConfiguration.ConfigModal(this, btnCancelar, pBoxCerrar)`. Deja el estilo de tarjeta (fondo opaco, tipografia, `ForeColor`), las esquinas redondeadas, y el boton Cancelar, la `X` y la tecla ESC haciendo lo mismo
 - [ ] `ClienteModalControl` y `RecursoModalControl` la llaman desde el constructor y quedan sin codigo repetido entre si
 - [ ] Los tres modales (Cliente, Recurso y Reserva) son iguales en estructura: los mismos eventos, los mismos botones y el mismo ciclo de vida. Lo unico que cambia son los controles que cada uno declara. Por eso lo repetido va en una clase estatica y no en una clase base con herencia
-- [ ] La `Region` que se le pasa a la ventana host es una **copia**: el `UserControl` puede dispostear la suya sin matar la de la ventana
+- [ ] La `Region` que se le pasa a la ventana del modal es una **copia**: el `UserControl` puede dispostear la suya sin matar la de la ventana
 - [ ] La clase estatica no depende de la capa de datos: sigue siendo valido el criterio de D-005 (el modal no toca el DAO)
+- [ ] `ModalDialog.Mostrar(modal, ancla)` es el otro unico punto de entrada: abre el modal y devuelve el `DialogResult`
 
 ### ComboBox buscable
 
@@ -115,10 +116,8 @@ nada por constructor: el modal se ancla solo sobre la ventana principal.
 
 **Los UserControl modales**
 
-- `AplicarEstiloCard()` se reemplaza por `ModalConfiguration.AplicarEstilo(this)`, que hace las tres
-  cosas: fondo opaco, tipografia y esquinas redondeadas
-- Cancelar y la `X` se conectan con `ModalConfiguration.ConectarCierre(this, btnCancelar, pBoxCerrar, ...)`
-- El ESC se conecta con `ModalConfiguration.ConectarEsc(this, ...)`
+- `AplicarEstiloCard()` se borra y se reemplaza por **una sola llamada**:
+  `ModalConfiguration.ConfigModal(this, btnCancelar, pBoxCerrar)`
 - Al guardar, el modal arma la entidad, la deja en una propiedad publica `Entidad` y cierra con
   `ModalConfiguration.CerrarModal(this, DialogResult.OK)`
 - Los eventos `Aceptado` y `Closed` desaparecen: el resultado viaja en el `DialogResult` y la entidad

@@ -55,9 +55,12 @@ public static class ModalDialog
         modal.Location = Point.Empty;
         ventana.Controls.Add(modal);
 
-        // La ventana toma la misma forma redondeada que el modal, pero con
-        // su propio Region (un clon): el modal libera el suyo en su resize
-        // y no debe dejar muerta la Region de la ventana.
+        // La ventana del modal toma la forma redondeada del modal. Se
+        // vuelve a sincronizar en cada resize del modal, y el handler se
+        // saca al cerrar la ventana: si no, un modal que se abre dos veces
+        // deja handlers viejos apuntando a una ventana ya liberada.
+        EventHandler alRedimensionar = (s, e) => ModalConfiguration.SincronizarRegion(modal, ventana);
+        modal.Resize += alRedimensionar;
         ModalConfiguration.SincronizarRegion(modal, ventana);
 
         Centrar(ventana, modal, ancla);
@@ -68,6 +71,7 @@ public static class ModalDialog
         }
         finally
         {
+            modal.Resize -= alRedimensionar;
             ventana.Close();
             ventana.Dispose();
         }

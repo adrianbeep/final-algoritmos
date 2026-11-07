@@ -3,17 +3,18 @@ using System.Drawing.Drawing2D;
 namespace SistemaCoworking.Herramientas;
 
 /// <summary>
-/// Estilo y comportamiento comun de los modales: los UserControl que se
-/// muestran dentro de una ventana propia.
+/// Configuracion comun de los UserControl que se muestran como modal.
 ///
-/// POR QUE LA REGION NO SE COMPARTE CON LA VENTANA:
-/// Medido en .NET 10: el setter de <see cref="Control.Region"/> guarda el
-/// objeto tal cual (misma instancia) y dispose el anterior. Si la ventana
-/// que hospeda al modal recibe el MISMO Region que el modal, el modal lo
-/// dispostea en su resize y esa ventana queda con un Region muerto: al
-/// leerla tira "ArgumentException: Parameter is not valid". Por eso recibe
-/// un CLON, que es independiente del Region del modal: el modal puede
-/// liberar el suyo sin romper el de la ventana.
+/// UNA SOLA LLAMADA, en el constructor del modal:
+///
+/// <code>
+/// ModalConfiguration.ConfigModal(this, btnCancelar, pBoxCerrar);
+/// </code>
+///
+/// deja el modal con el estilo de tarjeta, las esquinas redondeadas, y el
+/// boton Cancelar, la X y la tecla ESC haciendo lo mismo: cerrar el modal
+/// sin guardar. Para guardar, el modal arma la entidad y cierra con
+/// <see cref="CerrarModal"/>.
 /// </summary>
 public static class ModalConfiguration
 {
@@ -29,34 +30,68 @@ public static class ModalConfiguration
     private static readonly Font ModalFont = new Font("Segoe UI", 9F);
 
     /// <summary>
-    /// Deja el modal con el fondo opaco, las esquinas redondeadas y la
-    /// tipografia de las tarjetas.
-    ///
-    /// El fondo opaco es obligatorio: sin esto el UserControl es
-    /// transparente y se ve el overlay gris a traves del modal.
-    ///
-    /// Reemplaza al <c>AplicarEstiloCard</c> que cada modal tenia
-    /// duplicado: hace las tres cosas, y las esquinas redondeadas van
-    /// aca adentro para que nadie se las olvide.
+    /// Configura el modal completo. Esta es la unica llamada que hace el
+    /// modal.
     /// </summary>
-    public static void AplicarEstilo(UserControl modal)
+    /// <param name="modal">El UserControl del modal.</param>
+    /// <param name="btnCancelar">El boton que cancela.</param>
+    /// <param name="pboxCerrar">La X de cerrar, si tiene.</param>
+    public static void ConfigModal(
+        UserControl modal,
+        Button btnCancelar,
+        PictureBox? pboxCerrar = null)
     {
+        // Fondo opaco: sin esto el UserControl es transparente y se ve el
+        // fondo de la app a traves del modal.
         modal.BackColor = Fondo;
         modal.ForeColor = TextoPrimario;
         modal.Font = ModalFont;
 
         AplicarRegionRedondeada(modal);
+
+        ConectarCierre(modal, btnCancelar, pboxCerrar);
+        ConectarEsc(modal);
     }
 
     /// <summary>
-    /// Recorta el modal con las esquinas redondeadas.
-    /// Libera el Region anterior antes de asignar el nuevo: sin esto cada
-    /// resize deja un Region huerfano (handle de GDI).
+    /// Cierra la ventana del modal con el resultado indicado. El form que
+    /// abrio el modal lo lee con el DialogResult que devuelve
+    /// <see cref="ModalDialog.Mostrar"/>.
     /// </summary>
-    public static void AplicarRegionRedondeada(UserControl modal)
+    public static void CerrarModal(UserControl modal, DialogResult resultado)
     {
-        int radio = RadioEsquina;
-        int diametro = radio * 2;
+        Form? ventana = modal.FindForm();
+        if (ventana is null) return;
+
+        ventana.DialogResult = resultado;
+        ventana.Close();
+    }
+
+    /// <summary>
+    /// Le da a la ventana del modal la misma forma redondeada que el modal.
+    ///
+    /// La ventana recibe un CLON del Region del modal, nunca el mismo
+    /// objeto: el setter de Region guarda la instancia tal cual y el modal
+    /// libera el suyo en su resize. Si compartieran el objeto, la ventana
+    /// quedaria con un Region muerto, y al leerla tiraria
+    /// "ArgumentException: Parameter is not valid".
+    /// </summary>
+    public static void SincronizarRegion(UserControl modal, Form ventana)
+    {
+        // Primero la del modal, despues el clon para la ventana.
+        AplicarRegionRedondeada(modal);
+
+        Region? anterior = ventana.Region;
+        ventana.Region = modal.Region?.Clone();
+        anterior?.Dispose();
+    }
+
+    /// <summary>
+    /// Recorta al modal con las esquinas redondeadas.
+    /// </summary>
+    private static void AplicarRegionRedondeada(UserControl modal)
+    {
+        int diametro = RadioEsquina * 2;
 
         var path = new GraphicsPath();
         path.AddArc(0, 0, diametro, diametro, 180, 90);
@@ -71,53 +106,17 @@ public static class ModalConfiguration
     }
 
     /// <summary>
-    /// Region para la ventana que hospeda al modal.
-    /// Devuelve un CLON, nunca el mismo objeto: asi el modal puede
-    /// liberar el suyo en el resize sin dejar muerta la Region de la ventana.
-    /// Si el modal todavia no tiene Region, devuelve null.
+    /// Conecta el boton Cancelar y la X al mismo cierre: los dos cancelan.
     /// </summary>
-    public static Region? RegionParaLaVentana(UserControl modal)
-    {
-        return modal.Region?.Clone();
-    }
-
-    /// <summary>
-    /// Sincroniza la forma de la ventana con la del modal y la vuelve
-    /// a sincronizar cada vez que el modal cambia de tamaño.
-    /// </summary>
-    public static void SincronizarRegion(UserControl modal, Form ventana)
-    {
-        AplicarRegionAVentana(modal, ventana);
-
-        // El modal puede cambiar de tamaño (por ejemplo, si se ajusta el
-        // contenido): la ventana tiene que seguir la misma forma.
-        modal.Resize += (s, e) => AplicarRegionAVentana(modal, ventana);
-    }
-
-    /// <summary>
-    /// Conecta el boton Cancelar y el PictureBox de la X al mismo cierre.
-    /// Los dos hacen exactamente lo mismo. Si <paramref name="alCerrar"/> es
-    /// null, no se conecta nada.
-    /// </summary>
-    public static void ConectarCierre(
+    private static void ConectarCierre(
         UserControl modal,
         Button btnCancelar,
-        PictureBox pboxCerrar,
-        Action alCerrar)
+        PictureBox? pboxCerrar)
     {
-        if (alCerrar is null) return;
-
-        EventHandler cerrar = (s, e) =>
-        {
-            // Si el modal ya se libero, el callback ya no tiene a quien
-            // avisarle.
-            if (modal.IsDisposed) return;
-
-            alCerrar();
-        };
+        EventHandler cerrar = (s, e) => CerrarModal(modal, DialogResult.Cancel);
 
         btnCancelar.Click += cerrar;
-        pboxCerrar.Click += cerrar;
+        if (pboxCerrar is not null) pboxCerrar.Click += cerrar;
     }
 
     /// <summary>
@@ -131,21 +130,20 @@ public static class ModalConfiguration
     /// se perdia.
     ///
     /// Por eso, ademas del KeyDown del modal, se usa el preview de la
-    /// VENTANA: con <see cref="Form.KeyPreview"/> el Form ve la tecla
-    /// ANTES que el control enfocado, y como el handler la marca como
-    /// manejada, el control enfocado nunca la ve. Asi el ESC se dispara una
-    /// sola vez, y las demas teclas siguen llegando al control enfocado.
+    /// ventana que lo hospeda: con <see cref="Form.KeyPreview"/> el Form ve
+    /// la tecla ANTES que el control enfocado, y como el handler la marca
+    /// como manejada, el control enfocado nunca la ve. Asi el ESC se dispara
+    /// una sola vez, y las demas teclas siguen llegando al control enfocado.
     /// </summary>
-    public static void ConectarEsc(UserControl modal, Action alCancelar)
+    private static void ConectarEsc(UserControl modal)
     {
-        if (alCancelar is null) return;
-
         void AlPresionarEsc(KeyEventArgs e)
         {
             if (e.KeyCode != Keys.Escape) return;
+
             e.Handled = true;
             e.SuppressKeyPress = true;
-            alCancelar();
+            CerrarModal(modal, DialogResult.Cancel);
         }
 
         // El KeyDown del modal sirve cuando el foco esta en el modal.
@@ -173,41 +171,5 @@ public static class ModalConfiguration
         {
             modal.ParentChanged += (s, e) => ConectarAVentana();
         }
-    }
-
-    /// <summary>
-    /// Cierra la ventana que hospeda al modal, dejandole el DialogResult
-    /// para que el form que abrio el modal sepa que paso al volver de
-    /// ShowDialog().
-    /// Si el modal no esta en ninguna ventana, no hace nada.
-    /// </summary>
-    public static void CerrarModal(UserControl modal, DialogResult resultado)
-    {
-        Form? ventana = modal.FindForm();
-        if (ventana is null) return;
-
-        ventana.DialogResult = resultado;
-        ventana.Close();
-    }
-
-    /// <summary>
-    /// Recorta al modal con las esquinas redondeadas y le pasa a la ventana
-    /// ventana un CLON de esa forma.
-    /// </summary>
-    private static void AplicarRegionAVentana(UserControl modal, Form ventana)
-    {
-        // La forma se recalcula con el tamaño actual del modal.
-        if (modal.Width > 0 && modal.Height > 0)
-        {
-            AplicarRegionRedondeada(modal);
-        }
-
-        Region? nuevo = RegionParaLaVentana(modal);
-
-        // El Region anterior de la ventana se libera antes de asignar el nuevo:
-        // si no, cada resize deja un Region huerfano (handle de GDI).
-        Region? anterior = ventana.Region;
-        ventana.Region = nuevo;
-        anterior?.Dispose();
     }
 }

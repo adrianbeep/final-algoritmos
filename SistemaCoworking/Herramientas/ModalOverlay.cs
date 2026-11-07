@@ -74,7 +74,10 @@ public static class ModalOverlay
             Owner = overlay,
             // Hereda la forma del modal: sin esto el fondo blanco del host
             // pinta un rectangulo y tapa las esquinas redondeadas.
-            Region = modal.Region
+            // Va un CLON y no el Region del modal: el modal libera el suyo
+            // en cada resize, y si compartieran el mismo objeto, la
+            // ventana host quedaria con un Region muerto.
+            Region = ModalConfiguration.RegionParaElHost(modal)
         };
 
         modal.Location = Point.Empty;

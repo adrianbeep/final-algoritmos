@@ -29,15 +29,23 @@ public static class ModalConfiguration
     private static readonly Font ModalFont = new Font("Segoe UI", 9F);
 
     /// <summary>
-    /// Deja el modal con el fondo opaco y la tipografia de las tarjetas.
+    /// Deja el modal con el fondo opaco, las esquinas redondeadas y la
+    /// tipografia de las tarjetas.
+    ///
     /// El fondo opaco es obligatorio: sin esto el UserControl es
     /// transparente y se ve el overlay gris a traves del modal.
+    ///
+    /// Reemplaza al <c>AplicarEstiloCard</c> que cada modal tenia
+    /// duplicado: hace las tres cosas, y las esquinas redondeadas van
+    /// aca adentro para que nadie se las olvide.
     /// </summary>
     public static void AplicarEstilo(UserControl modal)
     {
         modal.BackColor = Fondo;
         modal.ForeColor = TextoPrimario;
         modal.Font = ModalFont;
+
+        AplicarRegionRedondeada(modal);
     }
 
     /// <summary>

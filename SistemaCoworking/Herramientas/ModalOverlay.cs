@@ -97,18 +97,17 @@ public sealed class ModalOverlay : IDisposable
             // Owner una ventana que ya es propiedad de la principal, el
             // ShowDialog(owner) tira "ArgumentException: Referencia
             // circular del control".
-            Owner = _owner,
-
-            // Un CLON de la Region del modal, no el Region del modal: el
-            // modal libera el suyo en su resize y no debe dejar muerta la
-            // Region de esta ventana.
-            Region = ModalConfiguration.RegionParaLaVentana(modal)
+            Owner = _owner
         };
 
         modal.Location = Point.Empty;
         ventana.Controls.Add(modal);
 
-        // Si el modal cambia de tamaño, la ventana sigue su misma forma.
+        // La ventana del modal toma la misma forma redondeada que el modal,
+        // pero con su propio Region (un clon): el modal libera el suyo en
+        // su resize y no debe dejar muerta la Region de esta ventana.
+        // Esto tambien recalcula la Region del modal, asi que la ventana
+        // nunca queda sin recorte.
         ModalConfiguration.SincronizarRegion(modal, ventana);
 
         _ventana = ventana;

@@ -68,8 +68,7 @@ public partial class ClienteModalControl : Form
     {
         //OfType<T> permite filtrar por el control
         //que necesito recorrer
-        foreach (TextControl txt in this.Controls.OfType<TextControl>())
-            txt.LimpiarError();
+        TextControl.LimpiarErrores(this);
 
         bool errores = false;
         string? error;

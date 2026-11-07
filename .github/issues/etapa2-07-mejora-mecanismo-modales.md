@@ -130,7 +130,7 @@ y `RecursoDAO` devuelve `DataTable` (unificar eso es de la Etapa 5).
 
 - [ ] Las fuentes de `DataGridViewConfiguration` son estaticas: no se crean por llamada ni por celda repintada
 - [ ] `CellPainting` se desuscribe antes de suscribirse de nuevo
-- [ ] Queda decidido y documentado si el form embebido se recrea en cada click del sidebar o se conserva la instancia
+- [ ] **Decidido**: el form embebido se **recrea** en cada click del sidebar. Se elige asi porque es lo simple y garantiza que el listado muestre los datos mas frescos: al volver a un modulo se vuelve a consultar la base. El costo es una consulta extra por navegacion, que con el volumen del sistema no importa.
 
 ## Criterio de pase
 
@@ -143,6 +143,8 @@ y `RecursoDAO` devuelve `DataTable` (unificar eso es de la Etapa 5).
 - [ ] No hay dos modales que implementen el estilo de tarjeta por separado
 - [ ] `ReservaModalControl` se escribe sin copiar nada: declara sus controles y su validacion, y el mecanismo lo trae de `ModalConfiguration`
 - [ ] El combo buscable filtra con `Contains`, con el texto vacio muestra la lista entera, y el combo no usa `AutoCompleteMode` ni `AutoCompleteSource`
+- [ ] Al elegir un item de la lista desplegada, el combo queda con ese item seleccionado: el form puede leerlo con `BuscableSeleccionado`
+- [ ] Al escribir, el combo conserva el texto escrito y el caret: la proxima tecla se concatena y no se inserta al principio
 - [ ] `FrmReservas` se puede escribir sin copiar el mecanismo: el modal devuelve un resultado y el form persiste
 - [ ] El proyecto compila sin errores
 

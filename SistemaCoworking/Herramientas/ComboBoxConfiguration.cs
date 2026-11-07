@@ -168,11 +168,17 @@ public static class ComboBoxConfiguration
         {
             if (reconstruyendo) return;
 
-            // El texto y el caret se copian antes de tocar la lista: al
-            // vaciarla, los dos se pierden.
+            // El texto se copia antes de tocar la lista: al vaciarla, el
+            // texto escrito y el caret se pierden.
             string texto = combo.Text;
+
+            // Si el texto escrito es exactamente el texto de un item que ya
+            // esta en la lista, no hay nada que filtrar: es el usuario
+            // eligiendo uno de la lista desplegada. Si se reconstruyera la
+            // lista en ese momento, se perderia la seleccion.
+            if (IndicePorTexto<T>(combo, texto) >= 0) return;
+
             int caret = CaretActual(combo, texto.Length);
-            T? seleccionActual = Desenvolver<T>(combo.SelectedItem);
 
             reconstruyendo = true;
             try
@@ -187,18 +193,13 @@ public static class ComboBoxConfiguration
                 combo.Text = texto;
                 combo.SelectionStart = caret;
 
-                // La seleccion se conserva SOLO si el item sigue en la lista
-                // y el texto escrito es el texto del item: o sea, cuando el
-                // usuario eligio un item de la lista desplegada. Si esta
-                // escribiendo a medio camino, forzar la seleccion le pisaria
-                // el texto que acaba de escribir.
-                if (seleccionActual is not null)
+                // Si el texto escrito es exactamente el de un item, se
+                // selecciona: el usuario puede haber escrito el nombre
+                // completo en vez de elegirlo de la lista.
+                int indice = IndicePorTexto<T>(combo, texto);
+                if (indice >= 0)
                 {
-                    int indice = IndiceDe(combo, seleccionActual);
-                    if (indice >= 0 && TextoDelItem<T>(combo, indice) == texto)
-                    {
-                        combo.SelectedIndex = indice;
-                    }
+                    combo.SelectedIndex = indice;
                 }
             }
             finally
@@ -284,28 +285,19 @@ public static class ComboBoxConfiguration
     }
 
     /// <summary>
-    /// Indice del item que envuelve a <paramref name="valor"/>, o -1 si no
-    /// esta en la lista.
+    /// Indice del item cuyo texto es exactamente el indicado, o -1 si no
+    /// hay ninguno.
     /// </summary>
-    private static int IndiceDe<T>(ComboBox combo, T valor) where T : class
+    private static int IndicePorTexto<T>(ComboBox combo, string texto) where T : class
     {
         for (int i = 0; i < combo.Items.Count; i++)
         {
-            if (combo.Items[i] is Envoltura<T> env
-                && EqualityComparer<T>.Default.Equals(env.Valor, valor))
+            if (combo.Items[i] is Envoltura<T> env && env.Texto == texto)
             {
                 return i;
             }
         }
         return -1;
-    }
-
-    /// <summary>
-    /// Texto con el que se muestra un item del combo.
-    /// </summary>
-    private static string TextoDelItem<T>(ComboBox combo, int indice) where T : class
-    {
-        return combo.Items[indice] is Envoltura<T> env ? env.Texto : string.Empty;
     }
 
     private static void AplicarEstilo(ComboBox combo)

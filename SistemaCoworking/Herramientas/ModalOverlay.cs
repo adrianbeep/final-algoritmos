@@ -1,4 +1,4 @@
-﻿using System.Drawing;
+using System.Drawing;
 using System.Windows.Forms;
 
 namespace SistemaCoworking.Herramientas;
@@ -72,12 +72,12 @@ public static class ModalOverlay
             BackColor = modal.BackColor,
             Size = modal.Size,
             Owner = overlay,
-            // Hereda la forma del modal: sin esto el fondo blanco del host
+            // Hereda la forma del modal: sin esto el fondo blanco de la ventana
             // pinta un rectangulo y tapa las esquinas redondeadas.
             // Va un CLON y no el Region del modal: el modal libera el suyo
             // en cada resize, y si compartieran el mismo objeto, la
-            // ventana host quedaria con un Region muerto.
-            Region = ModalConfiguration.RegionParaElHost(modal)
+            // la ventana quedaria con un Region muerto.
+            Region = ModalConfiguration.RegionParaLaVentana(modal)
         };
 
         modal.Location = Point.Empty;

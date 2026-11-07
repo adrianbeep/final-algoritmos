@@ -4,16 +4,16 @@ namespace SistemaCoworking.Herramientas;
 
 /// <summary>
 /// Estilo y comportamiento comun de los modales: los UserControl que se
-/// muestran dentro de una ventana propia (ver <see cref="ModalOverlay"/>).
+/// muestran dentro de una ventana propia.
 ///
-/// POR QUE LA REGION NO SE COMPARTE CON LA VENTANA HOST:
+/// POR QUE LA REGION NO SE COMPARTE CON LA VENTANA:
 /// Medido en .NET 10: el setter de <see cref="Control.Region"/> guarda el
 /// objeto tal cual (misma instancia) y dispose el anterior. Si la ventana
-/// host recibe el MISMO Region que el modal, el modal lo dispostea en su
-/// resize y la ventana host queda con un Region muerto: al leerla tira
-/// "ArgumentException: Parameter is not valid". Por eso el host recibe un
-/// CLON, que es independiente del Region del modal: el modal puede
-/// liberar el suyo sin romper el del host.
+/// que hospeda al modal recibe el MISMO Region que el modal, el modal lo
+/// dispostea en su resize y esa ventana queda con un Region muerto: al
+/// leerla tira "ArgumentException: Parameter is not valid". Por eso recibe
+/// un CLON, que es independiente del Region del modal: el modal puede
+/// liberar el suyo sin romper el de la ventana.
 /// </summary>
 public static class ModalConfiguration
 {
@@ -65,25 +65,25 @@ public static class ModalConfiguration
     /// <summary>
     /// Region para la ventana que hospeda al modal.
     /// Devuelve un CLON, nunca el mismo objeto: asi el modal puede
-    /// liberar el suyo en el resize sin dejar muerta la Region del host.
+    /// liberar el suyo en el resize sin dejar muerta la Region de la ventana.
     /// Si el modal todavia no tiene Region, devuelve null.
     /// </summary>
-    public static Region? RegionParaElHost(UserControl modal)
+    public static Region? RegionParaLaVentana(UserControl modal)
     {
         return modal.Region?.Clone();
     }
 
     /// <summary>
-    /// Sincroniza la forma de la ventana host con la del modal y la vuelve
+    /// Sincroniza la forma de la ventana con la del modal y la vuelve
     /// a sincronizar cada vez que el modal cambia de tamaño.
     /// </summary>
-    public static void SincronizarRegion(UserControl modal, Form host)
+    public static void SincronizarRegion(UserControl modal, Form ventana)
     {
-        AplicarRegionAlHost(modal, host);
+        AplicarRegionAVentana(modal, ventana);
 
         // El modal puede cambiar de tamaño (por ejemplo, si se ajusta el
-        // contenido): la ventana host tiene que seguir la misma forma.
-        modal.Resize += (s, e) => AplicarRegionAlHost(modal, host);
+        // contenido): la ventana tiene que seguir la misma forma.
+        modal.Resize += (s, e) => AplicarRegionAVentana(modal, ventana);
     }
 
     /// <summary>
@@ -123,7 +123,7 @@ public static class ModalConfiguration
     /// se perdia.
     ///
     /// Por eso, ademas del KeyDown del modal, se usa el preview de la
-    /// ventana host: con <see cref="Form.KeyPreview"/> el Form ve la tecla
+    /// VENTANA: con <see cref="Form.KeyPreview"/> el Form ve la tecla
     /// ANTES que el control enfocado, y como el handler la marca como
     /// manejada, el control enfocado nunca la ve. Asi el ESC se dispara una
     /// sola vez, y las demas teclas siguen llegando al control enfocado.
@@ -145,25 +145,25 @@ public static class ModalConfiguration
 
         bool conectado = false;
 
-        void ConectarAlHost()
+        void ConectarAVentana()
         {
             if (conectado) return;
 
-            Form? host = modal.FindForm();
-            if (host is null) return;
+            Form? ventana = modal.FindForm();
+            if (ventana is null) return;
 
             conectado = true;
-            host.KeyPreview = true;
-            host.KeyDown += (s, e) => AlPresionarEsc(e);
+            ventana.KeyPreview = true;
+            ventana.KeyDown += (s, e) => AlPresionarEsc(e);
         }
 
-        ConectarAlHost();
+        ConectarAVentana();
 
         // Si todavia no esta hospedado, se espera a que lo agreguen a una
         // ventana para enganchar el preview de esa ventana.
         if (!conectado)
         {
-            modal.ParentChanged += (s, e) => ConectarAlHost();
+            modal.ParentChanged += (s, e) => ConectarAVentana();
         }
     }
 
@@ -175,18 +175,18 @@ public static class ModalConfiguration
     /// </summary>
     public static void CerrarModal(UserControl modal, DialogResult resultado)
     {
-        Form? host = modal.FindForm();
-        if (host is null) return;
+        Form? ventana = modal.FindForm();
+        if (ventana is null) return;
 
-        host.DialogResult = resultado;
-        host.Close();
+        ventana.DialogResult = resultado;
+        ventana.Close();
     }
 
     /// <summary>
     /// Recorta al modal con las esquinas redondeadas y le pasa a la ventana
-    /// host un CLON de esa forma.
+    /// ventana un CLON de esa forma.
     /// </summary>
-    private static void AplicarRegionAlHost(UserControl modal, Form host)
+    private static void AplicarRegionAVentana(UserControl modal, Form ventana)
     {
         // La forma se recalcula con el tamaño actual del modal.
         if (modal.Width > 0 && modal.Height > 0)
@@ -194,12 +194,12 @@ public static class ModalConfiguration
             AplicarRegionRedondeada(modal);
         }
 
-        Region? nuevo = RegionParaElHost(modal);
+        Region? nuevo = RegionParaLaVentana(modal);
 
-        // El Region anterior del host se libera antes de asignar el nuevo:
+        // El Region anterior de la ventana se libera antes de asignar el nuevo:
         // si no, cada resize deja un Region huerfano (handle de GDI).
-        Region? anterior = host.Region;
-        host.Region = nuevo;
+        Region? anterior = ventana.Region;
+        ventana.Region = nuevo;
         anterior?.Dispose();
     }
 }

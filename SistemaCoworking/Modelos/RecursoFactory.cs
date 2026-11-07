@@ -25,11 +25,16 @@ public static class RecursoFactory
     /// <summary>
     /// Crea el recurso concreto que corresponde al tipo indicado.
     /// Los datos especificos del tipo que no aplican se mandan en null.
+    ///
+    /// Devuelve null si falta el dato obligatorio del tipo, o si el dato no
+    /// se puede guardar: el formulario puede estar incompleto todavia y eso no
+    /// es un error. El mensaje exacto lo da la validacion del modelo, que es
+    /// la que se muestra al usuario.
     /// </summary>
     /// <exception cref="InvalidOperationException">
-    /// Si el tipo no existe o si falta el dato obligatorio del tipo.
+    /// Si el tipo no existe. Eso es un error de programacion, no del usuario.
     /// </exception>
-    public static Recurso Crear(
+    public static Recurso? Crear(
         string nombreTipo,
         int id,
         int idTipoRecurso,
@@ -47,8 +52,7 @@ public static class RecursoFactory
             case "Sala":
                 if (capacidadPersonas is null)
                 {
-                    throw new InvalidOperationException(
-                        "Una Sala requiere la capacidad de personas.");
+                    return null;
                 }
 
                 return new Sala(
@@ -58,8 +62,7 @@ public static class RecursoFactory
             case "PuestoTrabajo":
                 if (numeroMonitor is null)
                 {
-                    throw new InvalidOperationException(
-                        "Un PuestoTrabajo requiere la cantidad de monitores.");
+                    return null;
                 }
 
                 return new PuestoTrabajo(
@@ -69,14 +72,14 @@ public static class RecursoFactory
             case "OficinaPrivada":
                 if (metrosCuadrados is null)
                 {
-                    throw new InvalidOperationException(
-                        "Una OficinaPrivada requiere los metros cuadrados.");
+                    return null;
                 }
 
                 if (metrosCuadrados.Value != decimal.Truncate(metrosCuadrados.Value))
                 {
-                    throw new InvalidOperationException(
-                        "Los metros cuadrados deben ser un numero entero: la columna metros_cuadrados es entera.");
+                    // La columna metros_cuadrados es entera: un valor con
+                    // decimales no se puede guardar.
+                    return null;
                 }
 
                 return new OficinaPrivada(

@@ -13,6 +13,21 @@ public class Sala : Recurso
     public bool TieneProyector { get; set; }
 
     /// <summary>
+    /// Valida la capacidad de personas de la sala.
+    /// </summary>
+    public static bool ValidarCapacidad(int capacidad, out string? mensajeError)
+    {
+        if (capacidad <= 0)
+        {
+            mensajeError = "La capacidad de personas debe ser mayor a cero.";
+            return false;
+        }
+
+        mensajeError = null;
+        return true;
+    }
+
+    /// <summary>
     /// Datos especificos de la sala. Los de los otros tipos van en null.
     /// </summary>
     public override DetalleTipo Detalle =>

@@ -1,4 +1,4 @@
-﻿using SistemaCoworking.Herramientas;
+using SistemaCoworking.Herramientas;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -53,6 +53,12 @@ namespace SistemaCoworking.Formularios.UserControls
             }
         }
 
+        /// <summary>
+        /// Se dispara cuando cambia el texto del campo. Sirve para recalcular
+        /// lo que dependa del valor, como el precio de un recurso.
+        /// </summary>
+        public event EventHandler? ValueChanged;
+
         [DefaultValue("")]
         public string LblText
         {
@@ -85,10 +91,14 @@ namespace SistemaCoworking.Formularios.UserControls
         public void Configurar(
             string etiqueta,
             string placeholder,
-            TipoEntrada tipo = TipoEntrada.Texto)
+            TipoEntrada tipo = TipoEntrada.Texto,
+            int? maxLength = null)
         {
             LblText = etiqueta;
             Placeholder = placeholder;
+
+            if (maxLength.HasValue)
+                MaxLength = maxLength.Value;
 
             // Si el campo ya estaba configurado, se sacan los handlers
             // anteriores antes de poner los nuevos.
@@ -112,7 +122,17 @@ namespace SistemaCoworking.Formularios.UserControls
 
             // Pegar no dispara KeyPress, asi que lo que entra por el
             // portapapeles se revisa aparte.
-            _filtroPegado = (s, e) => SanearTexto(tipo);
+            _filtroPegado = (s, e) =>
+            {
+                // El saneo vuelve a disparar TextChanged: con el guard se evita
+                // que el evento se dispare dos veces por el mismo cambio.
+                if (_saneando)
+                    return;
+
+                SanearTexto(tipo);
+
+                ValueChanged?.Invoke(this, EventArgs.Empty);
+            };
 
             txt.TextChanged += _filtroPegado;
         }
@@ -148,9 +168,7 @@ namespace SistemaCoworking.Formularios.UserControls
             InitializeComponent();
 
             lbl.Text = label;
-            lbl.BackColor = Color.Transparent;
-            lbl.ForeColor = Color.FromArgb(80, 80, 80);
-            lbl.Font = new Font("Segoe UI", 9F);
+            InputConfiguration.ConfigLabel(lbl);
 
             InputConfiguration.Configuration(barra, txt, placeholder, Color.White);
 
@@ -160,7 +178,7 @@ namespace SistemaCoworking.Formularios.UserControls
             barra.Click += (s, e) => txt.Focus();
         }
 
-        public void MostrarError(string mensaje)
+        public void MostrarError(string? mensaje)
         {
             barra.BackColor = BordeError;
             pBox.Visible = true;

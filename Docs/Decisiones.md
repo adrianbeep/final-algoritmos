@@ -292,7 +292,7 @@ El síntoma es concreto: **el `Recurso` que entrega el modal no tenía origen**.
 
 - Recibe el nombre del tipo, los **datos comunes** (id, idTipoRecurso, nombre, ubicación, costo, estado) y los **datos específicos del tipo como opcionales** (`capacidadPersonas`, `tieneProyector`, `numeroMonitor`, `metrosCuadrados`).
 - **Es el único lugar del sistema que sabe qué tipo se construye con qué clase.**
-- **Valida el dato obligatorio del tipo** al construir: si el tipo es `Sala` y no viene `capacidadPersonas`, lanza `InvalidOperationException` con un mensaje claro. Si el tipo no existe, también lanza.
+- **Devuelve `null` cuando falta el dato obligatorio del tipo.** El formulario construye el recurso mientras el usuario escribe, y un formulario incompleto no es un error: es el estado normal. La excepción queda reservada para el **tipo desconocido**, que es un error de programación (un seed corrupto), no del usuario. *(Contrato revisado el 06/11/2026: antes devolvía `null` en los dos casos; ver la nota de abajo.)*
 - **No conoce la regla de precio**: esa vive en `CalcularPrecio()`, que es polimorfismo del modelo (D-003). La fábrica solo decide **qué clase** se construye.
 - `RecursoDAO` dejó de instanciar clases concretas: ahora llama a `RecursoFactory.Crear(...)`.
 - En toda la cadena se respeta la diferencia entre **"no aplica"** (null) y **"vale cero"**: los helpers de lectura del DAO devuelven `null` en vez de `0` cuando la columna viene en NULL, porque la fábrica necesita distinguir las dos cosas.
@@ -313,6 +313,7 @@ El síntoma es concreto: **el `Recurso` que entrega el modal no tenía origen**.
 - El modal de Recursos puede armar el `Recurso` **sin tocar la capa de datos**.
 - La invariante "una `Sala` siempre tiene capacidad" se verifica **al construir el objeto**, no recién cuando se escribe en la base.
 - La regla de precio sigue en un solo lugar: `CalcularPrecio()`.
+- **El modal puede construir el recurso mientras el usuario escribe**, sin excepciones en el flujo normal: la fábrica devuelve `null` hasta que el formulario está completo, y el precio se recalcula en vivo sobre ese mismo objeto.
 
 **En contra (y cómo se mitiga):**
 
@@ -321,6 +322,19 @@ El síntoma es concreto: **el `Recurso` que entrega el modal no tenía origen**.
 - **Queda un acoplamiento residual del DAO con las clases concretas.** `Insertar` y `Modificar` tienen que extraer del objeto los datos específicos del tipo para mandarlos al procedimiento almacenado, y lo hacen con un `switch` sobre el tipo concreto. Es un acoplamiento de otro nivel que el de la fábrica: la capa de datos mapea el objeto a los parámetros de un SP cuya firma la define la estructura de la tabla, que ya replica la jerarquía de tipos (D-002).
   - **Resuelto en D-006**: cada clase expone sus datos específicos en una forma común y el DAO dejó de conocer las clases concretas.
 - **La validación del dato obligatorio del tipo vive en tres capas**: la UI (mensaje al usuario), la fábrica (al construir el objeto) y el procedimiento almacenado (al escribir, con `SIGNAL SQLSTATE '45000'`). No es duplicación: cada capa protege su frontera, y las tres son exigidas por el diseño en capas que el proyecto ya manifiesta.
+
+### Nota — revisión del contrato (06/11/2026)
+
+La fábrica nació **lanzando** `InvalidOperationException` cuando faltaba el dato obligatorio del tipo. Eso se vio al construir el modal de Recursos: el modal tiene que armar el recurso **en vivo**, con el formulario a medio completar, para poder mostrar el precio mientras el usuario escribe. Con el contrato viejo, cada tecla que dejaba el formulario incompleto lanzaba una excepción.
+
+El contrato quedó así:
+
+- **Falta el dato obligatorio del tipo** → la fábrica devuelve `null`. Es el estado normal de un formulario incompleto, no un error.
+- **El tipo no existe** → sigue lanzando `InvalidOperationException`. Eso es un error de programación (o un seed corrupto) y tiene que ser ruidoso.
+
+El mensaje al usuario no lo da la fábrica: lo dan los validadores del modelo (`Recurso.ValidarCosto`, `OficinaPrivada.ValidarMetrosCuadrados`), que son los que la interfaz muestra. La fábrica deja de ser la capa que informa y queda como la que construye.
+
+Consecuencia de fondo: **el objeto que calcula el precio y el objeto que se guarda son el mismo**. El modal mantiene un borrador, que se rehace en cada cambio, y el precio sale de ese borrador. No hay dos objetos ni dos caminos que puedan desincronizarse.
 
 ### Referencias
 
@@ -369,7 +383,7 @@ Ese `switch` además **escondía un problema de precisión**. `OficinaPrivada.Me
 | `OficinaPrivada` | metros cuadrados |
 
 - El DAO llama a `AgregarParametrosDetalle(comando, recurso.Detalle)` y **no nombra ninguna clase concreta**. La conversión de `decimal` a `int` de los metros queda en el DAO, que es la capa que conoce la forma de la columna.
-- **Los metros con decimales se rechazan en vez de truncar**: `OficinaPrivada.ValidarMetrosCuadrados` lo valida para la interfaz, y `RecursoFactory` lanza `InvalidOperationException` si el valor no es entero.
+- **Los metros con decimales se rechazan en vez de truncar**: `OficinaPrivada.ValidarMetrosCuadrados` lo valida para la interfaz, y `RecursoFactory` devuelve `null` si el valor no es entero.
 
 ### Alternativas descartadas
 

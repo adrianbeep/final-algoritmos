@@ -98,7 +98,7 @@ Roadmap de trabajo del proyecto integrador. Cada etapa corresponde a un hito del
 - [ ] DateTimePicker para fechas
 - [ ] NumericUpDown cuando corresponda
 - [ ] Botones de acción (Nuevo, Guardar, Eliminar, Cancelar)
-- [ ] Campo de búsqueda por módulo
+- [ ] Campo de búsqueda por módulo — *nice to have: fuera del alcance de la etapa 2. Queda para una entrega posterior si sobra tiempo.*
 
 ### Dashboard principal
 - [ ] Tarjeta: Total clientes (consume `fn_total_clientes`)

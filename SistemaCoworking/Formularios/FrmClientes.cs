@@ -1,11 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Text;
 using System.Windows.Forms;
-using SistemaCoworking;
 using SistemaCoworking.Datos;
 using SistemaCoworking.Formularios.UserControls;
 using SistemaCoworking.Herramientas;
@@ -13,24 +7,24 @@ using SistemaCoworking.Modelos;
 
 namespace SistemaCoworking.Formularios;
 
+/// <summary>
+/// El listado de clientes.
+///
+/// Es un form embebido en el panel del FrmPrincipal. No edita nada: abre el
+/// modal de cliente y espera.
+/// </summary>
 public partial class FrmClientes : Form
 {
     private ClienteDAO _clienteDAO = new ClienteDAO();
-    private readonly Form _modalOverlay;
 
-    public FrmClientes(Form? modalOverlay = null)
+    public FrmClientes()
     {
         InitializeComponent();
-        _modalOverlay = modalOverlay ?? new Form { Opacity = 0 };
 
         DataGridViewConfiguration.ConfigDGV(dgvClientes);
         CargarDataGridViewClientes(dgvClientes);
 
         ButtonConfiguration.ConfigPrimary(btnCrearCliente);
-    }
-
-    private void FrmClientes_Load(object sender, EventArgs e)
-    {
     }
 
     private void CargarDataGridViewClientes(DataGridView dgv)
@@ -48,65 +42,69 @@ public partial class FrmClientes : Form
         }
     }
 
+    /// <summary>
+    /// Click en el boton de la fila: abre el modal para editar ese cliente.
+    /// </summary>
     private void dgvClientes_CellContentClick(object sender, DataGridViewCellEventArgs e)
     {
         if (e.RowIndex < 0) return;
 
-        DataGridViewColumn col = dgvClientes.Columns[e.ColumnIndex];
+        // Solo el boton de la fila abre el modal, no cualquier celda.
+        if (dgvClientes.Columns[e.ColumnIndex] is not DataGridViewButtonColumn) return;
 
-        // Solo actuar en columnas de tipo botón
-        if (col is not DataGridViewButtonColumn) return;
+        int id = Convert.ToInt32(dgvClientes.Rows[e.RowIndex].Cells["colId"].Value);
 
-        DataGridViewRow fila = dgvClientes.Rows[e.RowIndex];
-        Cliente? c =
-            _clienteDAO.ObtenerPorId(
-                Convert.ToInt32(fila.Cells["colId"].Value)
-            );
-
-        if (c is null)
+        Cliente? cliente = _clienteDAO.ObtenerPorId(id);
+        if (cliente is null)
         {
             MessageBox.Show("No se encontro el cliente.",
                             "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             return;
         }
 
-        AbrirModalUsuario(c);
+        AbrirModalCliente(cliente);
     }
 
-    //Sin cliente es alta, con cliente es edicion
-    private void AbrirModalUsuario(Cliente? cliente = null)
+    /// <summary>
+    /// Abre el modal de cliente y, si el usuario guardo, lo escribe en la base.
+    ///
+    /// Sin cliente es un ALTA, con cliente es una EDICION: lo decide este
+    /// form, que es el que abre el modal.
+    ///
+    /// ShowDialog() espera a que el modal se cierre y devuelve
+    /// DialogResult.OK si el usuario guardo. Cuando guardo, el modal deja el
+    /// cliente en su propiedad Entidad, y recien ahi se escribe en la base.
+    /// Por eso la escritura va despues: si la base falla, el modal ya cerro
+    /// y la aplicacion no queda bloqueada.
+    /// </summary>
+    private void AbrirModalCliente(Cliente? cliente = null)
     {
         ClienteModalControl modal = new ClienteModalControl(cliente);
 
-        modal.Closed += (s, args) =>
+        if (modal.ShowDialog() != DialogResult.OK) return;
+
+        Cliente? datos = modal.Entidad;
+        if (datos is null) return;
+
+        if (cliente is null)
         {
-            ModalOverlay.Close(_modalOverlay);
-        };
-
-        modal.Aceptado += (s, c) =>
+            _clienteDAO.Insertar(
+                datos.Nombre,
+                datos.Apellido,
+                datos.Dni,
+                datos.Telefono,
+                datos.Email);
+        }
+        else
         {
-            if (modal.EsNuevo)
-            {
-                _clienteDAO.Insertar(
-                    c.Nombre,
-                    c.Apellido,
-                    c.Dni,
-                    c.Telefono,
-                    c.Email);
-            }
-            else
-            {
-                _clienteDAO.Modificar(c);
-            }
+            _clienteDAO.Modificar(datos);
+        }
 
-            CargarDataGridViewClientes(dgvClientes); // refrescar la grilla
-        };
-
-        ModalOverlay.Show(_modalOverlay, modal);
+        CargarDataGridViewClientes(dgvClientes); // refrescar la grilla
     }
 
     private void btnCrearCliente_Click(object sender, EventArgs e)
     {
-        AbrirModalUsuario();
+        AbrirModalCliente();
     }
 }

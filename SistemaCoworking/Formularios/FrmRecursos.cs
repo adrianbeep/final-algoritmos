@@ -1,31 +1,31 @@
-﻿using SistemaCoworking.Datos;
+﻿using System;
+using System.Collections.Generic;
+using System.Windows.Forms;
+using SistemaCoworking.Datos;
 using SistemaCoworking.Formularios.UserControls;
 using SistemaCoworking.Herramientas;
 using SistemaCoworking.Modelos;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Text;
-using System.Windows.Forms;
 
 namespace SistemaCoworking.Formularios;
 
+/// <summary>
+/// El listado de recursos.
+///
+/// Es un form embebido en el panel del FrmPrincipal. No edita nada: abre el
+/// modal de recurso y espera.
+/// </summary>
 public partial class FrmRecursos : Form
 {
     private RecursoDAO _recursoDAO = new RecursoDAO();
     private TipoRecursoDAO _tipoRecursoDAO = new TipoRecursoDAO();
-    private readonly Form _modalOverlay;
 
     //Catalogo de tipos de recurso. Se carga una vez y se le pasa al modal:
     //el modal no depende de la capa de datos.
     private List<TipoRecurso> _tiposRecurso = new List<TipoRecurso>();
 
-    public FrmRecursos(Form? modalOverlay = null)
+    public FrmRecursos()
     {
         InitializeComponent();
-        _modalOverlay = modalOverlay ?? new Form { Opacity = 0 };
 
         DataGridViewConfiguration.ConfigDGV(dgvRecursos);
         CargarDataGridViewRecursos(dgvRecursos);
@@ -62,56 +62,60 @@ public partial class FrmRecursos : Form
         }
     }
 
+    /// <summary>
+    /// Click en el boton de la fila: abre el modal para editar ese recurso.
+    /// </summary>
     private void dgvRecursos_CellContentClick(object sender, DataGridViewCellEventArgs e)
     {
         if (e.RowIndex < 0) return;
 
-        DataGridViewColumn col = dgvRecursos.Columns[e.ColumnIndex];
+        // Solo el boton de la fila abre el modal, no cualquier celda.
+        if (dgvRecursos.Columns[e.ColumnIndex] is not DataGridViewButtonColumn) return;
 
-        // Solo actuar en columnas de tipo botón
-        if (col is not DataGridViewButtonColumn) return;
+        int id = Convert.ToInt32(dgvRecursos.Rows[e.RowIndex].Cells["colId"].Value);
 
-        DataGridViewRow fila = dgvRecursos.Rows[e.RowIndex];
-        Recurso? r =
-            _recursoDAO.ObtenerPorId(
-                Convert.ToInt32(fila.Cells["colId"].Value)
-            );
-
-        if (r is null)
+        Recurso? recurso = _recursoDAO.ObtenerPorId(id);
+        if (recurso is null)
         {
             MessageBox.Show("No se encontro el recurso.",
                             "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             return;
         }
 
-        AbrirModalRecurso(r);
+        AbrirModalRecurso(recurso);
     }
 
-    //Sin cliente es alta, con cliente es edicion
+    /// <summary>
+    /// Abre el modal de recurso y, si el usuario guardo, lo escribe en la base.
+    ///
+    /// Sin recurso es un ALTA, con recurso es una EDICION: lo decide este
+    /// form, que es el que abre el modal.
+    ///
+    /// ShowDialog() espera a que el modal se cierre y devuelve
+    /// DialogResult.OK si el usuario guardo. Cuando guardo, el modal deja el
+    /// recurso en su propiedad Entidad, y recien ahi se escribe en la base.
+    /// Por eso la escritura va despues: si la base falla, el modal ya cerro
+    /// y la aplicacion no queda bloqueada.
+    /// </summary>
     private void AbrirModalRecurso(Recurso? recurso = null)
     {
         RecursoModalControl modal = new RecursoModalControl(recurso, _tiposRecurso);
 
-        modal.Closed += (s, args) =>
+        if (modal.ShowDialog() != DialogResult.OK) return;
+
+        Recurso? datos = modal.Entidad;
+        if (datos is null) return;
+
+        if (recurso is null)
         {
-            ModalOverlay.Close(_modalOverlay);
-        };
-
-        modal.Aceptado += (s, r) =>
+            _recursoDAO.Insertar(datos);
+        }
+        else
         {
-            if (modal.EsNuevo)
-            {
-                _recursoDAO.Insertar(r);
-            }
-            else
-            {
-                _recursoDAO.Modificar(r);
-            }
+            _recursoDAO.Modificar(datos);
+        }
 
-            CargarDataGridViewRecursos(dgvRecursos); // refrescar la grilla
-        };
-
-        ModalOverlay.Show(_modalOverlay, modal);
+        CargarDataGridViewRecursos(dgvRecursos); // refrescar la grilla
     }
 
     private void btnCrearRecurso_Click(object sender, EventArgs e)

@@ -60,7 +60,7 @@ public class Reserva
 
         if (recurso.Estado != Recurso.EstadoRecurso.Disponible)
         {
-            mensajeError = "El recurso no esta disponible.";
+            mensajeError = "El recurso no está disponible.";
             return false;
         }
 

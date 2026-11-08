@@ -24,6 +24,13 @@ public class Cliente
         Email = email;
     }
 
+    /// <summary>
+    /// Nombre y apellido juntos. Es lo que se muestra en los combos y en
+    /// los listados: el nombre solo no distingue a dos clientes con el
+    /// mismo nombre.
+    /// </summary>
+    public string NombreCompleto => $"{Nombre} {Apellido}";
+
     public static bool ValidarNombre(string nombre, out string? mensajeError)
     {
         if (string.IsNullOrEmpty(nombre))

@@ -97,14 +97,18 @@ pierde es el oscurecido.
 
 ### ComboBox buscable
 
-- [ ] `ComboBoxConfiguration` suma un metodo para cargar un combo con busqueda interna: `DropDownStyle = DropDown`, el usuario escribe y la lista se filtra
+- [ ] `ComboBoxConfiguration` suma el combo buscable: el usuario escribe y la lista se filtra
+- [ ] **Una llamada por tipo, sin delegates en el que llama**: `ConfigBuscableClientes(combo, clientes)` y `ConfigBuscableRecursos(combo, recursos)`. Las reglas de busqueda quedan escritas en el helper, no en el form
+- [ ] Para leer lo elegido: `ClienteSeleccionado(combo)` y `RecursoSeleccionado(combo)`
 - [ ] Con el texto vacio se muestra la lista entera
 - [ ] La busqueda es `Contains` e insensible a mayusculas, **no** `StartsWith`
 - [ ] El combo **no** usa `AutoCompleteMode` ni `AutoCompleteSource`: el autocompletado nativo del `ComboBox` busca con `StartsWith` y no sirve
 - [ ] El filtro no se realimenta: recargar los `Items` no vuelve a disparar el filtro
 - [ ] Al filtrar se restauran el texto escrito y el caret: si no, cada tecla se inserta al principio
-- [ ] El combo de clientes del modal de Reservas busca por nombre, apellido o DNI
-- [ ] El combo de recursos del modal de Reservas busca por nombre o ubicacion
+- [ ] Al elegir un item de la lista desplegada, el combo queda con ese item seleccionado: el form puede leerlo
+- [ ] El combo de clientes busca por nombre, apellido o DNI
+- [ ] El combo de recursos busca por nombre o ubicacion
+- [ ] El modal de Reservas necesita la lista de recursos con su tipo concreto: `RecursoDAO.ObtenerTodosComoLista()` (el JOIN con `recursos_detalle` y la reconstruccion con `RecursoFactory`). `ObtenerTodos()` sigue devolviendo la vista plana, que es la que bindea la grilla
 
 ### El modal recibe lo que necesita, no el DAO
 

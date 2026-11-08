@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using MySql.Data.MySqlClient;
 using SistemaCoworking.Modelos;
@@ -27,6 +28,70 @@ public class RecursoDAO
                     conexion))
             {
                 adaptador.Fill(recursos);
+            }
+        }
+
+        return recursos;
+    }
+
+    /// <summary>
+    /// Lista de recursos con su tipo concreto (Sala, PuestoTrabajo u
+    /// OficinaPrivada).
+    ///
+    /// Es lo que necesita el modal de Reservas: el total sale de
+    /// Recurso.PrecioDia, y ese precio depende de los datos del tipo
+    /// (proyector, monitores, metros), que solo estan en recursos_detalle.
+    ///
+    /// El listado de la grilla sigue usando ObtenerTodos(), que devuelve la
+    /// vista plana: ahi la columna del tipo no se puede bindear, porque
+    /// Recurso no tiene el nombre del tipo, solo su IdTipoRecurso.
+    /// </summary>
+    public List<Recurso> ObtenerTodosComoLista()
+    {
+        List<Recurso> recursos = new List<Recurso>();
+
+        using (MySqlConnection conexion =
+            ConexionBD.CrearConexion())
+        {
+            conexion.Open();
+
+            string sql =
+                "SELECT r.id, r.id_tipo_recurso, r.nombre, r.estado, r.ubicacion, r.costo, " +
+                "tr.nombre_tipo_recurso, " +
+                "rd.capacidad_personas, rd.tiene_proyector, rd.numero_monitor, rd.metros_cuadrados " +
+                "FROM recursos r " +
+                "INNER JOIN tipo_recursos tr ON tr.id = r.id_tipo_recurso " +
+                "LEFT JOIN recursos_detalle rd ON rd.id_recurso = r.id " +
+                "ORDER BY r.id ";
+
+            using (MySqlCommand comando =
+                new MySqlCommand(sql, conexion))
+            using (MySqlDataReader lector =
+                comando.ExecuteReader())
+            {
+                while (lector.Read())
+                {
+                    Recurso? recurso = RecursoFactory.Crear(
+                        Convert.ToString(lector["nombre_tipo_recurso"])!,
+                        Convert.ToInt32(lector["id"]),
+                        Convert.ToInt32(lector["id_tipo_recurso"]),
+                        Convert.ToString(lector["nombre"])!,
+                        Convert.ToString(lector["ubicacion"])!,
+                        Convert.ToDecimal(lector["costo"]),
+                        Enum.Parse<Recurso.EstadoRecurso>(Convert.ToString(lector["estado"])!),
+                        LeerInt(lector["capacidad_personas"]),
+                        LeerBool(lector["tiene_proyector"]),
+                        LeerInt(lector["numero_monitor"]),
+                        LeerDecimal(lector["metros_cuadrados"])
+                    );
+
+                    // La fabrica devuelve null si le falta el dato obligatorio
+                    // del tipo. Un recurso sin su fila de detalle no se
+                    // muestra: es preferible que no aparezca a que rompa el
+                    // combo.
+                    if (recurso is not null)
+                        recursos.Add(recurso);
+                }
             }
         }
 

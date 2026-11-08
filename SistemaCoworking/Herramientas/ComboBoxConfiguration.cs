@@ -97,7 +97,7 @@ public static class ComboBoxConfiguration
     /// <summary>
     /// Envuelve el item original para poder mostrar otro texto en el combo.
     /// El combo guarda objetos, asi que el item va envuelto; el valor
-    /// original se recupera con <see cref="BuscableSeleccionado{T}"/>.
+    /// original se recupera con <see cref="Desenvolver{T}"/>.
     /// </summary>
     private sealed class Envoltura<T> where T : class
     {
@@ -114,6 +114,67 @@ public static class ComboBoxConfiguration
     }
 
     /// <summary>
+    /// Configura un combo BUSCABLE de clientes: el usuario escribe y la
+    /// lista se filtra por nombre, apellido o DNI.
+    ///
+    /// Con el texto vacio se muestra la lista entera. La busqueda es por
+    /// Contains, no por StartsWith: el autocompletado nativo de WinForms
+    /// busca con StartsWith y por eso queda desactivado.
+    /// </summary>
+    /// <param name="seleccionado">Cliente que queda elegido, para el modo edicion.</param>
+    public static void ConfigBuscableClientes(
+        ComboBox combo,
+        List<Cliente> clientes,
+        Cliente? seleccionado = null)
+    {
+        ConfigBuscable(
+            combo,
+            clientes,
+            textoMostrado: c => $"{c.Nombre} {c.Apellido}",
+            coincide: (c, t) => c.Nombre.Contains(t, StringComparison.OrdinalIgnoreCase)
+                          || c.Apellido.Contains(t, StringComparison.OrdinalIgnoreCase)
+                          || c.Dni.ToString().Contains(t),
+            seleccionado);
+    }
+
+    /// <summary>
+    /// Configura un combo BUSCABLE de recursos: el usuario escribe y la
+    /// lista se filtra por nombre o ubicacion.
+    /// </summary>
+    /// <param name="seleccionado">Recurso que queda elegido, para el modo edicion.</param>
+    public static void ConfigBuscableRecursos(
+        ComboBox combo,
+        List<Recurso> recursos,
+        Recurso? seleccionado = null)
+    {
+        ConfigBuscable(
+            combo,
+            recursos,
+            textoMostrado: r => $"{r.Nombre} - {r.Ubicacion}",
+            coincide: (r, t) => r.Nombre.Contains(t, StringComparison.OrdinalIgnoreCase)
+                          || r.Ubicacion.Contains(t, StringComparison.OrdinalIgnoreCase),
+            seleccionado);
+    }
+
+    /// <summary>
+    /// Cliente elegido en un combo buscable de clientes, o null si no hay
+    /// ninguno elegido.
+    /// </summary>
+    public static Cliente? ClienteSeleccionado(ComboBox combo)
+    {
+        return Desenvolver<Cliente>(combo.SelectedItem);
+    }
+
+    /// <summary>
+    /// Recurso elegido en un combo buscable de recursos, o null si no hay
+    /// ninguno elegido.
+    /// </summary>
+    public static Recurso? RecursoSeleccionado(ComboBox combo)
+    {
+        return Desenvolver<Recurso>(combo.SelectedItem);
+    }
+
+    /// <summary>
     /// Configura un combo BUSCABLE: el usuario escribe y la lista se filtra
     /// con <paramref name="coincide"/>.
     ///
@@ -122,7 +183,7 @@ public static class ComboBoxConfiguration
     ///
     /// Cada item se muestra con <paramref name="textoMostrado"/>; el valor
     /// original (no el envuelto) se recupera con
-    /// <see cref="BuscableSeleccionado{T}"/>.
+    /// <see cref="Desenvolver{T}"/>.
     ///
     /// La lista arranca COMPLETA: el filtro no corre sobre el texto
     /// inicial.
@@ -133,7 +194,7 @@ public static class ComboBoxConfiguration
     /// cuando el usuario eligio un item de la lista desplegada. Si esta
     /// escribiendo a medio camino, la seleccion se suelta y queda el texto.
     /// </summary>
-    public static void ConfigBuscable<T>(
+    private static void ConfigBuscable<T>(
         ComboBox combo,
         List<T> items,
         Func<T, string> textoMostrado,
@@ -228,15 +289,6 @@ public static class ComboBoxConfiguration
 
         estado.Handler = filtrar;
         combo.TextChanged += filtrar;
-    }
-
-    /// <summary>
-    /// Item original seleccionado en un combo buscable, o null si no hay
-    /// nada seleccionado. Devuelve el valor original, no el envuelto.
-    /// </summary>
-    public static T? BuscableSeleccionado<T>(ComboBox combo) where T : class
-    {
-        return Desenvolver<T>(combo.SelectedItem);
     }
 
     /// <summary>

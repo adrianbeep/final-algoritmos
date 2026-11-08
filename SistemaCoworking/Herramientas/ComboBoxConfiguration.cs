@@ -78,40 +78,9 @@ public static class ComboBoxConfiguration
         return combo.SelectedItem as TipoRecurso;
     }
 
-    // ============================================================
-    // COMBO BUSCABLE
-    // ============================================================
-
-    /// <summary>
-    /// Estado del combo buscable. Guarda el handler de TextChanged para
-    /// poder sacarlo si el combo se vuelve a configurar: si no, el filtro
-    /// se aplicaria dos veces.
-    /// </summary>
-    private sealed class EstadoBuscable
-    {
-        public EventHandler? Handler { get; set; }
-    }
-
-    private static readonly ConditionalWeakTable<ComboBox, EstadoBuscable> Estados = new();
-
-    /// <summary>
-    /// Envuelve el item original para poder mostrar otro texto en el combo.
-    /// El combo guarda objetos, asi que el item va envuelto; el valor
-    /// original se recupera con <see cref="Desenvolver{T}"/>.
-    /// </summary>
-    private sealed class Envoltura<T> where T : class
-    {
-        public T Valor { get; }
-        public string Texto { get; }
-
-        public Envoltura(T valor, string texto)
-        {
-            Valor = valor;
-            Texto = texto;
-        }
-
-        public override string ToString() => Texto;
-    }
+    //==================================================
+    //COMBOS BUSCABLES
+    //==================================================
 
     /// <summary>
     /// Configura un combo BUSCABLE de clientes: el usuario escribe y la
@@ -120,40 +89,58 @@ public static class ComboBoxConfiguration
     /// Con el texto vacio se muestra la lista entera. La busqueda es por
     /// Contains, no por StartsWith: el autocompletado nativo de WinForms
     /// busca con StartsWith y por eso queda desactivado.
+    ///
+    /// El Id del cliente es el Value del combo, asi que lo elegido se lee
+    /// con SelectedValue.
     /// </summary>
-    /// <param name="seleccionado">Cliente que queda elegido, para el modo edicion.</param>
+    /// <param name="idSeleccionado">Id del cliente que queda elegido, para el modo edicion.</param>
     public static void ConfigBuscableClientes(
         ComboBox combo,
         List<Cliente> clientes,
-        Cliente? seleccionado = null)
+        int? idSeleccionado = null)
     {
         ConfigBuscable(
             combo,
             clientes,
+            idDe: c => c.Id,
             textoMostrado: c => $"{c.Nombre} {c.Apellido}",
             coincide: (c, t) => c.Nombre.Contains(t, StringComparison.OrdinalIgnoreCase)
                           || c.Apellido.Contains(t, StringComparison.OrdinalIgnoreCase)
                           || c.Dni.ToString().Contains(t),
-            seleccionado);
+            idSeleccionado);
     }
 
     /// <summary>
     /// Configura un combo BUSCABLE de recursos: el usuario escribe y la
     /// lista se filtra por nombre o ubicacion.
+    ///
+    /// El Id del recurso es el Value del combo.
     /// </summary>
-    /// <param name="seleccionado">Recurso que queda elegido, para el modo edicion.</param>
+    /// <param name="idSeleccionado">Id del recurso que queda elegido, para el modo edicion.</param>
     public static void ConfigBuscableRecursos(
         ComboBox combo,
         List<Recurso> recursos,
-        Recurso? seleccionado = null)
+        int? idSeleccionado = null)
     {
         ConfigBuscable(
             combo,
             recursos,
+            idDe: r => r.Id,
             textoMostrado: r => $"{r.Nombre} - {r.Ubicacion}",
             coincide: (r, t) => r.Nombre.Contains(t, StringComparison.OrdinalIgnoreCase)
                           || r.Ubicacion.Contains(t, StringComparison.OrdinalIgnoreCase),
-            seleccionado);
+            idSeleccionado);
+    }
+
+    /// <summary>
+    /// Id de lo elegido en un combo buscable, o null si no hay nada
+    /// seleccionado. Cada item del combo lleva su Id.
+    /// </summary>
+    public static int? IdSeleccionado(ComboBox combo)
+    {
+        return combo.SelectedItem is Envoltura<Cliente> env ? env.Id
+             : combo.SelectedItem is Envoltura<Recurso> envR ? envR.Id
+             : null;
     }
 
     /// <summary>
@@ -175,31 +162,56 @@ public static class ComboBoxConfiguration
     }
 
     /// <summary>
+    /// Estado del combo buscable. Guarda el handler de TextChanged para
+    /// poder sacarlo si el combo se vuelve a configurar: si no, el filtro
+    /// se aplicaria dos veces.
+    /// </summary>
+    private sealed class EstadoBuscable
+    {
+        public EventHandler? Handler { get; set; }
+    }
+
+    private static readonly ConditionalWeakTable<ComboBox, EstadoBuscable> Estados = new();
+
+    /// <summary>
+    /// Envuelve el item original para poder mostrar otro texto en el combo y
+    /// para llevar el Id. El combo guarda objetos, asi que el item va
+    /// envuelto; el valor original se recupera con
+    /// <see cref="Desenvolver{T}"/> y el Id con
+    /// <see cref="IdSeleccionado"/>.
+    ///
+    /// El combo NO se bindea con DataSource a proposito: un combo con
+    /// DataSource exige que el texto escrito coincida con el texto de un
+    /// item, y al filtrar revierte lo que el usuario escribio. Un combo
+    /// buscable necesita texto libre.
+    /// </summary>
+    private sealed class Envoltura<T> where T : class
+    {
+        public T Valor { get; }
+        public int Id { get; }
+        public string Texto { get; }
+
+        public Envoltura(T valor, int id, string texto)
+        {
+            Valor = valor;
+            Id = id;
+            Texto = texto;
+        }
+
+        public override string ToString() => Texto;
+    }
+
+    /// <summary>
     /// Configura un combo BUSCABLE: el usuario escribe y la lista se filtra
     /// con <paramref name="coincide"/>.
-    ///
-    /// El autocompletado nativo de WinForms queda desactivado a proposito:
-    /// el nativo busca con StartsWith y el filtro es propio.
-    ///
-    /// Cada item se muestra con <paramref name="textoMostrado"/>; el valor
-    /// original (no el envuelto) se recupera con
-    /// <see cref="Desenvolver{T}"/>.
-    ///
-    /// La lista arranca COMPLETA: el filtro no corre sobre el texto
-    /// inicial.
-    ///
-    /// Al escribir, el texto del combo NO se pisa: se filtra la lista y se
-    /// restaura lo escrito. La seleccion previa se mantiene solo si el item
-    /// sigue en la lista y el texto escrito es el texto del item, o sea
-    /// cuando el usuario eligio un item de la lista desplegada. Si esta
-    /// escribiendo a medio camino, la seleccion se suelta y queda el texto.
     /// </summary>
     private static void ConfigBuscable<T>(
         ComboBox combo,
         List<T> items,
+        Func<T, int> idDe,
         Func<T, string> textoMostrado,
         Func<T, string, bool> coincide,
-        T? seleccionado = null) where T : class
+        int? idSeleccionado) where T : class
     {
         // Editable: el usuario escribe. No se usa el AplicarEstilo de los
         // combos de lista, que fuerza DropDownList.
@@ -229,22 +241,22 @@ public static class ComboBoxConfiguration
         {
             if (reconstruyendo) return;
 
-            // El texto se copia antes de tocar la lista: al vaciarla, el
-            // texto escrito y el caret se pierden.
+            // El texto y el caret se copian antes de tocar la lista: al
+            // vaciarla, los dos se pierden.
             string texto = combo.Text;
 
             // Si el texto escrito es exactamente el texto de un item que ya
             // esta en la lista, no hay nada que filtrar: es el usuario
             // eligiendo uno de la lista desplegada. Si se reconstruyera la
             // lista en ese momento, se perderia la seleccion.
-            if (IndicePorTexto<T>(combo, texto) >= 0) return;
+            if (IdDeTexto<T>(combo, texto) is not null) return;
 
             int caret = CaretActual(combo, texto.Length);
 
             reconstruyendo = true;
             try
             {
-                Poblar(combo, items, textoMostrado, item => coincide(item, texto));
+                Poblar(combo, items, idDe, textoMostrado, i => coincide(i, texto));
 
                 // Al vaciar la lista de un ComboBox editable se borra tambien
                 // el texto escrito, y el caret queda en 0. Se restauran los
@@ -257,11 +269,9 @@ public static class ComboBoxConfiguration
                 // Si el texto escrito es exactamente el de un item, se
                 // selecciona: el usuario puede haber escrito el nombre
                 // completo en vez de elegirlo de la lista.
-                int indice = IndicePorTexto<T>(combo, texto);
-                if (indice >= 0)
-                {
-                    combo.SelectedIndex = indice;
-                }
+                int? id = IdDeTexto<T>(combo, texto);
+                if (id is not null)
+                    SeleccionarPorId<T>(combo, id.Value);
             }
             finally
             {
@@ -272,20 +282,10 @@ public static class ComboBoxConfiguration
         // La lista completa se carga ANTES de enganchar el filtro: si el
         // filtro ya estuviera enganchado, la seleccion inicial dispararia
         // el TextChanged y dejaria la lista reducida a un solo item.
-        Poblar(combo, items, textoMostrado, _ => true);
+        Poblar(combo, items, idDe, textoMostrado, _ => true);
 
-        if (seleccionado is not null)
-        {
-            foreach (object? item in combo.Items)
-            {
-                if (item is Envoltura<T> env
-                    && EqualityComparer<T>.Default.Equals(env.Valor, seleccionado))
-                {
-                    combo.SelectedItem = env;
-                    break;
-                }
-            }
-        }
+        if (idSeleccionado is not null)
+            SeleccionarPorId<T>(combo, idSeleccionado.Value);
 
         estado.Handler = filtrar;
         combo.TextChanged += filtrar;
@@ -297,6 +297,7 @@ public static class ComboBoxConfiguration
     private static void Poblar<T>(
         ComboBox combo,
         List<T> items,
+        Func<T, int> idDe,
         Func<T, string> textoMostrado,
         Func<T, bool> incluir) where T : class
     {
@@ -306,7 +307,37 @@ public static class ComboBoxConfiguration
         {
             if (!incluir(item)) continue;
 
-            combo.Items.Add(new Envoltura<T>(item, textoMostrado(item)));
+            combo.Items.Add(new Envoltura<T>(item, idDe(item), textoMostrado(item)));
+        }
+    }
+
+    /// <summary>
+    /// Id del item cuyo texto es exactamente el indicado, o null si no hay
+    /// ninguno.
+    /// </summary>
+    private static int? IdDeTexto<T>(ComboBox combo, string texto) where T : class
+    {
+        foreach (object? item in combo.Items)
+        {
+            if (item is Envoltura<T> env && env.Texto == texto)
+                return env.Id;
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Deja elegido el item con ese Id, si esta en la lista.
+    /// </summary>
+    private static void SeleccionarPorId<T>(ComboBox combo, int id) where T : class
+    {
+        for (int i = 0; i < combo.Items.Count; i++)
+        {
+            if (combo.Items[i] is Envoltura<T> env && env.Id == id)
+            {
+                combo.SelectedIndex = i;
+                return;
+            }
         }
     }
 
@@ -334,22 +365,6 @@ public static class ComboBoxConfiguration
     private static T? Desenvolver<T>(object? item) where T : class
     {
         return item is Envoltura<T> env ? env.Valor : null;
-    }
-
-    /// <summary>
-    /// Indice del item cuyo texto es exactamente el indicado, o -1 si no
-    /// hay ninguno.
-    /// </summary>
-    private static int IndicePorTexto<T>(ComboBox combo, string texto) where T : class
-    {
-        for (int i = 0; i < combo.Items.Count; i++)
-        {
-            if (combo.Items[i] is Envoltura<T> env && env.Texto == texto)
-            {
-                return i;
-            }
-        }
-        return -1;
     }
 
     private static void AplicarEstilo(ComboBox combo)

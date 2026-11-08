@@ -100,7 +100,8 @@ pierde es el oscurecido.
 - [ ] `ComboBoxConfiguration` queda como helper **solo estetico**, con un unico metodo: `Configuracion(combo)`. Deja el combo sin bordes, con la misma fuente que los campos de texto, fondo blanco y el color de la app
 - [ ] Cargar los items es cosa del que abre el combo, no del helper: cada modal bindea su combo con `DisplayMember`, `ValueMember` y `DataSource`
 - [ ] El `Value` del combo es el `Id`, asi que lo elegido se lee con `SelectedValue` y la edicion se abre con `SelectedValue = id`
-- [ ] Para que el combo muestre nombre y apellido, `Cliente` tiene la propiedad `NombreCompleto`
+- [ ] Para que el combo muestre nombre y apellido, `Cliente` tiene la propiedad `Descripcion` y su `ToString()` la devuelve: el combo muestra "Juan Perez - DNI 12345678"
+- [ ] `Recurso` tiene lo mismo: `Descripcion` es "Sala A - Planta baja" y su `ToString()` la devuelve
 - [ ] El combo de estado es un enum: no lleva `DataSource`, se cargan los valores y se lee con `SelectedItem`
 
 ### El modal recibe lo que necesita, no el DAO

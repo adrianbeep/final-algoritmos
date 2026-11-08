@@ -25,11 +25,16 @@ public class Cliente
     }
 
     /// <summary>
-    /// Nombre y apellido juntos. Es lo que se muestra en los combos y en
-    /// los listados: el nombre solo no distingue a dos clientes con el
-    /// mismo nombre.
+    /// Como se ve el cliente: nombre, apellido y DNI. Es lo que muestran
+    /// los combos y los listados: con el nombre solo no se distingue a dos
+    /// clientes que se llaman igual.
     /// </summary>
-    public string NombreCompleto => $"{Nombre} {Apellido}";
+    public string Descripcion => $"{Nombre} {Apellido} - DNI {Dni}";
+
+    /// <summary>
+    /// El cliente se muestra con su nombre, su apellido y su DNI.
+    /// </summary>
+    public override string ToString() => Descripcion;
 
     public static bool ValidarNombre(string nombre, out string? mensajeError)
     {

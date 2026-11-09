@@ -95,16 +95,14 @@ pierde es el oscurecido.
 - [ ] Los tres modales (Cliente, Recurso y Reserva) son iguales en estructura: los mismos botones y el mismo ciclo de vida. Lo unico que cambia son los controles que cada uno declara. Por eso lo repetido va en una clase estatica y no en una clase base con herencia
 - [ ] La clase estatica no depende de la capa de datos: sigue siendo valido el criterio de D-005 (el modal no toca el DAO)
 
-### ComboBox buscable
+### ComboBox con estilo de la app
 
-- [ ] `ComboBoxConfiguration` suma un metodo para cargar un combo con busqueda interna: `DropDownStyle = DropDown`, el usuario escribe y la lista se filtra
-- [ ] Con el texto vacio se muestra la lista entera
-- [ ] La busqueda es `Contains` e insensible a mayusculas, **no** `StartsWith`
-- [ ] El combo **no** usa `AutoCompleteMode` ni `AutoCompleteSource`: el autocompletado nativo del `ComboBox` busca con `StartsWith` y no sirve
-- [ ] El filtro no se realimenta: recargar los `Items` no vuelve a disparar el filtro
-- [ ] Al filtrar se restauran el texto escrito y el caret: si no, cada tecla se inserta al principio
-- [ ] El combo de clientes del modal de Reservas busca por nombre, apellido o DNI
-- [ ] El combo de recursos del modal de Reservas busca por nombre o ubicacion
+- [ ] `ComboBoxConfiguration` queda como helper **solo estetico**, con un unico metodo: `Configuracion(combo)`. Deja el combo sin bordes, con la misma fuente que los campos de texto, fondo blanco y el color de la app
+- [ ] Cargar los items es cosa del que abre el combo, no del helper: cada modal bindea su combo con `DisplayMember`, `ValueMember` y `DataSource`
+- [ ] El `Value` del combo es el `Id`, asi que lo elegido se lee con `SelectedValue` y la edicion se abre con `SelectedValue = id`
+- [ ] Para que el combo muestre nombre y apellido, `Cliente` tiene la propiedad `Descripcion` y su `ToString()` la devuelve: el combo muestra "Juan Perez - DNI 12345678"
+- [ ] `Recurso` tiene lo mismo: `Descripcion` es "Sala A - Planta baja" y su `ToString()` la devuelve
+- [ ] El combo de estado es un enum: no lleva `DataSource`, se cargan los valores y se lee con `SelectedItem`
 
 ### El modal recibe lo que necesita, no el DAO
 
@@ -142,9 +140,8 @@ y `RecursoDAO` devuelve `DataTable` (unificar eso es de la Etapa 5).
 - [ ] `grep` de `CancelButton` en los modales da un resultado: sin eso, ESC no cierra nada
 - [ ] No hay dos modales que implementen el estilo de tarjeta por separado
 - [ ] `ReservaModalControl` se escribe sin copiar nada: declara sus controles y su validacion, y el mecanismo lo trae de `ModalConfiguration`
-- [ ] El combo buscable filtra con `Contains`, con el texto vacio muestra la lista entera, y el combo no usa `AutoCompleteMode` ni `AutoCompleteSource`
-- [ ] Al elegir un item de la lista desplegada, el combo queda con ese item seleccionado: el form puede leerlo con `BuscableSeleccionado`
-- [ ] Al escribir, el combo conserva el texto escrito y el caret: la proxima tecla se concatena y no se inserta al principio
+- [ ] El combo tiene el estilo de la app con una sola llamada: `ComboBoxConfiguration.Configuracion(combo)`
+- [ ] El combo bindeado muestra el texto y guarda el Id como `Value`: lo elegido se lee con `SelectedValue`
 - [ ] `FrmReservas` se puede escribir sin copiar el mecanismo: el modal devuelve un resultado y el form persiste
 - [ ] El proyecto compila sin errores
 

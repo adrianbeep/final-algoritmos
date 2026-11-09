@@ -30,4 +30,56 @@ public class Reserva
         Estado = estadoReserva;
         TotalReserva = totalReserva;
     }
+
+    /// <summary>
+    /// La reserva tiene que ser de un cliente.
+    /// </summary>
+    public static bool ValidarCliente(Cliente? cliente, out string? mensajeError)
+    {
+        if (cliente is null)
+        {
+            mensajeError = "Elija un cliente.";
+            return false;
+        }
+
+        mensajeError = null;
+        return true;
+    }
+
+    /// <summary>
+    /// La reserva tiene que ser de un recurso, y el recurso tiene que estar
+    /// disponible: si no, el procedimiento almacenado lo rechaza.
+    /// </summary>
+    public static bool ValidarRecurso(Recurso? recurso, out string? mensajeError)
+    {
+        if (recurso is null)
+        {
+            mensajeError = "Elija un recurso.";
+            return false;
+        }
+
+        if (recurso.Estado != Recurso.EstadoRecurso.Disponible)
+        {
+            mensajeError = "El recurso no está disponible.";
+            return false;
+        }
+
+        mensajeError = null;
+        return true;
+    }
+
+    /// <summary>
+    /// La fecha de fin tiene que ser posterior a la de inicio.
+    /// </summary>
+    public static bool ValidarFechas(DateTime fechaInicio, DateTime fechaFin, out string? mensajeError)
+    {
+        if (fechaFin <= fechaInicio)
+        {
+            mensajeError = "La fecha de fin debe ser posterior a la fecha de inicio.";
+            return false;
+        }
+
+        mensajeError = null;
+        return true;
+    }
 }

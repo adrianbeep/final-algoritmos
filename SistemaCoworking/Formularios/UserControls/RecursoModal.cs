@@ -10,7 +10,7 @@ using System.Windows.Forms;
 
 namespace SistemaCoworking.Formularios.UserControls;
 
-public partial class RecursoModalControl : Form
+public partial class RecursoModal : Form
 {
     //Si es null el modal es de alta, si no es de edicion
     private readonly Recurso? _recurso;
@@ -31,7 +31,7 @@ public partial class RecursoModalControl : Form
     public Recurso? Entidad { get; set; }
 
     //Con cliente es edicion, sin cliente es alta
-    public RecursoModalControl(Recurso? recurso = null, List<TipoRecurso>? tipos = null)
+    public RecursoModal(Recurso? recurso = null, List<TipoRecurso>? tipos = null)
     {
         InitializeComponent();
 
@@ -120,12 +120,18 @@ public partial class RecursoModalControl : Form
 
     private void CargarComboTipoRecurso(ComboBox combo)
     {
-        ComboBoxConfiguration.ConfigTipos(combo, _tipos);
+        ComboBoxConfiguration.Configuracion(combo);
+        combo.DisplayMember = nameof(TipoRecurso.Nombre);
+        combo.ValueMember = nameof(TipoRecurso.Id);
+        combo.DataSource = _tipos;
     }
 
     private void CargarComboEstado(ComboBox combo)
     {
-        ComboBoxConfiguration.ConfigEstados(combo);
+        ComboBoxConfiguration.Configuracion(combo);
+        combo.Items.AddRange(
+            Enum.GetValues<Recurso.EstadoRecurso>().Cast<object>().ToArray());
+        combo.SelectedItem = Recurso.EstadoRecurso.Disponible;
     }
 
     private void cmbTipo_SelectedIndexChanged(object? sender, EventArgs e)
@@ -162,7 +168,7 @@ public partial class RecursoModalControl : Form
     /// </summary>
     private Recurso? ConstruirBorrador()
     {
-        TipoRecurso? tipo = ComboBoxConfiguration.TipoSeleccionado(cmbTipo);
+        TipoRecurso? tipo = cmbTipo.SelectedItem as TipoRecurso;
 
         if (tipo is null)
             return null;
@@ -177,7 +183,7 @@ public partial class RecursoModalControl : Form
             txtNombre.Value,
             txtUbicacion.Value,
             costo,
-            ComboBoxConfiguration.EstadoSeleccionado(cmbEstado),
+            cmbEstado.SelectedItem is Recurso.EstadoRecurso estado ? estado : Recurso.EstadoRecurso.Disponible,
             capacidadPersonas: LeerEntero(txtCapacidad),
             tieneProyector: chkProyector.Checked,
             numeroMonitor: LeerEntero(txtNumMonitores),
@@ -248,7 +254,7 @@ public partial class RecursoModalControl : Form
 
         // Los datos del tipo seleccionado. Los de los otros tipos van en null
         // y no bloquean el guardado: sus campos estan ocultos.
-        TipoRecurso? tipo = ComboBoxConfiguration.TipoSeleccionado(cmbTipo);
+        TipoRecurso? tipo = cmbTipo.SelectedItem as TipoRecurso;
         int? capacidad = null;
         int? monitores = null;
         decimal? metros = null;
@@ -308,7 +314,7 @@ public partial class RecursoModalControl : Form
             nombre,
             ubicacion,
             costo,
-            ComboBoxConfiguration.EstadoSeleccionado(cmbEstado),
+            cmbEstado.SelectedItem is Recurso.EstadoRecurso estado ? estado : Recurso.EstadoRecurso.Disponible,
             capacidadPersonas: capacidad,
             tieneProyector: tieneProyector,
             numeroMonitor: monitores,

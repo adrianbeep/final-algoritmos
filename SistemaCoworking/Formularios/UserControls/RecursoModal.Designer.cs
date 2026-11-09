@@ -1,6 +1,6 @@
 namespace SistemaCoworking.Formularios.UserControls
 {
-    partial class RecursoModalControl
+    partial class RecursoModal
     {
         /// <summary> 
         /// Variable del diseñador necesaria.

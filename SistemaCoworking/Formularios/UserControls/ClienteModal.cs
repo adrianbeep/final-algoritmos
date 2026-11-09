@@ -8,7 +8,7 @@ using System.Windows.Forms;
 
 namespace SistemaCoworking.Formularios.UserControls;
 
-public partial class ClienteModalControl : Form
+public partial class ClienteModal : Form
 {
     //Si es null el modal es de alta, si no es de edicion
     private readonly Cliente? _cliente;
@@ -21,7 +21,7 @@ public partial class ClienteModalControl : Form
     public Cliente? Entidad { get; set; }
 
     //Con cliente es edicion, sin cliente es alta
-    public ClienteModalControl(Cliente? cliente = null)
+    public ClienteModal(Cliente? cliente = null)
     {
         InitializeComponent();
 

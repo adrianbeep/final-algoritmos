@@ -31,6 +31,17 @@ public abstract class Recurso : IReservable
     public decimal PrecioDia => CalcularPrecio();
 
     /// <summary>
+    /// Como se ve el recurso: nombre y ubicacion. Con el nombre solo no se
+    /// distingue a dos recursos que se llaman igual.
+    /// </summary>
+    public string Descripcion => $"{Nombre} - {Ubicacion}";
+
+    /// <summary>
+    /// El recurso se muestra con su nombre y su ubicacion.
+    /// </summary>
+    public override string ToString() => Descripcion;
+
+    /// <summary>
     /// Datos especificos del tipo, con la forma que espera la base. Por
     /// defecto no hay datos especificos; cada clase derivada devuelve los
     /// suyos. Es lo que permite que la capa de datos mande los parametros del

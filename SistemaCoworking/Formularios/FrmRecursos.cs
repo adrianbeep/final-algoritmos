@@ -99,7 +99,7 @@ public partial class FrmRecursos : Form
     /// </summary>
     private void AbrirModalRecurso(Recurso? recurso = null)
     {
-        RecursoModalControl modal = new RecursoModalControl(recurso, _tiposRecurso);
+        RecursoModal modal = new RecursoModal(recurso, _tiposRecurso);
 
         if (modal.ShowDialog() != DialogResult.OK) return;
 

@@ -79,7 +79,7 @@ public partial class FrmClientes : Form
     /// </summary>
     private void AbrirModalCliente(Cliente? cliente = null)
     {
-        ClienteModalControl modal = new ClienteModalControl(cliente);
+        ClienteModal modal = new ClienteModal(cliente);
 
         if (modal.ShowDialog() != DialogResult.OK) return;
 

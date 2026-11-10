@@ -86,10 +86,10 @@ public partial class FrmReservas : Form
     /// form, que es el que abre el modal.
     ///
     /// El modal escribe en el momento de apretar Guardar, con el DAO que le
-    /// pasa este form. Si la escritura falla, el DAO ya mostro el error (por
-    /// ejemplo, que el recurso no esta disponible en esa fecha) y el modal
-    /// sigue abierto con lo que cargo el usuario: puede elegir otra fecha y
-    /// reintentar.
+    /// pasa este form. Si la escritura falla, el DAO lanza la excepcion (por
+    /// ejemplo, que el recurso no esta disponible en esa fecha), el modal la
+    /// captura y muestra el error, y el modal sigue abierto con lo que cargo el
+    /// usuario: puede elegir otra fecha y reintentar.
     /// </summary>
     private void AbrirModalReserva(Reserva? reserva = null)
     {
@@ -123,7 +123,18 @@ public partial class FrmReservas : Form
             return;
         }
 
-        Reserva? reserva = _reservaDAO.ObtenerPorId(id);
+        Reserva? reserva;
+        try
+        {
+            reserva = _reservaDAO.ObtenerPorId(id);
+        }
+        catch (Exception ex)
+        {
+            // El DAO lanza y aca se captura: se muestra el error y no se abre
+            // el modal.
+            ErroresDeBaseDeDatos.Mostrar(ex);
+            return;
+        }
         if (reserva is null)
         {
             MessageBox.Show("No se encontro la reserva.",

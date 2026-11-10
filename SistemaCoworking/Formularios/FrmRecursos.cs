@@ -78,7 +78,19 @@ public partial class FrmRecursos : Form
 
         int id = Convert.ToInt32(dgvRecursos.Rows[e.RowIndex].Cells["colId"].Value);
 
-        Recurso? recurso = _recursoDAO.ObtenerPorId(id);
+        Recurso? recurso;
+        try
+        {
+            recurso = _recursoDAO.ObtenerPorId(id);
+        }
+        catch (Exception ex)
+        {
+            // El DAO lanza y aca se captura: se muestra el error y no se abre
+            // el modal.
+            ErroresDeBaseDeDatos.Mostrar(ex);
+            return;
+        }
+
         if (recurso is null)
         {
             MessageBox.Show("No se encontro el recurso.",
@@ -96,9 +108,9 @@ public partial class FrmRecursos : Form
     /// form, que es el que abre el modal.
     ///
     /// El modal escribe en el momento de apretar Guardar, con el DAO que le
-    /// pasa este form. Si la escritura falla, el DAO ya mostro el error y el
-    /// modal sigue abierto con lo que cargo el usuario: puede corregir y
-    /// reintentar.
+    /// pasa este form. Si la escritura falla, el DAO lanza la excepcion, el
+    /// modal la captura y muestra el error, y el modal sigue abierto con lo
+    /// que cargo el usuario: puede corregir y reintentar.
     /// </summary>
     private void AbrirModalRecurso(Recurso? recurso = null)
     {

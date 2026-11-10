@@ -24,9 +24,9 @@ namespace SistemaCoworking.Formularios.UserControls
         public Reserva? Entidad { get; set; }
 
         //El DAO lo pasa el form. El modal lo usa para escribir: si la escritura
-        //falla, el DAO ya mostro el error y devuelve false, asi que el modal NO
-        //se cierra y el usuario puede corregir y reintentar sin perder lo que
-        //escribio.
+        //falla, el DAO lanza la excepcion, el modal la captura y muestra el
+        //error, asi que el modal NO se cierra y el usuario puede corregir y
+        //reintentar sin perder lo que escribio.
         private readonly ReservaDAO _dao;
 
         public ReservaModal(
@@ -144,11 +144,11 @@ namespace SistemaCoworking.Formularios.UserControls
             Reserva borrador = ConstruirBorrador(cliente, recurso);
             borrador.TotalReserva = borrador.CalcularTotal(recurso);
 
-            // La escritura la hace el form. Si falla, el DAO ya mostro el
-            // error de la base (por ejemplo, que el recurso no esta
-            // disponible en esa fecha) y devuelve false: el modal SIGUE
-            // ABIERTO con lo que cargo el usuario, para que elija otra fecha
-            // y reintente.
+            // La escritura la hace el modal, con el DAO que le paso el form.
+            // Si falla, el DAO lanza la excepcion, el modal la captura y
+            // muestra el error (por ejemplo, que el recurso no esta
+            // disponible en esa fecha) y el modal SIGUE ABIERTO con lo que
+            // cargo el usuario, para que elija otra fecha y reintente.
             if (!Guardar(borrador))
                 return;
 

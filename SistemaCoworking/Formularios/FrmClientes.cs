@@ -56,7 +56,19 @@ public partial class FrmClientes : Form
 
         int id = Convert.ToInt32(dgvClientes.Rows[e.RowIndex].Cells["colId"].Value);
 
-        Cliente? cliente = _clienteDAO.ObtenerPorId(id);
+        Cliente? cliente;
+        try
+        {
+            cliente = _clienteDAO.ObtenerPorId(id);
+        }
+        catch (Exception ex)
+        {
+            // El DAO lanza y aca se captura: se muestra el error y no se abre
+            // el modal.
+            ErroresDeBaseDeDatos.Mostrar(ex);
+            return;
+        }
+
         if (cliente is null)
         {
             MessageBox.Show("No se encontro el cliente.",
@@ -74,9 +86,10 @@ public partial class FrmClientes : Form
     /// form, que es el que abre el modal.
     ///
     /// El modal escribe en el momento de apretar Guardar, con el DAO que le
-    /// pasa este form. Si la escritura falla, el DAO ya mostro el error y el
-    /// modal sigue abierto con lo que cargo el usuario: puede corregir y
-    /// reintentar. Por eso el modal no devuelve la entidad para que el form
+    /// pasa este form. Si la escritura falla, el DAO lanza la excepcion, el
+    /// modal la captura y muestra el error, y el modal sigue abierto con lo
+    /// que cargo el usuario: puede corregir y reintentar. Por eso el modal no
+    /// devuelve la entidad para que el form
     /// la escriba DESPUES: ShowDialog() solo vuelve cuando el modal se cerro,
     /// y para entonces los datos ya se perdieron.
     /// </summary>

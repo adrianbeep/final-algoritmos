@@ -14,17 +14,17 @@ public partial class ClienteModal : Form
     //Si es null el modal es de alta, si no es de edicion
     private readonly Cliente? _cliente;
 
-    //El modal entrega el cliente al form, que decide si lo inserta o lo
-    //modifica. El atributo le dice al serializador del diseñador que esta
-    //propiedad no se guarda: sin el, el analizador de WinForms la toma por
-    //error y rompe el build (WFO1000).
+    //El modal escribe el cliente con el DAO que le pasa el form. La entidad
+    //guardada queda disponible aca. El atributo le dice al serializador del
+    //diseñador que esta propiedad no se guarda: sin el, el analizador de
+    //WinForms la toma por error y rompe el build (WFO1000).
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public Cliente? Entidad { get; set; }
 
     //El DAO lo pasa el form. El modal lo usa para escribir: si la escritura
-    //falla, el DAO ya mostro el error y devuelve false, asi que el modal NO
-    //se cierra y el usuario puede corregir y reintentar sin perder lo que
-    //escribio.
+    //falla, el DAO lanza la excepcion, el modal la captura y muestra el error,
+    //asi que el modal NO se cierra y el usuario puede corregir y reintentar sin
+    //perder lo que escribio.
     private readonly ClienteDAO _dao;
 
     //Con cliente es edicion, sin cliente es alta
@@ -125,9 +125,10 @@ public partial class ClienteModal : Form
 
         Cliente cliente = new Cliente(id, nombre, apellido, dni, telefono, email);
 
-        // La escritura la hace el form. Si falla, el DAO ya mostro el error
-        // y devuelve false: el modal SIGUE ABIERTO con lo que cargo el
-        // usuario, para que corrija y reintente.
+        // La escritura la hace el modal, con el DAO que le paso el form. Si
+        // falla, el DAO lanza la excepcion, el modal la captura y muestra el
+        // error y el modal SIGUE ABIERTO con lo que cargo el usuario, para que
+        // corrija y reintente.
         if (!Guardar(cliente))
             return;
 

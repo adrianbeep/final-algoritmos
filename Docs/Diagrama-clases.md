@@ -169,7 +169,9 @@ viven en el modelo, y eso es una decisión, no un descuido.
 | Un recurso solo se reserva si está `Disponible` | **Modelo** (`PuedeReservarse()`) y **SP** (`sp_alta_reserva`) | Regla duplicada a propósito: la UI puede validar antes de llamar y la base no confía en la UI |
 | Las reservas son **por días**, no por horarios: `fechaFin >= fechaInicio` | **Modelo** (`Reserva.ValidarFechas`) y **SP** (`CHECK` + `SIGNAL`) | Con la misma fecha de inicio y de fin la reserva ocupa **un día completo**; el conteo de días es inclusivo |
 | No se superponen reservas sobre el mismo recurso | **SP** (`sp_alta_reserva`, `sp_modificar_reserva`) | `SIGNAL 'El recurso no esta disponible en la fecha ingresada'` |
-| Solo una reserva `Confirmada` se puede modificar o cancelar | **SP** (`sp_modificar_reserva`, `sp_cancelar_reserva`) | `SIGNAL 'La reserva no existe o no se puede modificar'` |
+| Solo una reserva `Confirmada` se puede modificar | **SP** (`sp_modificar_reserva`) | `SIGNAL 'La reserva no existe o no se puede modificar'` |
+| Solo una reserva `Confirmada` se puede cancelar | **SP** (`sp_cancelar_reserva`) | `SIGNAL 'La reserva no existe o ya esta cancelada'` |
+| El boton de cancelar solo esta habilitado para una reserva `Confirmada` | **Aplicacion** (`FrmReservas`) | En las reservas ya canceladas el boton aparece atenuado y la accion no llega a la base |
 | El cliente y el recurso de una reserva existen | **SP** | `SIGNAL 'El cliente no existe'` / `'El recurso no existe'` |
 | `dni` y `email` de cliente son únicos | **Base** (`UNIQUE`) + **SP** | Restricción del schema y `SIGNAL` |
 | Cada tipo exige sus datos obligatorios | **SP** | `SIGNAL 'Sala requiere capacidad de personas'` |

@@ -123,6 +123,7 @@
             dgvReservas.Size = new Size(730, 310);
             dgvReservas.TabIndex = 6;
             dgvReservas.CellContentClick += dgvReservas_CellContentClick_1;
+            dgvReservas.CellFormatting += dgvReservas_CellFormatting;
             // 
             // colId
             // 

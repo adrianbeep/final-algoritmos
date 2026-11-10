@@ -22,6 +22,11 @@ public partial class FrmReservas : Form
     private List<Cliente> _clientes = new List<Cliente>();
     private List<Recurso> _recursos = new List<Recurso>();
 
+    // Boton de cancelar atenuado: la reserva no esta en estado Confirmada.
+    private static readonly Color BotonDeshabilitadoFondo = Color.FromArgb(224, 224, 224);
+    private static readonly Color BotonDeshabilitadoBorde = Color.FromArgb(190, 190, 190);
+    private static readonly Color BotonDeshabilitadoTexto = Color.FromArgb(150, 150, 150);
+
     public FrmReservas()
     {
         InitializeComponent();
@@ -106,9 +111,50 @@ public partial class FrmReservas : Form
 
     }
 
+    /// <summary>
+    /// Solo se puede cancelar una reserva en estado Confirmada: es la misma
+    /// regla que aplica el SP sp_cancelar_reserva. Aca se resuelve antes para
+    /// que el boton aparezca atenuado y la accion no llegue a la base.
+    /// </summary>
+    private static bool EsCancelable(DataGridViewRow fila)
+    {
+        object? valor = fila.Cells["colEstado"].Value;
+
+        return valor is not null
+            && Enum.TryParse<Reserva.EstadoReserva>(valor.ToString(), out Reserva.EstadoReserva estado)
+            && estado == Reserva.EstadoReserva.Confirmada;
+    }
+
+    /// <summary>
+    /// Atenua el boton de cancelar cuando la reserva no esta en estado
+    /// Confirmada: el usuario ve que la accion no aplica antes de hacer click.
+    ///
+    /// El color va al estilo propio de la celda (celda.Style) porque es lo que
+    /// lee el pintado de la grilla. e.CellStyle no sirve para marcar esta
+    /// celda: es la mezcla final de estilos y la fila la arma sola.
+    /// </summary>
+    private void dgvReservas_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
+    {
+        if (e.RowIndex < 0 || e.ColumnIndex < 0) return;
+        if (dgvReservas.Columns[e.ColumnIndex].Name != "colCancelar") return;
+        if (EsCancelable(dgvReservas.Rows[e.RowIndex])) return;
+
+        // El boton queda atenuado: se ve que la accion no aplica.
+        var celda = dgvReservas.Rows[e.RowIndex].Cells[e.ColumnIndex];
+
+        celda.Style.BackColor = BotonDeshabilitadoFondo;
+        celda.Style.SelectionBackColor = BotonDeshabilitadoBorde;
+        celda.Style.ForeColor = BotonDeshabilitadoTexto;
+
+        e.CellStyle.BackColor = BotonDeshabilitadoFondo;
+        e.CellStyle.SelectionBackColor = BotonDeshabilitadoBorde;
+        e.CellStyle.ForeColor = BotonDeshabilitadoTexto;
+    }
+
     private void dgvReservas_CellContentClick_1(object sender, DataGridViewCellEventArgs e)
     {
         if (e.RowIndex < 0) return;
+        if (e.ColumnIndex < 0) return;
 
         // Solo el boton de la fila hace algo, no cualquier celda.
         if (dgvReservas.Columns[e.ColumnIndex] is not DataGridViewButtonColumn boton) return;
@@ -119,6 +165,17 @@ public partial class FrmReservas : Form
         // cancela la reserva.
         if (boton.Name == "colCancelar")
         {
+            if (!EsCancelable(dgvReservas.Rows[e.RowIndex]))
+            {
+                // El boton esta atenuado: se explica igual por que no pasa nada.
+                MessageBox.Show(
+                    "Solo se pueden cancelar las reservas en estado Confirmada.",
+                    "Cancelar reserva",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Information);
+                return;
+            }
+
             CancelarReserva(id);
             return;
         }
@@ -135,6 +192,7 @@ public partial class FrmReservas : Form
             ErroresDeBaseDeDatos.Mostrar(ex);
             return;
         }
+
         if (reserva is null)
         {
             MessageBox.Show("No se encontro la reserva.",

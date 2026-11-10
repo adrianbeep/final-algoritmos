@@ -87,22 +87,23 @@ proceso `3.0` devuelve al personal una confirmacion o el mensaje de error de
 la regla que fallo, y esa respuesta sale hacia la misma entidad externa que
 entra. Es lo que en el nivel 0 se resume en el flujo `Sistema -> Personal`.
 
-## Dos cosas que el diagrama muestra y el codigo todavia no
+## Una cosa que el diagrama muestra y el codigo todavia no
 
-El diagrama describe lo que el sistema **hace**, y en dos lugares el codigo
-todavia no llega. No son decisiones de diseno: son pendientes de cerrar.
-
-**La cancelacion de reservas no se puede ejecutar desde la aplicacion.** La
-cadena existe y funciona: `ReservaDAO.Cancelar(id)` llama a `sp_cancelar_reserva`,
-que pasa la reserva a `Cancelada` y dispara el trigger de auditoria. Pero la
-grilla de `FrmReservas` tiene una columna de boton `colCancelar` que, al
-hacerse clic, cae en el mismo manejador que la de editar y abre el modal de
-edicion en vez de cancelar. El flujo `reserva confirmada, modificada o
-cancelada` esta dibujado porque el sistema lo soporta; falta exponerlo.
+El diagrama describe lo que el sistema **hace**, y hay un lugar donde el codigo
+todavia no llega. No es una decision de diseno: es un pendiente de cerrar.
 
 **No hay busqueda ni baja logica.** Ninguna pantalla busca y ninguna da de
 baja: el listado se muestra completo y la modificacion es una edicion. Por eso
 los flujos de `D1` y `D2` hacia sus procesos dicen solo `listado`.
+
+La cancelacion, en cambio, ya esta expuesta y coincide con el diagrama: el
+boton `colCancelar` de la grilla de `FrmReservas` pide confirmacion, llama a
+`ReservaDAO.Cancelar(id)`, que va a `sp_cancelar_reserva`, pasa la reserva a
+`Cancelada` y dispara el trigger de auditoria. El boton solo esta habilitado
+si la reserva esta en estado `Confirmada`: en las que ya estan canceladas
+aparece atenuado y la accion no llega a la base. Es la misma regla que aplica
+el procedimiento almacenado, resuelta en la interfaz para que el usuario no
+llegue a un error.
 
 ## Balance con el nivel 0
 

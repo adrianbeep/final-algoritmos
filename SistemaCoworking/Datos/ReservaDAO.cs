@@ -86,6 +86,54 @@ public class ReservaDAO
         return r;
     }
 
+    /// <summary>
+    /// Si el recurso ya tiene una reserva confirmada que se superpone con el
+    /// periodo indicado.
+    ///
+    /// La regla de superposicion vive en la funcion fn_recurso_ocupado, que es
+    /// la misma que usan los procedimientos almacenados: la base y la
+    /// aplicacion no pueden discrepar.
+    ///
+    /// idReservaExcluida sirve para editar una reserva sin que se superponga
+    /// consigo misma: se pasa el id de la reserva que se esta editando.
+    /// </summary>
+    public bool RecursoOcupado(int idRecurso, DateTime fechaInicio, DateTime fechaFin, int idReservaExcluida = 0)
+    {
+        using (MySqlConnection conexion =
+            ConexionBD.CrearConexion())
+        {
+            conexion.Open();
+
+            using (MySqlCommand comando =
+                new MySqlCommand(
+                    "SELECT fn_recurso_ocupado(@id_recurso, @fecha_inicio, @fecha_fin, @id_reserva_excluida)",
+                    conexion))
+            {
+                comando.Parameters.AddWithValue(
+                    "@id_recurso",
+                    idRecurso
+                );
+
+                comando.Parameters.AddWithValue(
+                    "@fecha_inicio",
+                    fechaInicio
+                );
+
+                comando.Parameters.AddWithValue(
+                    "@fecha_fin",
+                    fechaFin
+                );
+
+                comando.Parameters.AddWithValue(
+                    "@id_reserva_excluida",
+                    idReservaExcluida
+                );
+
+                return Convert.ToInt32(comando.ExecuteScalar()) == 1;
+            }
+        }
+    }
+
     public void Insertar(
         int idCliente,
         int idRecurso,

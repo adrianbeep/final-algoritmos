@@ -123,21 +123,42 @@ namespace SistemaCoworking.Formularios.UserControls
                 MostrarError(lblClienteInfo, error);
             }
 
-            if (!Reserva.ValidarRecurso(recurso, out error))
+            if (!Reserva.ValidarReserva(recurso, dtpInicio.Value, dtpFin.Value, out error))
             {
                 errores = true;
                 MostrarError(lblRecursoInfo, error);
             }
 
-            if (!Reserva.ValidarFechas(dtpInicio.Value, dtpFin.Value, out error))
-            {
-                errores = true;
-                MostrarError(lblTotalInfo, error);
-            }
-
             if (errores) return;
 
             if (cliente is null || recurso is null) return;
+
+            // La disponibilidad real la consulta la base: si hay otra reserva
+            // confirmada en ese periodo, el recurso no esta disponible. La
+            // misma regla la aplica sp_alta_reserva al guardar, asi que la
+            // base sigue siendo la que decide.
+            bool ocupado;
+            try
+            {
+                ocupado = _dao.RecursoOcupado(
+                    recurso.Id,
+                    dtpInicio.Value,
+                    dtpFin.Value,
+                    _reserva?.Id ?? 0);
+            }
+            catch (Exception ex)
+            {
+                // El DAO lanza y aca se captura: se muestra el error y el modal
+                // sigue abierto con lo que cargo el usuario.
+                ErroresDeBaseDeDatos.Mostrar(ex);
+                return;
+            }
+
+            if (ocupado)
+            {
+                MostrarError(lblTotalInfo, "El recurso no está disponible en la fecha ingresada.");
+                return;
+            }
 
             // El total lo calcula el modelo: los dias, la regla de la reserva,
             // y el precio por dia, el polimorfismo de Recurso.

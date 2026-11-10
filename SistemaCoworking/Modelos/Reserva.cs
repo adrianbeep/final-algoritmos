@@ -62,10 +62,14 @@ public class Reserva
     }
 
     /// <summary>
-    /// La reserva tiene que ser de un recurso, y el recurso tiene que estar
-    /// disponible: si no, el procedimiento almacenado lo rechaza.
+    /// El recurso tiene que estar disponible y las fechas tienen que ser
+    /// coherentes.
+    ///
+    /// La regla vive en el recurso: `Recurso.PuedeReservarse` decide, y aca
+    /// solo se traduce el resultado a un mensaje para el usuario. Asi la regla
+    /// no esta escrita dos veces.
     /// </summary>
-    public static bool ValidarRecurso(Recurso? recurso, out string? mensajeError)
+    public static bool ValidarReserva(Recurso? recurso, DateTime fechaInicio, DateTime fechaFin, out string? mensajeError)
     {
         if (recurso is null)
         {
@@ -73,26 +77,13 @@ public class Reserva
             return false;
         }
 
-        if (recurso.Estado != Recurso.EstadoRecurso.Disponible)
+        if (!recurso.PuedeReservarse(fechaInicio, fechaFin))
         {
-            mensajeError = "El recurso no está disponible.";
-            return false;
-        }
-
-        mensajeError = null;
-        return true;
-    }
-
-    /// <summary>
-    /// La fecha de fin no puede ser anterior a la de inicio. Se comparan solo
-    /// las fechas: el sistema reserva por dias, asi que la misma fecha de
-    /// inicio y de fin es una reserva de un dia completo.
-    /// </summary>
-    public static bool ValidarFechas(DateTime fechaInicio, DateTime fechaFin, out string? mensajeError)
-    {
-        if (fechaFin.Date < fechaInicio.Date)
-        {
-            mensajeError = "La fecha de fin no puede ser anterior a la fecha de inicio.";
+            // El mensaje distingue los dos motivos: el recurso no esta
+            // disponible o las fechas estan al reves.
+            mensajeError = fechaFin.Date < fechaInicio.Date
+                ? "La fecha de fin no puede ser anterior a la fecha de inicio."
+                : "El recurso no está disponible.";
             return false;
         }
 

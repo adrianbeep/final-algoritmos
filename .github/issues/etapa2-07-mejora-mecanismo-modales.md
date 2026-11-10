@@ -111,8 +111,8 @@ pierde es el oscurecido.
 - [ ] La base comun de los modales no conoce la capa de datos: recibe por parametro todo lo que necesita
 - [ ] El modal de Recursos recibe el catalogo de tipos (ya lo hace hoy)
 - [ ] El modal de Reservas recibe un `List<Cliente>` y un `List<Recurso>`, igual que el modal de Recursos recibe el `List<TipoRecurso>`
-- [ ] La superposicion de reservas no se valida en el modal: la valida el procedimiento almacenado al guardar. El modal no puede saber que reservas tiene cada recurso
-- [ ] La disponibilidad no se resuelve en el modal: el estado del recurso (`Disponible`) se filtra en el combo, y el conflicto de fechas lo rechaza el SP
+- [ ] La superposicion de reservas se avisa en el modal antes de guardar: el modal consulta a la base la funcion `fn_recurso_ocupado`. `sp_alta_reserva` la vuelve a validar al guardar
+- [ ] La disponibilidad se resuelve tambien en el modal: el estado del recurso (`Disponible`) se filtra en el combo, y el conflicto de fechas se consulta a la base antes de guardar
 - [ ] El modal de Clientes sigue recibiendo la entidad a editar, no la lista: la busca el form
 
 ### Lo repetido de los forms de listado NO se extrae

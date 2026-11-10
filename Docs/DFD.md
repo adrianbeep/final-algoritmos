@@ -56,7 +56,7 @@ flowchart TB
 |---|---|---|
 | `1.0 Administrar clientes` | Alta y modificacion de clientes, y listado para verlos | `Formularios/FrmClientes.cs` |
 | `2.0 Administrar recursos` | Alta y modificacion de recursos, con las caracteristicas que exige cada tipo y su estado. Listado para verlos | `Formularios/FrmRecursos.cs` |
-| `3.0 Administrar reservas` | Agenda, modifica y cancela reservas. Valida cliente, recurso, fechas y superposicion | `Formularios/FrmReservas.cs` |
+| `3.0 Administrar reservas` | Agenda, modifica y cancela reservas. Valida cliente, recurso y fechas en el modal, y la superposicion la consulta a la base antes de guardar | `Formularios/FrmReservas.cs` |
 | `4.0 Generar indicadores y reportes` | Dashboard con los cinco indicadores del coworking | `Formularios/FrmDashboard.cs` |
 
 ## Los almacenes de datos
@@ -75,7 +75,7 @@ flowchart TB
 la reserva: la pide a `D1` y a `D2` para saber si el cliente y el recurso
 existen y estan disponibles, y a `D3` para saber si el recurso ya esta
 reservado en esas fechas. Por eso el control de superposicion necesita leer
-`D3` antes de escribir en `D3`.
+`D3` antes de escribir en `D3`. La regla de superposicion esta escrita una sola vez, en la base: la funcion `fn_recurso_ocupado`. Los procedimientos `sp_alta_reserva` y `sp_modificar_reserva` la usan para rechazar, y la aplicacion la consulta antes de guardar para avisar. Por eso la base y la aplicacion no pueden decidir distinto.
 
 **La auditoria no la escribe la aplicacion.** La flecha punteada de `D3` a `D5`
 representa el trigger de la base: cada alta y cada cancelacion se auditan sola,

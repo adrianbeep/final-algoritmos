@@ -51,12 +51,14 @@ IA para que los formularios se vean modernos.
 - [ ] La `X` de cierre tiene `TabStop = true` y se puede alcanzar con el teclado
 - [ ] `ShowDialog()` bloquea al que llama: el codigo que abre el modal sigue recien cuando el modal cerro
 
-### El modal devuelve la entidad, el form persiste
+### El modal escribe, y solo cierra si la escritura tuvo exito
 
-- [ ] El modal arma la entidad, la deja en una propiedad publica `Entidad` y cierra con `DialogResult.OK`
-- [ ] El form escribe en la base **despues** de que el modal cerro, no dentro de un handler de evento
-- [ ] Si la escritura falla, el modal ya cerro: la aplicacion no queda bloqueada
-- [ ] La excepcion se propaga al hilo de la UI (el `try/catch` del DAO es de la Etapa 4), pero el modal ya se cerro
+- [ ] El modal recibe el DAO por constructor: el modal es el que sabe si es un alta o una edicion
+- [ ] Al apretar Guardar, el modal arma la entidad y **escribe en la base**
+- [ ] Si la escritura falla, el modal **sigue abierto** con lo que cargo el usuario: el error ya se mostro, asi que puede corregir y reintentar sin perder lo que escribio
+- [ ] El boton Guardar se deshabilita mientras dura la escritura, para que un doble clic no dispare dos veces la misma operacion
+- [ ] Recien si la escritura tuvo exito, el modal se cierra con `DialogResult.OK`
+- [ ] El `try/catch` vive en la **capa de presentacion**, no en el DAO: el DAO lanza y lo capturan el modal y los forms
 
 ### Sin velo: el modal va en su propia ventana y nada mas
 
@@ -134,7 +136,7 @@ y `RecursoDAO` devuelve `DataTable` (unificar eso es de la Etapa 5).
 
 - [ ] El modal de Clientes y el de Recursos se cierran con ESC, con Cancelar y con la `X`
 - [ ] Con el modal abierto, un click real de mouse sobre la ventana principal no llega a sus botones
-- [ ] Un alta con DNI repetido no deja la aplicacion bloqueada: el modal se cerro antes de escribir en la base
+- [ ] Un alta con DNI repetido no deja la aplicacion bloqueada: el modal se cerro con el error del SP y el usuario puede corregir
 - [ ] Los errores de `txtCapacidad`, `txtNumMonitores` y `txtMetros` se limpian al reintentar con datos validos
 - [ ] `grep` de `Aceptado` o de `Closed` en los modales no devuelve nada: el resultado viaja en el `DialogResult`
 - [ ] `grep` de `CancelButton` en los modales da un resultado: sin eso, ESC no cierra nada
@@ -142,12 +144,13 @@ y `RecursoDAO` devuelve `DataTable` (unificar eso es de la Etapa 5).
 - [ ] `ReservaModalControl` se escribe sin copiar nada: declara sus controles y su validacion, y el mecanismo lo trae de `ModalConfiguration`
 - [ ] El combo tiene el estilo de la app con una sola llamada: `ComboBoxConfiguration.Configuracion(combo)`
 - [ ] El combo bindeado muestra el texto y guarda el Id como `Value`: lo elegido se lee con `SelectedValue`
-- [ ] `FrmReservas` se puede escribir sin copiar el mecanismo: el modal devuelve un resultado y el form persiste
+- [ ] `grep` de `try` en `Datos/` no devuelve nada: el DAO lanza y el error lo capturan el modal y los forms
+- [ ] `grep` de `MessageBox` en `Datos/` no devuelve nada: la capa de datos no muestra mensajes
+- [ ] `FrmReservas` se puede escribir sin copiar el mecanismo: el modal escribe y solo cierra si tuvo exito
 - [ ] El proyecto compila sin errores
 
 ## Fuera de alcance
 
-- [ ] `try/catch` de `MySqlException` y del `SQLSTATE 45000` en los DAO -> Etapa 4
 - [ ] Unificar el tipo de retorno de los DAO (`DataTable` vs `List<T>`) -> Etapa 5
 - [ ] `FrmReservas` y su modal -> issue 2.05
 - [ ] `DashboardDAO` y las tarjetas del dashboard -> issue 3.01
@@ -158,8 +161,8 @@ y `RecursoDAO` devuelve `DataTable` (unificar eso es de la Etapa 5).
 Si al cerrar este issue queda wiring a medias, se anota explicitamente en el issue de la Etapa 4
 para que no se pierda:
 
-- [ ] `ClienteDAO` / `RecursoDAO` — el `SIGNAL 45000` por DNI o email repetido todavia no se maneja: la excepcion sube al hilo de la UI
-- [ ] `RecursoDAO.ObtenerPorId` — `Enum.Parse` sobre `EstadoRecurso` y `RecursoFactory.Crear` lanzan si el dato de la base no coincide con lo esperado
+- [ ] `RecursoDAO.ObtenerPorId` — `Enum.Parse` sobre `EstadoRecurso` y `RecursoFactory.Crear` lanzan si el dato de la base no coincide con lo esperado. Con el `try/catch` en la presentacion, el error se muestra en vez de romper la app, pero el `Enum.Parse` case-sensitive conviene revisarlo
+- [ ] El dashboard (issue 3.01) tiene que capturar los errores de las 5 funciones en el form, como hacen los demas modulos
 
 ## Archivos a crear
 

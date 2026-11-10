@@ -37,8 +37,10 @@ public partial class FrmClientes : Form
         }
         catch (Exception ex)
         {
-            MessageBox.Show("Error al cargar clientes: " + ex.Message,
-                            "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            // El DAO lanza y aca se captura: se muestra el error y la grilla
+            // queda vacia, pero el usuario ya sabe que fallo la consulta.
+            ErroresDeBaseDeDatos.Mostrar(ex);
+            dgv.DataSource = null;
         }
     }
 
@@ -66,39 +68,23 @@ public partial class FrmClientes : Form
     }
 
     /// <summary>
-    /// Abre el modal de cliente y, si el usuario guardo, lo escribe en la base.
+    /// Abre el modal de cliente.
     ///
     /// Sin cliente es un ALTA, con cliente es una EDICION: lo decide este
     /// form, que es el que abre el modal.
     ///
-    /// ShowDialog() espera a que el modal se cierre y devuelve
-    /// DialogResult.OK si el usuario guardo. Cuando guardo, el modal deja el
-    /// cliente en su propiedad Entidad, y recien ahi se escribe en la base.
-    /// Por eso la escritura va despues: si la base falla, el modal ya cerro
-    /// y la aplicacion no queda bloqueada.
+    /// El modal escribe en el momento de apretar Guardar, con el DAO que le
+    /// pasa este form. Si la escritura falla, el DAO ya mostro el error y el
+    /// modal sigue abierto con lo que cargo el usuario: puede corregir y
+    /// reintentar. Por eso el modal no devuelve la entidad para que el form
+    /// la escriba DESPUES: ShowDialog() solo vuelve cuando el modal se cerro,
+    /// y para entonces los datos ya se perdieron.
     /// </summary>
     private void AbrirModalCliente(Cliente? cliente = null)
     {
-        ClienteModal modal = new ClienteModal(cliente);
+        ClienteModal modal = new ClienteModal(cliente, _clienteDAO);
 
         if (modal.ShowDialog() != DialogResult.OK) return;
-
-        Cliente? datos = modal.Entidad;
-        if (datos is null) return;
-
-        if (cliente is null)
-        {
-            _clienteDAO.Insertar(
-                datos.Nombre,
-                datos.Apellido,
-                datos.Dni,
-                datos.Telefono,
-                datos.Email);
-        }
-        else
-        {
-            _clienteDAO.Modificar(datos);
-        }
 
         CargarDataGridViewClientes(dgvClientes); // refrescar la grilla
     }

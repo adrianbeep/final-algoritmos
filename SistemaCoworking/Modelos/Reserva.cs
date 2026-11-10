@@ -32,6 +32,21 @@ public class Reserva
     }
 
     /// <summary>
+    /// La cantidad de dias que ocupa la reserva. El sistema reserva por dias,
+    /// no por horarios: una reserva con la misma fecha de inicio y de fin
+    /// ocupa UN dia completo. El conteo es inclusivo, asi que del 10/03 al
+    /// 12/03 son 3 dias.
+    /// </summary>
+    public int DiasReservados => Math.Max(0, (FechaFin.Date - FechaInicio.Date).Days + 1);
+
+    /// <summary>
+    /// El total de la reserva: el precio por dia del recurso por la cantidad
+    /// de dias reservados. El precio por dia sale del polimorfismo, de
+    /// <see cref="Recurso.CalcularPrecio"/>.
+    /// </summary>
+    public decimal CalcularTotal(Recurso recurso) => Math.Round(recurso.PrecioDia * DiasReservados, 2);
+
+    /// <summary>
     /// La reserva tiene que ser de un cliente.
     /// </summary>
     public static bool ValidarCliente(Cliente? cliente, out string? mensajeError)
@@ -69,13 +84,15 @@ public class Reserva
     }
 
     /// <summary>
-    /// La fecha de fin tiene que ser posterior a la de inicio.
+    /// La fecha de fin no puede ser anterior a la de inicio. Se comparan solo
+    /// las fechas: el sistema reserva por dias, asi que la misma fecha de
+    /// inicio y de fin es una reserva de un dia completo.
     /// </summary>
     public static bool ValidarFechas(DateTime fechaInicio, DateTime fechaFin, out string? mensajeError)
     {
-        if (fechaFin <= fechaInicio)
+        if (fechaFin.Date < fechaInicio.Date)
         {
-            mensajeError = "La fecha de fin debe ser posterior a la fecha de inicio.";
+            mensajeError = "La fecha de fin no puede ser anterior a la fecha de inicio.";
             return false;
         }
 

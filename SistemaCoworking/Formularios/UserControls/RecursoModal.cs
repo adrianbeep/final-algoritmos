@@ -1,3 +1,4 @@
+using SistemaCoworking.Datos;
 using SistemaCoworking.Herramientas;
 using SistemaCoworking.Modelos;
 using System;
@@ -30,8 +31,17 @@ public partial class RecursoModal : Form
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public Recurso? Entidad { get; set; }
 
+    //El DAO lo pasa el form. El modal lo usa para escribir: si la escritura
+    //falla, el DAO ya mostro el error y devuelve false, asi que el modal NO
+    //se cierra y el usuario puede corregir y reintentar sin perder lo que
+    //escribio.
+    private readonly RecursoDAO _dao;
+
     //Con cliente es edicion, sin cliente es alta
-    public RecursoModal(Recurso? recurso = null, List<TipoRecurso>? tipos = null)
+    public RecursoModal(
+        Recurso? recurso,
+        List<TipoRecurso>? tipos,
+        RecursoDAO dao)
     {
         InitializeComponent();
 
@@ -42,6 +52,7 @@ public partial class RecursoModal : Form
         ConfigurarModal();
 
         _recurso = recurso;
+        _dao = dao;
 
         if (recurso is null)
         {
@@ -325,10 +336,50 @@ public partial class RecursoModal : Form
         if (recurso is null)
             return;
 
-        // El modal entrega la entidad y cierra. El form la persiste DESPUES,
-        // cuando ShowDialog() ya devolvio: si la escritura falla, el modal
-        // ya cerro y la aplicacion no queda bloqueada.
+        // La escritura la hace el form. Si falla, el DAO ya mostro el error
+        // y devuelve false: el modal SIGUE ABIERTO con lo que cargo el
+        // usuario, para que corrija y reintente.
+        if (!Guardar(recurso))
+            return;
+
         Entidad = recurso;
         ModalConfiguration.CerrarModal(this, DialogResult.OK);
+    }
+
+    /// <summary>
+    /// Escribe el recurso. El boton se deshabilita mientras dura la escritura
+    /// para que un doble clic no dispare dos veces la misma operacion.
+    /// </summary>
+    private bool Guardar(Recurso recurso)
+    {
+        btnGuardar.Enabled = false;
+
+        try
+        {
+            // Sin recurso es un alta, con recurso es una edicion: el modal ya lo
+            // sabe, porque es el que tiene el _recurso.
+            if (_recurso is null)
+            {
+                _dao.Insertar(recurso);
+            }
+            else
+            {
+                _dao.Modificar(recurso);
+            }
+
+            return true;
+        }
+        catch (Exception ex)
+        {
+            // El DAO lanza y aca se captura: se muestra el error con el
+            // mensaje del SP y el modal SIGUE ABIERTO con lo que cargo el
+            // usuario, para que corrija y reintente sin perderlo.
+            ErroresDeBaseDeDatos.Mostrar(ex);
+            return false;
+        }
+        finally
+        {
+            btnGuardar.Enabled = true;
+        }
     }
 }

@@ -40,8 +40,10 @@ public partial class FrmReservas : Form
         }
         catch (Exception ex)
         {
-            MessageBox.Show("Error al cargar clientes: " + ex.Message,
-                            "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            // El DAO lanza y aca se captura: se muestra el error y el combo de
+            // clientes queda vacio.
+            ErroresDeBaseDeDatos.Mostrar(ex);
+            _clientes = new List<Cliente>();
         }
     }
 
@@ -53,8 +55,10 @@ public partial class FrmReservas : Form
         }
         catch (Exception ex)
         {
-            MessageBox.Show("Error al cargar recursos: " + ex.Message,
-                            "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            // El DAO lanza y aca se captura: se muestra el error y el combo de
+            // recursos queda vacio.
+            ErroresDeBaseDeDatos.Mostrar(ex);
+            _recursos = new List<Recurso>();
         }
     }
 
@@ -68,46 +72,30 @@ public partial class FrmReservas : Form
         }
         catch (Exception ex)
         {
-            MessageBox.Show("Error al cargar reservas: " + ex.Message,
-                            "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            // El DAO lanza y aca se captura: se muestra el error y la grilla
+            // queda vacia, pero el usuario ya sabe que fallo la consulta.
+            ErroresDeBaseDeDatos.Mostrar(ex);
+            dgv.DataSource = null;
         }
     }
 
     /// <summary>
-    /// Abre el modal de cliente y, si el usuario guardo, lo escribe en la base.
+    /// Abre el modal de reserva.
     ///
-    /// Sin cliente es un ALTA, con cliente es una EDICION: lo decide este
+    /// Sin reserva es un ALTA, con reserva es una EDICION: lo decide este
     /// form, que es el que abre el modal.
     ///
-    /// ShowDialog() espera a que el modal se cierre y devuelve
-    /// DialogResult.OK si el usuario guardo. Cuando guardo, el modal deja el
-    /// cliente en su propiedad Entidad, y recien ahi se escribe en la base.
-    /// Por eso la escritura va despues: si la base falla, el modal ya cerro
-    /// y la aplicacion no queda bloqueada.
+    /// El modal escribe en el momento de apretar Guardar, con el DAO que le
+    /// pasa este form. Si la escritura falla, el DAO ya mostro el error (por
+    /// ejemplo, que el recurso no esta disponible en esa fecha) y el modal
+    /// sigue abierto con lo que cargo el usuario: puede elegir otra fecha y
+    /// reintentar.
     /// </summary>
     private void AbrirModalReserva(Reserva? reserva = null)
     {
-        ReservaModal modal = new ReservaModal(reserva, _clientes, _recursos);
+        ReservaModal modal = new ReservaModal(reserva, _clientes, _recursos, _reservaDAO);
 
         if (modal.ShowDialog() != DialogResult.OK) return;
-
-        Reserva? datos = modal.Entidad;
-        if (datos is null) return;
-
-        if (reserva is null)
-        {
-            _reservaDAO.Insertar(
-                datos.IdCliente,
-                datos.IdRecurso,
-                datos.FechaInicio,
-                datos.FechaFin,
-                datos.TotalReserva
-            );
-        }
-        else
-        {
-            _reservaDAO.Modificar(datos);
-        }
 
         CargarDataGridViewReservas(dgvReservas); // refrescar la grilla
     }
@@ -122,10 +110,18 @@ public partial class FrmReservas : Form
     {
         if (e.RowIndex < 0) return;
 
-        // Solo el boton de la fila abre el modal, no cualquier celda.
-        if (dgvReservas.Columns[e.ColumnIndex] is not DataGridViewButtonColumn) return;
+        // Solo el boton de la fila hace algo, no cualquier celda.
+        if (dgvReservas.Columns[e.ColumnIndex] is not DataGridViewButtonColumn boton) return;
 
         int id = Convert.ToInt32(dgvReservas.Rows[e.RowIndex].Cells["colId"].Value);
+
+        // El boton de cancelar es otro camino: no abre el modal de edicion,
+        // cancela la reserva.
+        if (boton.Name == "colCancelar")
+        {
+            CancelarReserva(id);
+            return;
+        }
 
         Reserva? reserva = _reservaDAO.ObtenerPorId(id);
         if (reserva is null)
@@ -136,5 +132,37 @@ public partial class FrmReservas : Form
         }
 
         AbrirModalReserva(reserva);
+    }
+
+    /// <summary>
+    /// Cancela una reserva.
+    ///
+    /// Cancelar NO borra: la reserva queda en estado Cancelada, con su
+    /// historial, y el trigger de la base la audita sola. Por eso se pide
+    /// confirmacion antes: es una accion que cambia el estado de la agenda.
+    /// </summary>
+    private void CancelarReserva(int id)
+    {
+        DialogResult confirmacion = MessageBox.Show(
+            "¿Cancelar la reserva? La reserva queda cancelada, no se elimina.",
+            "Cancelar reserva",
+            MessageBoxButtons.YesNo,
+            MessageBoxIcon.Question);
+
+        if (confirmacion != DialogResult.Yes) return;
+
+        // El DAO lanza y aca se captura: se muestra el error con el mensaje del
+        // SP y la reserva no se cancela.
+        try
+        {
+            _reservaDAO.Cancelar(id);
+        }
+        catch (Exception ex)
+        {
+            ErroresDeBaseDeDatos.Mostrar(ex);
+            return;
+        }
+
+        CargarDataGridViewReservas(dgvReservas); // refrescar la grilla
     }
 }

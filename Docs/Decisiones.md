@@ -282,7 +282,7 @@ Hay **dos caminos** para obtener un `Recurso` concreto, y los dos toman exactame
 
 Ese conocimiento tiene que estar en **un solo lugar**. Si está duplicado, un cuarto tipo obliga a tocar los dos, y es cuestión de tiempo que uno se olvide.
 
-La pregunta es **dónde** vive ese lugar. La primera implementación lo puso en `RecursoDAO.Construir`, con un `switch` sobre `nombre_tipo_recurso`. Eso dejaba la fábrica **en la capa de datos**, y el segundo camino se quedaba sin acceso: el modal no podía usarla sin depender del DAO, que es justo lo que la decisión ya tomada para Clientes evita —*"el modal de clientes no depende del DAO"*.
+La pregunta es **dónde** vive ese lugar. La primera implementación lo puso en `RecursoDAO.Construir`, con un `switch` sobre `nombre_tipo_recurso`. Eso dejaba la fábrica **en la capa de datos**, y el segundo camino se quedaba sin acceso: el modal no podía usarla sin depender del DAO para armar el recurso, que es justo lo que la decisión ya tomada para Clientes evita —*"para armar el cliente, el modal no necesita el DAO"*.
 
 El síntoma es concreto: **el `Recurso` que entrega el modal no tenía origen**. El formulario de Recursos no podía armar el objeto sin escribir su propio `switch`, es decir, duplicando el conocimiento en la capa de interfaz, que es el peor lugar posible para que viva.
 
@@ -311,6 +311,7 @@ El síntoma es concreto: **el `Recurso` que entrega el modal no tenía origen**.
 - Los dos caminos de creación usan la **misma** fábrica: un cuarto tipo se agrega en un solo lugar.
 - La capa de datos **no instancia** clases concretas. `RecursoDAO` dejó de hacer `new Sala(...)`, `new PuestoTrabajo(...)` y `new OficinaPrivada(...)`.
 - El modal de Recursos puede armar el `Recurso` **sin tocar la capa de datos**.
+- **Aclaración posterior**: los modales reciben el DAO por constructor, pero solo para **escribir** la entidad cuando el usuario guarda. Armar el objeto de dominio no pasa por el DAO: eso lo hace la fábrica, que vive en el dominio. Que el modal escriba no mueve la fábrica de lugar.
 - La invariante "una `Sala` siempre tiene capacidad" se verifica **al construir el objeto**, no recién cuando se escribe en la base.
 - La regla de precio sigue en un solo lugar: `CalcularPrecio()`.
 - **El modal puede construir el recurso mientras el usuario escribe**, sin excepciones en el flujo normal: la fábrica devuelve `null` hasta que el formulario está completo, y el precio se recalcula en vivo sobre ese mismo objeto.

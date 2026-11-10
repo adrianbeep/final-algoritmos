@@ -1,9 +1,8 @@
-﻿using SistemaCoworking.Modelos;
+using SistemaCoworking.Modelos;
 using System;
 using System.Collections.Generic;
 using System.Text;
-using MySql.Data;
-using MySql.Data.MySqlClient;
+using MySqlConnector;
 
 namespace SistemaCoworking.Datos;
 

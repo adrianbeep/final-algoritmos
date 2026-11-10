@@ -1,11 +1,16 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Data;
-using MySql.Data.MySqlClient;
+using MySqlConnector;
 using SistemaCoworking.Modelos;
 
 namespace SistemaCoworking.Datos;
 
+/// <summary>
+/// Los errores de la base NO se capturan aca: el DAO lanza la excepcion y la captura la`r`n    /// capa de presentacion (el modal o el form), que es la que decide como mostrarla.`r`n    /// Por eso esta capa no depende de WinForms.`r`n/// Los de escritura devuelven false para que el modal que pidio guardar sepa
+/// que fallo y siga abierto: el usuario puede corregir y reintentar sin
+/// perder lo que escribio.
+/// </summary>
 public class RecursoDAO
 {
     public RecursoDAO() { }
@@ -147,7 +152,6 @@ public class RecursoDAO
             }
         }
 
-            
         return r;
     }
 
@@ -204,6 +208,7 @@ public class RecursoDAO
                 comando.ExecuteNonQuery();
             }
         }
+
     }
 
     public void Modificar(Recurso recurso)
@@ -256,6 +261,7 @@ public class RecursoDAO
                 comando.ExecuteNonQuery();
             }
         }
+
     }
 
     /// <summary>

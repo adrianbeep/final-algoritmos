@@ -184,8 +184,11 @@ namespace SistemaCoworking.Formularios.UserControls
             // 
             // dtpInicio
             // 
+            dtpInicio.CustomFormat = "yyyy-MM-dd";
+            dtpInicio.Format = DateTimePickerFormat.Custom;
             dtpInicio.Location = new Point(12, 333);
             dtpInicio.Name = "dtpInicio";
+            dtpInicio.ShowUpDown = true;
             dtpInicio.Size = new Size(160, 27);
             dtpInicio.TabIndex = 73;
             // 
@@ -200,8 +203,11 @@ namespace SistemaCoworking.Formularios.UserControls
             // 
             // dtpFin
             // 
+            dtpFin.CustomFormat = "yyyy-MM-dd";
+            dtpFin.Format = DateTimePickerFormat.Custom;
             dtpFin.Location = new Point(246, 333);
             dtpFin.Name = "dtpFin";
+            dtpFin.ShowUpDown = true;
             dtpFin.Size = new Size(160, 27);
             dtpFin.TabIndex = 75;
             // 

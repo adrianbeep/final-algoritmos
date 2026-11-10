@@ -42,8 +42,10 @@ public partial class FrmRecursos : Form
         }
         catch (Exception ex)
         {
-            MessageBox.Show("Error al cargar los tipos de recurso: " + ex.Message,
-                            "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            // El DAO lanza y aca se captura: se muestra el error y el combo
+            // de tipos queda vacio.
+            ErroresDeBaseDeDatos.Mostrar(ex);
+            _tiposRecurso = new List<TipoRecurso>();
         }
     }
 
@@ -57,8 +59,10 @@ public partial class FrmRecursos : Form
         }
         catch (Exception ex)
         {
-            MessageBox.Show("Error al cargar recursos: " + ex.Message,
-                            "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            // El DAO lanza y aca se captura: se muestra el error y la grilla
+            // queda vacia, pero el usuario ya sabe que fallo la consulta.
+            ErroresDeBaseDeDatos.Mostrar(ex);
+            dgv.DataSource = null;
         }
     }
 
@@ -86,34 +90,21 @@ public partial class FrmRecursos : Form
     }
 
     /// <summary>
-    /// Abre el modal de recurso y, si el usuario guardo, lo escribe en la base.
+    /// Abre el modal de recurso.
     ///
     /// Sin recurso es un ALTA, con recurso es una EDICION: lo decide este
     /// form, que es el que abre el modal.
     ///
-    /// ShowDialog() espera a que el modal se cierre y devuelve
-    /// DialogResult.OK si el usuario guardo. Cuando guardo, el modal deja el
-    /// recurso en su propiedad Entidad, y recien ahi se escribe en la base.
-    /// Por eso la escritura va despues: si la base falla, el modal ya cerro
-    /// y la aplicacion no queda bloqueada.
+    /// El modal escribe en el momento de apretar Guardar, con el DAO que le
+    /// pasa este form. Si la escritura falla, el DAO ya mostro el error y el
+    /// modal sigue abierto con lo que cargo el usuario: puede corregir y
+    /// reintentar.
     /// </summary>
     private void AbrirModalRecurso(Recurso? recurso = null)
     {
-        RecursoModal modal = new RecursoModal(recurso, _tiposRecurso);
+        RecursoModal modal = new RecursoModal(recurso, _tiposRecurso, _recursoDAO);
 
         if (modal.ShowDialog() != DialogResult.OK) return;
-
-        Recurso? datos = modal.Entidad;
-        if (datos is null) return;
-
-        if (recurso is null)
-        {
-            _recursoDAO.Insertar(datos);
-        }
-        else
-        {
-            _recursoDAO.Modificar(datos);
-        }
 
         CargarDataGridViewRecursos(dgvRecursos); // refrescar la grilla
     }

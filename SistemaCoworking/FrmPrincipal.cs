@@ -25,7 +25,6 @@ namespace SistemaCoworking;
 
 public partial class FrmPrincipal : Form
 {
-    //private Color btnBGColor = ;
     private Form _formActivo = null;
     private Button _botonActivo = null;
 
@@ -35,11 +34,6 @@ public partial class FrmPrincipal : Form
     public FrmPrincipal()
     {
         InitializeComponent();
-
-        // pnModal del Designer ya no se usa: los modales son ventanas
-        // propias que se abren con ShowDialog(). Un Panel hijo no compone
-        // con sus hermanos y se ve gris opaco.
-        pnForms.Controls.Remove(pnModal);
 
         CargarFormularioAPanel(new FrmDashboard(), btnDashboard);
     }
@@ -57,7 +51,7 @@ public partial class FrmPrincipal : Form
 
         if (sidebarExpand)
         {
-            flpSidebar.Width -= 5;
+            flpSidebar.Width -= 25;
             if (flpSidebar.Width <= cerrada)
             {
                 sidebarExpand = false;
@@ -66,7 +60,7 @@ public partial class FrmPrincipal : Form
         }
         else
         {
-            flpSidebar.Width += 5;
+            flpSidebar.Width += 25;
             if (flpSidebar.Width >= expandida)
             {
                 sidebarExpand = true;

@@ -279,6 +279,12 @@ namespace SistemaCoworking.Formularios.UserControls
         private void ActualizarTotal()
         {
             Recurso? recurso = cmbRecursos.SelectedItem as Recurso;
+
+            // El label vuelve a su color normal antes de cualquier salida: si
+            // antes mostraba el error de disponibilidad, el usuario ya cambio
+            // lo que lo provocaba.
+            lblTotalInfo.ForeColor = ColorInfo;
+
             if (recurso is null)
             {
                 lblTotalInfo.Text = "";
@@ -290,9 +296,15 @@ namespace SistemaCoworking.Formularios.UserControls
 
             int dias = borrador.DiasReservados;
 
-            if (dias == 0) return;
+            if (dias == 0)
+            {
+                // Las fechas estan al reves: no hay dias que mostrar y el
+                // error lo explica el label del recurso.
+                lblTotalInfo.Text = "";
+                lblTotal.Text = "";
+                return;
+            }
 
-            lblTotalInfo.ForeColor = ColorInfo;
             lblTotalInfo.Text = $"{dias} {(dias == 1 ? "día" : "días")}";
             lblTotal.Text = $"{borrador.CalcularTotal(recurso):C}";
         }
@@ -313,11 +325,17 @@ namespace SistemaCoworking.Formularios.UserControls
 
         private void dtpInicio_ValueChanged(object? sender, EventArgs e)
         {
+            // El error del recurso puede haber sido por las fechas, asi que
+            // cambiar una fecha devuelve el label a su color normal.
+            ActualizarInfoRecurso();
             ActualizarTotal();
         }
 
         private void dtpFin_ValueChanged(object? sender, EventArgs e)
         {
+            // El error del recurso puede haber sido por las fechas, asi que
+            // cambiar una fecha devuelve el label a su color normal.
+            ActualizarInfoRecurso();
             ActualizarTotal();
         }
 

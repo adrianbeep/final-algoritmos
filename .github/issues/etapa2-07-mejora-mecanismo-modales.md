@@ -91,7 +91,7 @@ pierde es el oscurecido.
 
 ### Lo repetido de los modales sale a una clase estatica
 
-- [ ] `Herramientas/ModalConfiguration.cs`: clase estatica, al estilo de `ButtonConfiguration`, `InputConfiguration`, `ComboBoxConfiguration`, `DataGridViewConfiguration` y `CheckBoxConfiguration`
+- [ ] `Herramientas/ModalConfiguration.cs`: clase estatica, al estilo de `ButtonConfiguration`, `InputConfiguration`, `ComboBoxConfiguration` y `DataGridViewConfiguration`
 - [ ] **Una sola llamada** configura el modal completo: `ModalConfiguration.ConfigModal(this, btnCancelar, pBoxCerrar)`. Deja el estilo de tarjeta (fondo opaco, tipografia, `ForeColor`), las esquinas redondeadas, y el boton Cancelar, la `X` y la tecla ESC haciendo lo mismo
 - [ ] `ClienteModalControl` y `RecursoModalControl` la llaman desde el constructor y quedan sin codigo repetido entre si
 - [ ] Los tres modales (Cliente, Recurso y Reserva) son iguales en estructura: los mismos botones y el mismo ciclo de vida. Lo unico que cambia son los controles que cada uno declara. Por eso lo repetido va en una clase estatica y no en una clase base con herencia

@@ -41,7 +41,7 @@ public partial class FrmReservas : Form
     {
         try
         {
-            _clientes = _clienteDAO.ObtenerTodos();
+            _clientes = _clienteDAO.ObtenerTodosComoLista();
         }
         catch (Exception ex)
         {

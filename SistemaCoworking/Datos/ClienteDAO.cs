@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Data;
 using MySqlConnector;
 using SistemaCoworking.Modelos;
 
@@ -18,7 +19,47 @@ public class ClienteDAO
 {
     public ClienteDAO() { }
 
-    public List<Cliente> ObtenerTodos()
+    /// <summary>
+    /// Listado plano de clientes para la grilla.
+    ///
+    /// Es lo que usa el DataGridView: las columnas se bindean a los nombres
+    /// de las columnas de la tabla, no a las propiedades del modelo. Igual que
+    /// el listado de recursos.
+    /// </summary>
+    public DataTable ObtenerTodos()
+    {
+        DataTable clientes = new DataTable();
+
+        using (MySqlConnection conexion =
+            ConexionBD.CrearConexion())
+        {
+            string sql =
+                "SELECT id, nombre, apellido, dni, telefono, email " +
+                "FROM clientes " +
+                "ORDER BY id ";
+
+            using (MySqlDataAdapter adaptador =
+                new MySqlDataAdapter(
+                    sql,
+                    conexion))
+            {
+                adaptador.Fill(clientes);
+            }
+        }
+
+        return clientes;
+    }
+
+    /// <summary>
+    /// Lista de clientes.
+    ///
+    /// Es lo que necesita el modal de Reservas para armar el combo: el combo
+    /// muestra la descripcion del cliente y guarda el Id.
+    ///
+    /// El listado de la grilla sigue usando ObtenerTodos(), que devuelve la
+    /// tabla plana.
+    /// </summary>
+    public List<Cliente> ObtenerTodosComoLista()
     {
         List<Cliente> clientes = new List<Cliente>();
 

@@ -43,7 +43,6 @@
             btnRecursos = new Button();
             pnReservas = new Panel();
             btnReservas = new Button();
-            pnModal = new Panel();
             sidebarTransicion = new System.Windows.Forms.Timer(components);
             pnForms = new Panel();
             panel1.SuspendLayout();
@@ -53,7 +52,6 @@
             pnClientes.SuspendLayout();
             pnRecursos.SuspendLayout();
             pnReservas.SuspendLayout();
-            pnForms.SuspendLayout();
             SuspendLayout();
             // 
             // panel1
@@ -222,14 +220,6 @@
             btnReservas.UseVisualStyleBackColor = false;
             btnReservas.Click += btnReservas_Click;
             // 
-            // pnModal
-            // 
-            pnModal.Location = new Point(-238, 0);
-            pnModal.Name = "pnModal";
-            pnModal.Size = new Size(1212, 650);
-            pnModal.TabIndex = 0;
-            pnModal.Visible = false;
-            // 
             // sidebarTransicion
             // 
             sidebarTransicion.Interval = 10;
@@ -237,7 +227,6 @@
             // 
             // pnForms
             // 
-            pnForms.Controls.Add(pnModal);
             pnForms.Dock = DockStyle.Fill;
             pnForms.Location = new Point(250, 45);
             pnForms.Name = "pnForms";
@@ -263,7 +252,6 @@
             pnClientes.ResumeLayout(false);
             pnRecursos.ResumeLayout(false);
             pnReservas.ResumeLayout(false);
-            pnForms.ResumeLayout(false);
             ResumeLayout(false);
         }
 
@@ -284,6 +272,5 @@
         private Button btnReservas;
         private System.Windows.Forms.Timer sidebarTransicion;
         private Panel pnForms;
-        private Panel pnModal;
     }
 }

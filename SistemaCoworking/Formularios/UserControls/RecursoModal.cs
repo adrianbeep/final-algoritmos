@@ -81,7 +81,12 @@ public partial class RecursoModal : Form
         InputConfiguration.ConfigLabel(label3);
         InputConfiguration.ConfigLabel(label4);
 
-        CheckBoxConfiguration.Config(chkProyector);
+        // El checkbox usa el control nativo de Windows. Se le pone el color de
+        // las etiquetas de la app para que no desentone con el resto. La
+        // tipografia ya es la misma: Segoe UI 9.
+        chkProyector.FlatStyle = FlatStyle.Flat;
+        chkProyector.ForeColor = Color.FromArgb(80, 80, 80);
+
         ButtonConfiguration.ConfigPrimary(btnGuardar);
         ButtonConfiguration.ConfigSecondary(btnCancelar);
 

@@ -1,0 +1,42 @@
+[
+  {
+    "Id": 1,
+    "Nombre": "Juan",
+    "Apellido": "Perez",
+    "Dni": 40123456,
+    "Telefono": "1145678901",
+    "Email": "juan.perez@example.com"
+  },
+  {
+    "Id": 2,
+    "Nombre": "Maria",
+    "Apellido": "Gonzalez",
+    "Dni": 39654321,
+    "Telefono": "1145678902",
+    "Email": "maria.gonzalez@example.com"
+  },
+  {
+    "Id": 3,
+    "Nombre": "Carlos",
+    "Apellido": "Lopez",
+    "Dni": 42123987,
+    "Telefono": "1145678903",
+    "Email": "carlos.lopez@example.com"
+  },
+  {
+    "Id": 4,
+    "Nombre": "Ana",
+    "Apellido": "Martinez",
+    "Dni": 38765432,
+    "Telefono": "1145678904",
+    "Email": "ana.martinez@example.com"
+  },
+  {
+    "Id": 5,
+    "Nombre": "Luis",
+    "Apellido": "Rodriguez",
+    "Dni": 41111222,
+    "Telefono": "1145678905",
+    "Email": "luis.rodriguez@example.com"
+  }
+]

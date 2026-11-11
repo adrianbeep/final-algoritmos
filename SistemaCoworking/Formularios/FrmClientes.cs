@@ -1,5 +1,6 @@
 ﻿using MySqlConnector;
 using System;
+using System.Text.Json;
 using System.Windows.Forms;
 using SistemaCoworking.Datos;
 using SistemaCoworking.Formularios.UserControls;
@@ -162,5 +163,81 @@ public partial class FrmClientes : Form
     private void btnCrearCliente_Click(object sender, EventArgs e)
     {
         AbrirModalCliente();
+    }
+
+    /// <summary>
+    /// Exporta el catalogo de clientes a un archivo JSON.
+    ///
+    /// Usa los objetos reales del modelo (Cliente), no las filas de la grilla:
+    /// el JSON sale con los nombres de las propiedades del dominio y no con
+    /// los de las columnas de la base. El DataTable de la grilla son filas de
+    /// la base, y JsonSerializer no las serializa de forma utilizable.
+    ///
+    /// El destino se puede pasar para no preguntar. Si no se pasa, se le
+    /// pregunta al usuario con un SaveFileDialog.
+    /// </summary>
+    private void ExportarCatalogoClientes(string? ruta = null)
+    {
+        try
+        {
+            List<Cliente> clientes = _clienteDAO.ObtenerTodosComoLista();
+
+            string json = JsonSerializer.Serialize(
+                clientes,
+                new JsonSerializerOptions { WriteIndented = true });
+
+            if (ruta is null)
+            {
+                using SaveFileDialog dialogo = new SaveFileDialog
+                {
+                    Title = "Exportar catalogo de clientes",
+                    Filter = "Archivos JSON (*.json)|*.json|Todos los archivos (*.*)|*.*",
+                    FileName = "catalogo-clientes.json"
+                };
+
+                if (dialogo.ShowDialog() != DialogResult.OK) return;
+
+                ruta = dialogo.FileName;
+            }
+
+            File.WriteAllText(ruta, json);
+
+            MessageBox.Show(
+                $"Catalogo exportado con {clientes.Count} clientes.\n\n{ruta}",
+                "Exportacion correcta",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Information);
+        }
+        catch (MySqlException ex)
+        {
+            // El DAO lanza y aca se captura. El SQLSTATE 45000 es una regla de
+            // negocio: el mensaje es del dominio y se muestra tal cual.
+            if (ex.SqlState == "45000" || ex.Number == 1644)
+            {
+                MessageBox.Show(
+                    ex.Message,
+                    "No se pudo completar la operacion",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
+            }
+            else
+            {
+                MessageBox.Show(
+                    "Ocurrio un error al trabajar con la base de datos. Intente de nuevo."
+                        + Environment.NewLine + Environment.NewLine + ex.Message,
+                    "Error de base de datos",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+            }
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show(
+                "Ocurrio un error inesperado. Intente de nuevo."
+                    + Environment.NewLine + Environment.NewLine + ex.Message,
+                "Error",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Error);
+        }
     }
 }

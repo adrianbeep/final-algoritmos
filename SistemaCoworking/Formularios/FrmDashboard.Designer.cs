@@ -70,7 +70,6 @@ namespace SistemaCoworking.Formularios
             // 
             // lblTitulo
             // 
-            lblTitulo.AutoSize = false;
             lblTitulo.Dock = DockStyle.Fill;
             lblTitulo.Font = new Font("Segoe UI Semibold", 15F);
             lblTitulo.ForeColor = Color.FromArgb(40, 40, 40);
@@ -78,16 +77,16 @@ namespace SistemaCoworking.Formularios
             lblTitulo.Name = "lblTitulo";
             lblTitulo.Size = new Size(632, 70);
             lblTitulo.TabIndex = 0;
-            lblTitulo.Text = "Indicadores del sistema";
+            lblTitulo.Text = "Metricas del sistema";
             lblTitulo.TextAlign = ContentAlignment.MiddleLeft;
             // 
             // btnActualizar
             // 
             btnActualizar.Dock = DockStyle.Right;
-            btnActualizar.Location = new Point(656, 17);
+            btnActualizar.Location = new Point(656, 0);
             btnActualizar.Margin = new Padding(12, 17, 0, 17);
             btnActualizar.Name = "btnActualizar";
-            btnActualizar.Size = new Size(120, 36);
+            btnActualizar.Size = new Size(120, 70);
             btnActualizar.TabIndex = 1;
             btnActualizar.Text = "Actualizar";
             btnActualizar.UseVisualStyleBackColor = true;
@@ -101,13 +100,11 @@ namespace SistemaCoworking.Formularios
             flowLayoutPanel1.Controls.Add(card3);
             flowLayoutPanel1.Controls.Add(card4);
             flowLayoutPanel1.Dock = DockStyle.Fill;
-            flowLayoutPanel1.FlowDirection = FlowDirection.LeftToRight;
             flowLayoutPanel1.Location = new Point(0, 70);
             flowLayoutPanel1.Name = "flowLayoutPanel1";
-            flowLayoutPanel1.Padding = new Padding(12, 12, 12, 12);
+            flowLayoutPanel1.Padding = new Padding(12);
             flowLayoutPanel1.Size = new Size(800, 380);
             flowLayoutPanel1.TabIndex = 1;
-            flowLayoutPanel1.WrapContents = true;
             // 
             // card1
             // 
@@ -124,35 +121,32 @@ namespace SistemaCoworking.Formularios
             // 
             // lblValorCard1
             // 
-            lblValorCard1.AutoSize = false;
             lblValorCard1.Dock = DockStyle.Fill;
             lblValorCard1.Font = new Font("Segoe UI Semibold", 26F);
             lblValorCard1.ForeColor = Color.FromArgb(0, 120, 215);
             lblValorCard1.Location = new Point(0, 34);
             lblValorCard1.Name = "lblValorCard1";
             lblValorCard1.Padding = new Padding(16, 0, 0, 0);
-            lblValorCard1.Size = new Size(178, 104);
+            lblValorCard1.Size = new Size(208, 74);
             lblValorCard1.TabIndex = 1;
             lblValorCard1.Text = "-";
             lblValorCard1.TextAlign = ContentAlignment.MiddleLeft;
             // 
             // lblTituloCard1
             // 
-            lblTituloCard1.AutoSize = false;
             lblTituloCard1.Dock = DockStyle.Top;
             lblTituloCard1.Font = new Font("Segoe UI", 9.5F);
             lblTituloCard1.ForeColor = Color.FromArgb(138, 143, 152);
             lblTituloCard1.Location = new Point(0, 0);
             lblTituloCard1.Name = "lblTituloCard1";
             lblTituloCard1.Padding = new Padding(16, 0, 0, 0);
-            lblTituloCard1.Size = new Size(178, 34);
+            lblTituloCard1.Size = new Size(208, 34);
             lblTituloCard1.TabIndex = 0;
             lblTituloCard1.Text = "Total de clientes";
             lblTituloCard1.TextAlign = ContentAlignment.MiddleLeft;
             // 
             // lblDetalleCard1
             // 
-            lblDetalleCard1.AutoSize = false;
             lblDetalleCard1.BackColor = Color.White;
             lblDetalleCard1.Dock = DockStyle.Bottom;
             lblDetalleCard1.Font = new Font("Segoe UI", 9F);
@@ -160,7 +154,7 @@ namespace SistemaCoworking.Formularios
             lblDetalleCard1.Location = new Point(0, 108);
             lblDetalleCard1.Name = "lblDetalleCard1";
             lblDetalleCard1.Padding = new Padding(16, 0, 0, 0);
-            lblDetalleCard1.Size = new Size(178, 30);
+            lblDetalleCard1.Size = new Size(208, 30);
             lblDetalleCard1.TabIndex = 2;
             lblDetalleCard1.Text = "Clientes registrados";
             lblDetalleCard1.TextAlign = ContentAlignment.MiddleLeft;
@@ -172,7 +166,7 @@ namespace SistemaCoworking.Formularios
             card2.Controls.Add(lblValorCard2);
             card2.Controls.Add(lblTituloCard2);
             card2.Controls.Add(lblDetalleCard2);
-            card2.Location = new Point(298, 24);
+            card2.Location = new Point(258, 24);
             card2.Margin = new Padding(12);
             card2.Name = "card2";
             card2.Size = new Size(210, 140);
@@ -180,35 +174,32 @@ namespace SistemaCoworking.Formularios
             // 
             // lblValorCard2
             // 
-            lblValorCard2.AutoSize = false;
             lblValorCard2.Dock = DockStyle.Fill;
             lblValorCard2.Font = new Font("Segoe UI Semibold", 26F);
             lblValorCard2.ForeColor = Color.FromArgb(255, 159, 28);
             lblValorCard2.Location = new Point(0, 34);
             lblValorCard2.Name = "lblValorCard2";
             lblValorCard2.Padding = new Padding(16, 0, 0, 0);
-            lblValorCard2.Size = new Size(178, 104);
+            lblValorCard2.Size = new Size(208, 74);
             lblValorCard2.TabIndex = 1;
             lblValorCard2.Text = "-";
             lblValorCard2.TextAlign = ContentAlignment.MiddleLeft;
             // 
             // lblTituloCard2
             // 
-            lblTituloCard2.AutoSize = false;
             lblTituloCard2.Dock = DockStyle.Top;
             lblTituloCard2.Font = new Font("Segoe UI", 9.5F);
             lblTituloCard2.ForeColor = Color.FromArgb(138, 143, 152);
             lblTituloCard2.Location = new Point(0, 0);
             lblTituloCard2.Name = "lblTituloCard2";
             lblTituloCard2.Padding = new Padding(16, 0, 0, 0);
-            lblTituloCard2.Size = new Size(178, 34);
+            lblTituloCard2.Size = new Size(208, 34);
             lblTituloCard2.TabIndex = 0;
             lblTituloCard2.Text = "Reservas por finalizar";
             lblTituloCard2.TextAlign = ContentAlignment.MiddleLeft;
             // 
             // lblDetalleCard2
             // 
-            lblDetalleCard2.AutoSize = false;
             lblDetalleCard2.BackColor = Color.White;
             lblDetalleCard2.Dock = DockStyle.Bottom;
             lblDetalleCard2.Font = new Font("Segoe UI", 9F);
@@ -216,7 +207,7 @@ namespace SistemaCoworking.Formularios
             lblDetalleCard2.Location = new Point(0, 108);
             lblDetalleCard2.Name = "lblDetalleCard2";
             lblDetalleCard2.Padding = new Padding(16, 0, 0, 0);
-            lblDetalleCard2.Size = new Size(178, 30);
+            lblDetalleCard2.Size = new Size(208, 30);
             lblDetalleCard2.TabIndex = 2;
             lblDetalleCard2.Text = "Reservas en curso";
             lblDetalleCard2.TextAlign = ContentAlignment.MiddleLeft;
@@ -228,7 +219,7 @@ namespace SistemaCoworking.Formularios
             card3.Controls.Add(lblValorCard3);
             card3.Controls.Add(lblTituloCard3);
             card3.Controls.Add(lblDetalleCard3);
-            card3.Location = new Point(24, 188);
+            card3.Location = new Point(492, 24);
             card3.Margin = new Padding(12);
             card3.Name = "card3";
             card3.Size = new Size(210, 140);
@@ -236,35 +227,32 @@ namespace SistemaCoworking.Formularios
             // 
             // lblValorCard3
             // 
-            lblValorCard3.AutoSize = false;
             lblValorCard3.Dock = DockStyle.Fill;
             lblValorCard3.Font = new Font("Segoe UI Semibold", 26F);
             lblValorCard3.ForeColor = Color.FromArgb(56, 142, 60);
             lblValorCard3.Location = new Point(0, 34);
             lblValorCard3.Name = "lblValorCard3";
             lblValorCard3.Padding = new Padding(16, 0, 0, 0);
-            lblValorCard3.Size = new Size(178, 104);
+            lblValorCard3.Size = new Size(208, 74);
             lblValorCard3.TabIndex = 1;
             lblValorCard3.Text = "-";
             lblValorCard3.TextAlign = ContentAlignment.MiddleLeft;
             // 
             // lblTituloCard3
             // 
-            lblTituloCard3.AutoSize = false;
             lblTituloCard3.Dock = DockStyle.Top;
             lblTituloCard3.Font = new Font("Segoe UI", 9.5F);
             lblTituloCard3.ForeColor = Color.FromArgb(138, 143, 152);
             lblTituloCard3.Location = new Point(0, 0);
             lblTituloCard3.Name = "lblTituloCard3";
             lblTituloCard3.Padding = new Padding(16, 0, 0, 0);
-            lblTituloCard3.Size = new Size(178, 34);
+            lblTituloCard3.Size = new Size(208, 34);
             lblTituloCard3.TabIndex = 0;
             lblTituloCard3.Text = "Reservas de hoy";
             lblTituloCard3.TextAlign = ContentAlignment.MiddleLeft;
             // 
             // lblDetalleCard3
             // 
-            lblDetalleCard3.AutoSize = false;
             lblDetalleCard3.BackColor = Color.White;
             lblDetalleCard3.Dock = DockStyle.Bottom;
             lblDetalleCard3.Font = new Font("Segoe UI", 9F);
@@ -272,7 +260,7 @@ namespace SistemaCoworking.Formularios
             lblDetalleCard3.Location = new Point(0, 108);
             lblDetalleCard3.Name = "lblDetalleCard3";
             lblDetalleCard3.Padding = new Padding(16, 0, 0, 0);
-            lblDetalleCard3.Size = new Size(178, 30);
+            lblDetalleCard3.Size = new Size(208, 30);
             lblDetalleCard3.TabIndex = 2;
             lblDetalleCard3.Text = "Reservas que empiezan hoy";
             lblDetalleCard3.TextAlign = ContentAlignment.MiddleLeft;
@@ -284,7 +272,7 @@ namespace SistemaCoworking.Formularios
             card4.Controls.Add(lblValorCard4);
             card4.Controls.Add(lblTituloCard4);
             card4.Controls.Add(lblDetalleCard4);
-            card4.Location = new Point(298, 188);
+            card4.Location = new Point(24, 188);
             card4.Margin = new Padding(12);
             card4.Name = "card4";
             card4.Size = new Size(210, 140);
@@ -292,35 +280,32 @@ namespace SistemaCoworking.Formularios
             // 
             // lblValorCard4
             // 
-            lblValorCard4.AutoSize = false;
             lblValorCard4.Dock = DockStyle.Fill;
             lblValorCard4.Font = new Font("Segoe UI Semibold", 26F);
             lblValorCard4.ForeColor = Color.FromArgb(56, 142, 60);
             lblValorCard4.Location = new Point(0, 34);
             lblValorCard4.Name = "lblValorCard4";
             lblValorCard4.Padding = new Padding(16, 0, 0, 0);
-            lblValorCard4.Size = new Size(178, 104);
+            lblValorCard4.Size = new Size(208, 74);
             lblValorCard4.TabIndex = 1;
             lblValorCard4.Text = "-";
             lblValorCard4.TextAlign = ContentAlignment.MiddleLeft;
             // 
             // lblTituloCard4
             // 
-            lblTituloCard4.AutoSize = false;
             lblTituloCard4.Dock = DockStyle.Top;
             lblTituloCard4.Font = new Font("Segoe UI", 9.5F);
             lblTituloCard4.ForeColor = Color.FromArgb(138, 143, 152);
             lblTituloCard4.Location = new Point(0, 0);
             lblTituloCard4.Name = "lblTituloCard4";
             lblTituloCard4.Padding = new Padding(16, 0, 0, 0);
-            lblTituloCard4.Size = new Size(178, 34);
+            lblTituloCard4.Size = new Size(208, 34);
             lblTituloCard4.TabIndex = 0;
             lblTituloCard4.Text = "Ocupacion de hoy";
             lblTituloCard4.TextAlign = ContentAlignment.MiddleLeft;
             // 
             // lblDetalleCard4
             // 
-            lblDetalleCard4.AutoSize = false;
             lblDetalleCard4.BackColor = Color.White;
             lblDetalleCard4.Dock = DockStyle.Bottom;
             lblDetalleCard4.Font = new Font("Segoe UI", 9F);
@@ -328,7 +313,7 @@ namespace SistemaCoworking.Formularios
             lblDetalleCard4.Location = new Point(0, 108);
             lblDetalleCard4.Name = "lblDetalleCard4";
             lblDetalleCard4.Padding = new Padding(16, 0, 0, 0);
-            lblDetalleCard4.Size = new Size(178, 30);
+            lblDetalleCard4.Size = new Size(208, 30);
             lblDetalleCard4.TabIndex = 2;
             lblDetalleCard4.Text = "Recursos reservados hoy";
             lblDetalleCard4.TextAlign = ContentAlignment.MiddleLeft;

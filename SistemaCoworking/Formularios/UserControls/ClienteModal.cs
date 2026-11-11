@@ -150,12 +150,7 @@ public partial class ClienteModal : Form
             // sabe, porque es el que tiene el _cliente.
             if (_cliente is null)
             {
-                _dao.Insertar(
-                    cliente.Nombre,
-                    cliente.Apellido,
-                    cliente.Dni,
-                    cliente.Telefono,
-                    cliente.Email);
+                _dao.Insertar(cliente);
             }
             else
             {

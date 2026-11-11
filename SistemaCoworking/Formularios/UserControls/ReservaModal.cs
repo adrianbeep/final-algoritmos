@@ -193,12 +193,7 @@ namespace SistemaCoworking.Formularios.UserControls
                 // lo sabe, porque es el que tiene el _reserva.
                 if (_reserva is null)
                 {
-                    _dao.Insertar(
-                        reserva.IdCliente,
-                        reserva.IdRecurso,
-                        reserva.FechaInicio,
-                        reserva.FechaFin,
-                        reserva.TotalReserva);
+                    _dao.Insertar(reserva);
                 }
                 else
                 {

@@ -102,12 +102,13 @@ public class ClienteDAO
         return c;
     }
 
-    public void Insertar(
-        string nombre,
-        string apellido,
-        int dni,
-        string telefono,
-        string email)
+    /// <summary>
+    /// Da de alta un cliente.
+    ///
+    /// El Id lo asigna la base: en el alta la entidad llega con Id = 0 y el
+    /// procedimiento almacenado no lo recibe. El DAO lo ignora.
+    /// </summary>
+    public void Insertar(Cliente cliente)
     {
         using (MySqlConnection conexion =
             ConexionBD.CrearConexion())
@@ -128,27 +129,27 @@ public class ClienteDAO
                 //coincidan con los del StoredProcedure de sql
                 comando.Parameters.AddWithValue(
                     "p_nombre",
-                    nombre
+                    cliente.Nombre
                 );
 
                 comando.Parameters.AddWithValue(
                     "p_apellido",
-                    apellido
+                    cliente.Apellido
                 );
 
                 comando.Parameters.AddWithValue(
                     "p_dni",
-                    dni
+                    cliente.Dni
                 );
 
                 comando.Parameters.AddWithValue(
                     "p_telefono",
-                    telefono
+                    cliente.Telefono
                 );
 
                 comando.Parameters.AddWithValue(
                     "p_email",
-                    email
+                    cliente.Email
                 );
 
                 //Siempre en operaciones
@@ -159,7 +160,7 @@ public class ClienteDAO
 
     }
 
-    public void Modificar(Cliente c)
+    public void Modificar(Cliente cliente)
     {
         using (MySqlConnection conexion =
             ConexionBD.CrearConexion())
@@ -180,32 +181,32 @@ public class ClienteDAO
                 //coincidan con los del StoredProcedure de sql
                 comando.Parameters.AddWithValue(
                     "p_id",
-                    c.Id
+                    cliente.Id
                 );
 
                 comando.Parameters.AddWithValue(
                     "p_nombre",
-                    c.Nombre
+                    cliente.Nombre
                 );
 
                 comando.Parameters.AddWithValue(
                     "p_apellido",
-                    c.Apellido
+                    cliente.Apellido
                 );
 
                 comando.Parameters.AddWithValue(
                     "p_dni",
-                    c.Dni
+                    cliente.Dni
                 );
 
                 comando.Parameters.AddWithValue(
                     "p_telefono",
-                    c.Telefono
+                    cliente.Telefono
                 );
 
                 comando.Parameters.AddWithValue(
                     "p_email",
-                    c.Email
+                    cliente.Email
                 );
 
                 //Siempre en operaciones

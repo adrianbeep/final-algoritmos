@@ -19,6 +19,7 @@ Este archivo es documentación técnica del proyecto: sirve para la entrega, par
 | D-005 | [La fábrica de recursos vive en el dominio](#d-005--la-fábrica-de-recursos-vive-en-el-dominio-no-en-la-capa-de-datos) | 04/11/2026 | Aceptada |
 | D-006 | [Cada recurso declara sus propios datos de tipo](#d-006--cada-recurso-declara-sus-propios-datos-de-tipo) | 04/11/2026 | Aceptada |
 | D-007 | [La regla de superposicion de reservas vive en la base, en una funcion](#d-007--la-regla-de-superposicion-de-reservas-vive-en-la-base-en-una-funcion) | 10/11/2026 | Aceptada |
+| D-008 | [Los DAO de escritura reciben la entidad, no parámetros sueltos](#d-008--los-dao-de-escritura-reciben-la-entidad-no-parámetros-sueltos) | 11/11/2026 | Aceptada |
 
 ---
 
@@ -477,3 +478,84 @@ Se agrego la funcion `fn_recurso_ocupado(p_id_recurso, p_fecha_inicio, p_fecha_f
 - `SistemaCoworking/Datos/ReservaDAO.cs` — `RecursoOcupado`
 - `SistemaCoworking/Formularios/UserControls/ReservaModal.cs` — la preconsulta
 - `SistemaCoworking/Modelos/Reserva.cs` — `ValidarReserva`
+
+---
+
+## D-008 — Los DAO de escritura reciben la entidad, no parámetros sueltos
+
+**Fecha:** 11/11/2026
+**Estado:** Aceptada
+**Ámbito:** Capa de datos y capa de presentación (modales)
+
+### Contexto
+
+El spec de la etapa 3 ya pedia que los tres DAO de escritura tuvieran el mismo
+contrato: `Insertar(entidad)` y `Modificar(entidad)`. `RecursoDAO` lo cumple
+desde que se cambio de diez parametros sueltos a `Insertar(Recurso recurso)`
+(ver D-003). `ClienteDAO.Insertar` y `ReservaDAO.Insertar` quedaron con cinco
+parametros sueltos cada uno, y esa diferencia se filtraba a los modales: el
+modal de reservas armaba la entidad, le calculaba el total, y despues la
+desarmaba para pasarle las piezas sueltas al DAO.
+
+Un DAO que recibe la entidad tiene una ventaja que no es cosmetica: el
+procedimiento almacenado sigue siendo el unico que decide. Si el DAO recibiera
+el total ya calculado, el unico que podria calcularlo es quien conoce el
+recurso, y ese es el modal.
+
+### Decisión
+
+- `ClienteDAO.Insertar` recibe `Cliente` y `ReservaDAO.Insertar` recibe `Reserva`.
+  Los dos mapean las propiedades de la entidad a los mismos parametros del
+  procedimiento almacenado, sin cambiar nombres ni orden.
+- `ClienteDAO.Modificar` pasa a llamarse con el parametro `cliente`, como los
+  otros dos DAO, para que los tres contratos se lean igual.
+- El contrato queda escrito en el propio DAO, con las dos cosas que no son
+  obvias: el `Id` lo asigna la base y no se pasa, y el `TotalReserva` lo calcula
+  el modelo antes de guardar y el DAO no lo recalcula.
+- Los modales arman la entidad y se la pasan entera. No cambian los metodos de
+  validacion ni los de calculo.
+
+### Alternativas descartadas
+
+- **Una interfaz generica `ICrudDAO<T>`** para unificar los tres DAO. Se descarto
+  porque los tres contratos son genuinamente distintos: el cliente no recibe id,
+  el recurso tiene datos de tipo que van en otra tabla, y la reserva trae el
+  total ya calculado. Una interfaz comun obligaria a cada DAO a declarar
+  metodos que no usa, y la consigna no pide estructuras genericas propias.
+- **Que el DAO calcule el total de la reserva.** Se descarto porque el total
+  depende del tipo del recurso, y el tipo vive en el modelo, no en la capa de
+  datos. Si el DAO lo calculara, la regla de precio quedaria duplicada.
+- **Dejar los parametros sueltos y unificar solo la forma de llamarlos.** Se
+  descarto porque el problema no es la forma de la llamada: es que el modal
+  tiene que desarmar la entidad para poder llamar.
+
+### Consecuencias
+
+**A favor:**
+
+- Los tres DAO de escritura tienen el mismo contrato, que es el que pedia el
+  spec de la etapa 3.
+- Los modales arman la entidad y la pasan: no hay mas mapeo de mano en la
+  presentacion.
+- Menos posibilidades de equivocarse al pasar los parametros: el orden y el
+  tipo los impone el compilador.
+- El contrato escrito en el DAO evita las dos trampas del dominio: que alguien
+  espere que el DAO le asigne el id, o que le recalcule el total.
+
+**En contra (y cómo se mitigan):**
+
+- **El DAO depende de que la entidad llegue completa.** Si el modal seolvida de
+  calcular el total, el DAO escribe 0 sin avisar. Se mitiga con el contrato
+  escrito en el metodo y con que el calculo vive en una sola linea del modal,
+  que es la que arma la entidad.
+- **El `Id` de la entidad no sirve para el alta.** Se mitiga documentandolo: la
+  base lo asigna y el DAO lo ignora.
+
+### Referencias
+
+- `SistemaCoworking/Datos/ClienteDAO.cs` — `Insertar(Cliente cliente)`, `Modificar(Cliente cliente)`
+- `SistemaCoworking/Datos/RecursoDAO.cs` — `Insertar(Recurso recurso)`, `Modificar(Recurso recurso)`
+- `SistemaCoworking/Datos/ReservaDAO.cs` — `Insertar(Reserva reserva)`, `Modificar(Reserva reserva)`, `Cancelar(int id)`
+- `SistemaCoworking/Formularios/UserControls/ClienteModal.cs` — arma el cliente y lo pasa entero
+- `SistemaCoworking/Formularios/UserControls/ReservaModal.cs` — arma la reserva con el total calculado
+- `.github/issues/etapa3-01-integracion.md` — el spec que pedia el contrato uniforme

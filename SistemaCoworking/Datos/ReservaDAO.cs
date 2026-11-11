@@ -134,13 +134,14 @@ public class ReservaDAO
         }
     }
 
-    public void Insertar(
-        int idCliente,
-        int idRecurso,
-        DateTime fechaInicio,
-        DateTime fechaFin,
-        decimal total_reserva
-    )
+    /// <summary>
+    /// Da de alta una reserva.
+    ///
+    /// El TotalReserva lo calcula el modelo antes de guardar: el DAO no lo
+    /// recalcula, escribe el que trae la entidad. El Id tambien lo asigna la
+    /// base y no se pasa.
+    /// </summary>
+    public void Insertar(Reserva reserva)
     {
         using (MySqlConnection conexion =
             ConexionBD.CrearConexion())
@@ -157,27 +158,27 @@ public class ReservaDAO
 
                 comando.Parameters.AddWithValue(
                     "p_id_cliente",
-                    idCliente
+                    reserva.IdCliente
                 );
 
                 comando.Parameters.AddWithValue(
                     "p_id_recurso",
-                    idRecurso
+                    reserva.IdRecurso
                 );
 
                 comando.Parameters.AddWithValue(
                     "p_fecha_inicio",
-                    fechaInicio
+                    reserva.FechaInicio
                 );
 
                 comando.Parameters.AddWithValue(
                     "p_fecha_fin",
-                    fechaFin
+                    reserva.FechaFin
                 );
 
                 comando.Parameters.AddWithValue(
                     "p_total_reserva",
-                    total_reserva
+                    reserva.TotalReserva
                 );
 
                 comando.ExecuteNonQuery();

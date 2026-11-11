@@ -3,6 +3,8 @@
 TRIGGERS
 ===========================================
 */
+
+USE coworking;
 -- MySql limita los triggers a una accion, por ej sql server permite hacer un trigger
 -- para insert y para update.
 DROP TRIGGER IF EXISTS trg_auditoria_reservas_insert;

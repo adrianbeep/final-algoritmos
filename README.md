@@ -116,7 +116,7 @@ La aplicación **usa procedimientos almacenados, vistas y funciones**: no alcanz
 | 4 | `Procedimientos_Almacenados.sql` | Los 7 procedimientos `sp_*` |
 | 5 | `Triggers.sql` | Los 2 triggers de auditoría |
 
-> **Importante:** solo `Coworking_db.sql` incluye `USE coworking;`. Los otros cuatro se ejecutan contra el esquema que esté seleccionado en ese momento, así que en MySQL Workbench hay que **seleccionar la base `coworking` como esquema por defecto antes de correrlos**. Si se ejecuta uno de ellos con otro esquema seleccionado, los objetos se crean en la base equivocada y la aplicación falla al invocar los procedimientos.
+> Los cinco scripts incluyen `USE coworking;`, así que se pueden correr uno detrás de otro en cualquier cliente (línea de comandos o Workbench) sin tener que seleccionar el esquema a mano.
 
 Pasos:
 

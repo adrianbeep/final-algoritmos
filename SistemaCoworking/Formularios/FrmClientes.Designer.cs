@@ -132,7 +132,7 @@
             // 
             // colId
             // 
-            colId.DataPropertyName = "Id";
+            colId.DataPropertyName = "id";
             colId.HeaderText = "Id";
             colId.MinimumWidth = 6;
             colId.Name = "colId";
@@ -141,7 +141,7 @@
             // 
             // colNombre
             // 
-            colNombre.DataPropertyName = "Nombre";
+            colNombre.DataPropertyName = "nombre";
             colNombre.HeaderText = "Nombre";
             colNombre.MinimumWidth = 6;
             colNombre.Name = "colNombre";
@@ -150,7 +150,7 @@
             // 
             // colApellido
             // 
-            colApellido.DataPropertyName = "Apellido";
+            colApellido.DataPropertyName = "apellido";
             colApellido.HeaderText = "Apellido";
             colApellido.MinimumWidth = 6;
             colApellido.Name = "colApellido";
@@ -159,7 +159,7 @@
             // 
             // colDni
             // 
-            colDni.DataPropertyName = "Dni";
+            colDni.DataPropertyName = "dni";
             colDni.HeaderText = "Dni";
             colDni.MinimumWidth = 6;
             colDni.Name = "colDni";
@@ -168,7 +168,7 @@
             // 
             // colTelefono
             // 
-            colTelefono.DataPropertyName = "Telefono";
+            colTelefono.DataPropertyName = "telefono";
             colTelefono.HeaderText = "Telefono";
             colTelefono.MinimumWidth = 6;
             colTelefono.Name = "colTelefono";
@@ -177,7 +177,7 @@
             // 
             // colEmail
             // 
-            colEmail.DataPropertyName = "Email";
+            colEmail.DataPropertyName = "email";
             colEmail.HeaderText = "Email";
             colEmail.MinimumWidth = 6;
             colEmail.Name = "colEmail";

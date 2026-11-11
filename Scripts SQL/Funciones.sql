@@ -79,11 +79,15 @@ END //
 
 -- Determina si un recurso ya tiene una reserva confirmada en el periodo indicado.
 -- La usan los procedimientos almacenados y la aplicacion, para no duplicar la regla.
+--
+-- Los parametros NO llevan la palabra IN: MariaDB la acepta en los procedimientos
+-- pero no en las funciones (ERROR 1064). La sintaxis sin el modo es la que
+-- funcionan en MySQL y en MariaDB, asi que se usa la misma en los dos.
 CREATE FUNCTION fn_recurso_ocupado(
-	in p_id_recurso int,
-	in p_fecha_inicio datetime,
-	in p_fecha_fin datetime,
-	in p_id_reserva_excluida int
+	p_id_recurso int,
+	p_fecha_inicio datetime,
+	p_fecha_fin datetime,
+	p_id_reserva_excluida int
 )
 RETURNS TINYINT
 NOT DETERMINISTIC

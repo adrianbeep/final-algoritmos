@@ -18,6 +18,7 @@ Cierre del modulo de reservas en tres frentes que quedaban abiertos: el boton de
 - `p_id_reserva_excluida` evita que, al editar, la reserva se superponga consigo misma.
 - Indice `ix_reservas_recurso_periodo` sobre `(id_recurso, estado_reserva, fecha_inicio, fecha_fin)`: la consulta era un recorrido completo de la tabla.
 - Las fechas se comparan por dia y no por hora, en las columnas y en los procedimientos, porque el sistema reserva por dias.
+- La funcion declara sus parametros sin la palabra `IN`: MariaDB la acepta en los procedimientos pero no en las funciones.
 
 **El modelo decide la regla, no el formulario**
 - `Reserva.ValidarReserva` reemplaza a `ValidarRecurso` y `ValidarFechas`, que reimplementaban la misma condicion.
@@ -41,7 +42,6 @@ Cierre del modulo de reservas en tres frentes que quedaban abiertos: el boton de
 - `dotnet build SistemaCoworking\SistemaCoworking.csproj -t:Rebuild`: compilacion correcta, 0 errores y 7 advertencias preexistentes (4 en `FrmPrincipal.cs` y 3 en `TextControl.cs`).
 - Cada commit de la rama compila por separado.
 - El color de los botones se verifico midiendo los pixeles de la grilla dibujada: naranja (255,159,28) en las reservas `Confirmadas`, gris (224,224,224) en las canceladas, y el boton de editar azul (0,120,215) en todas las filas, pares e impares.
-
-Pendiente de verificar a mano: no hay servidor MySQL en la maquina de desarrollo, asi que los scripts quedaron revisados solo por lectura. Hay que correr los cinco scripts en orden sobre un MySQL real antes de la defensa.
+- Base real: los cinco scripts se ejecutaron en orden sobre MariaDB 10.4 y quedaron los 6 objetos creados (6 funciones y 7 procedimientos). La funcion se probo con datos reales: devuelve 1 cuando el recurso tiene una reserva confirmada que se superpone, 0 cuando no, 0 cuando la reserva editada es la misma que se excluye, y 0 si la reserva esta cancelada. `sp_alta_reserva` rechaza el alta superpuesta con `ERROR 1644 (45000)`, el error de negocio que la aplicacion sabe mostrar.
 
 Closes #34

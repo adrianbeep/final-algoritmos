@@ -78,4 +78,4 @@ Este issue cierra el modulo de reservas y, con el, la etapa 2. La consigna evalu
 
 La regla de superposicion era la unica regla del sistema duplicada entre la base y la aplicacion. Ahora vive en la funcion `fn_recurso_ocupado`, que usan tanto los procedimientos almacenados como la aplicacion: la base y la interfaz no pueden decidir distinto.
 
-Pendiente de verificar a mano: no hay servidor MySQL en la maquina de desarrollo, asi que los scripts quedaron revisados solo por lectura. Hay que correr los cinco scripts en orden sobre un MySQL real antes de la defensa.
+Verificado contra una base real: los cinco scripts se corrieron en orden sobre MariaDB 10.4 y los objetos quedaron creados (6 funciones y 7 procedimientos). La funcion se probo con datos reales y devuelve 1 cuando el recurso tiene una reserva confirmada que se superpone, 0 cuando no se superpone, 0 cuando la reserva que se esta editando es la misma que se excluye, y 0 si la reserva esta cancelada. El procedimiento `sp_alta_reserva` rechaza el alta superpuesta con `ERROR 1644 (45000)`, que es el error de negocio que la aplicacion sabe mostrar.

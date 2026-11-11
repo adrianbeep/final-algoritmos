@@ -13,13 +13,14 @@ Este archivo es documentación técnica del proyecto: sirve para la entrega, par
 | ID | Decisión | Fecha | Estado |
 |---|---|---|---|
 | D-001 | [Descomponer el sistema en issues de GitHub](#d-001--descomponer-el-sistema-en-issues-de-github) | 02/11/2026 | Aceptada |
-| D-002 | [Extender `recursos` con una tabla de detalle 1:1](#d-002--los-atributos-especificos-de-cada-tipo-viven-en-una-tabla-de-extensión-11-recursos_detalle) | 17/10/2026 | Aceptada |
+| D-002 | [Extender `recursos` con una tabla de detalle 1:1](#d-002--los-atributos-específicos-de-cada-tipo-viven-en-una-tabla-de-extensión-11-recursos_detalle) | 17/10/2026 | Aceptada |
 | D-003 | [El precio diario es un valor derivado, no un dato guardado](#d-003--el-precio-diario-es-un-valor-derivado-no-un-dato-guardado) | 04/11/2026 | Aceptada |
 | D-004 | [`tipo_recursos` es un catálogo fijo, de solo lectura](#d-004--tipo_recursos-es-un-catálogo-fijo-de-solo-lectura-desde-la-aplicación) | 17/10/2026 | Aceptada |
 | D-005 | [La fábrica de recursos vive en el dominio](#d-005--la-fábrica-de-recursos-vive-en-el-dominio-no-en-la-capa-de-datos) | 04/11/2026 | Aceptada |
 | D-006 | [Cada recurso declara sus propios datos de tipo](#d-006--cada-recurso-declara-sus-propios-datos-de-tipo) | 04/11/2026 | Aceptada |
 | D-007 | [La regla de superposicion de reservas vive en la base, en una funcion](#d-007--la-regla-de-superposicion-de-reservas-vive-en-la-base-en-una-funcion) | 10/11/2026 | Aceptada |
 | D-008 | [Los DAO de escritura reciben la entidad, no parámetros sueltos](#d-008--los-dao-de-escritura-reciben-la-entidad-no-parámetros-sueltos) | 11/11/2026 | Aceptada |
+| D-009 | [Los DAO devuelven dos cosas: la tabla plana para la grilla y la lista tipada para los combos](#d-009--los-dao-devuelven-dos-cosas-la-tabla-plana-para-la-grilla-y-la-lista-tipada-para-los-combos) | 11/11/2026 | Aceptada |
 
 ---
 
@@ -559,3 +560,89 @@ recurso, y ese es el modal.
 - `SistemaCoworking/Formularios/UserControls/ClienteModal.cs` — arma el cliente y lo pasa entero
 - `SistemaCoworking/Formularios/UserControls/ReservaModal.cs` — arma la reserva con el total calculado
 - `.github/issues/etapa3-01-integracion.md` — el spec que pedia el contrato uniforme
+
+---
+
+## D-009 — Los DAO devuelven dos cosas: la tabla plana para la grilla y la lista tipada para los combos
+
+**Fecha:** 11/11/2026
+**Estado:** Aceptada
+**Ámbito:** Capa de datos y capa de presentacion (formularios y modales)
+
+### Contexto
+
+`RecursoDAO` ya resolvia esto de una forma y `ClienteDAO` de otra. El DAO de
+recursos tenia dos metodos de lectura: `ObtenerTodos()` devolvia la vista
+plana en un `DataTable` para la grilla, y `ObtenerTodosComoLista()` devolvia
+los recursos con su tipo concreto para el combo del modal de reservas. El DAO
+de clientes, en cambio, tenia un solo metodo que devolvia una
+`List<Cliente>`, y la grilla lo consumia directamente.
+
+Eso dejaba la grilla de clientes bindeada a las **propiedades del modelo**: las
+columnas del `DataGridView` apuntaban a `Id`, `Nombre`, `Apellido`, `Dni`,
+`Telefono` y `Email`, que son los nombres de las propiedades de `Cliente`. La
+grilla de recursos, en cambio, apuntaba a los **nombres de las columnas de la
+base**: `id_recurso`, `recurso_nombre`, `recurso_ubicacion`. Dos formas de hacer
+lo mismo en la misma aplicacion.
+
+La diferencia no es cosmetica. Con la grilla bindeada a la entidad, cada
+columna del `DataGridView` depende de una propiedad del modelo, asi que
+cualquier cambio en el modelo puede romper la grilla sin que el compilador se
+entere. Con la grilla bindeada a la tabla, las columnas dependen de la consulta
+y del script, que es donde la base ya define los nombres.
+
+### Decision
+
+- `ClienteDAO.ObtenerTodos()` devuelve un `DataTable` con las columnas de la
+  tabla `clientes`, igual que hace `RecursoDAO.ObtenerTodos()` con su vista.
+- El listado de clientes que necesita el combo del modal de reservas pasa por
+  un metodo nuevo, `ClienteDAO.ObtenerTodosComoLista()`, que devuelve la
+  `List<Cliente>`. El nombre es el mismo que usa `RecursoDAO`, para que los
+  dos DAO se lean igual.
+- Las columnas de `dgvClientes` pasan a apuntar a los nombres de las columnas
+  de la base: `id`, `nombre`, `apellido`, `dni`, `telefono` y `email`. Los
+  `HeaderText` no cambian: los que se ven siguen siendo los de siempre.
+- `TipoRecursoDAO` se queda con un solo metodo, `ObtenerTodos()`, que devuelve
+  la lista: no tiene grilla, su unico consumidor es un combo.
+
+### Alternativas descartadas
+
+- **Que `ObtenerTodos()` siguiera devolviendo la lista y que la grilla la
+  leyera igual.** Se descarto porque es lo que ya hacia y por eso la grilla
+  queda atada a las propiedades del modelo.
+- **Crear una vista `vw_clientes` para la grilla.** Se descarto porque la
+  consulta de clientes no necesita nada derivado: con leer la tabla alcanza. Las
+  dos vistas que tiene el proyecto existen porque aportan algo (`vw_recursos_estado`
+  suma las reservas activas, `vw_reservas_completas` arma el detalle). Una
+  vista que solo copia la tabla no aporta nada.
+- **Una sola lectura que sirva para la grilla y para el combo.** Se descarto
+  porque el combo necesita los objetos con su tipo y su descripcion, y la
+  grilla necesita las columnas planas. Son dos consumidores distintos.
+
+### Consecuencias
+
+**A favor:**
+
+- Los dos DAO grandes tienen el mismo patron de lectura: `ObtenerTodos()` para
+  la grilla y `ObtenerTodosComoLista()` para los combos.
+- La grilla queda atada a los nombres de las columnas de la base, que es donde
+  la base define los datos, y no a los nombres de las propiedades del modelo.
+- `Cells["colId"].Value` sigue siendo el id, asi que el click del boton de la
+  fila no cambia.
+
+**En contra (y como se mitigan):**
+
+- **Un metodo mas por DAO.** Se mitiga con que el nombre y el proposito de cada
+  uno estan escritos en su XML doc: la tabla plana para la grilla, la lista
+  tipada para el combo.
+- **Si un dia el listado de clientes necesita algo derivado**, el `DataTable`
+  tiene que salir de una vista, como el de recursos. Se mitiga porque el
+  `DataTable` no promete ser la tabla: promete ser un conjunto de filas con
+  los nombres de las columnas.
+
+### Referencias
+
+- `SistemaCoworking/Datos/ClienteDAO.cs` — `ObtenerTodos()` y `ObtenerTodosComoLista()`
+- `SistemaCoworking/Datos/RecursoDAO.cs` — el patron que se copio
+- `SistemaCoworking/Formularios/FrmClientes.Designer.cs` — las columnas de la grilla
+- `SistemaCoworking/Formularios/FrmReservas.cs` — carga la lista de clientes para el combo

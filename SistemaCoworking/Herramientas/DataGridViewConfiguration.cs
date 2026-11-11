@@ -111,14 +111,29 @@ public static class DataGridViewConfiguration
         }
     }
 
+    // Un color vacio (Color.Empty) significa "no definido": se pasa al
+    // siguiente candidato. Asi el boton puede atenuarse desde CellFormatting
+    // sin romper el color por defecto de la columna.
+    private static Color PrimerColor(Color propio, Color heredado, Color porDefecto)
+    {
+        if (propio != Color.Empty) return propio;
+        if (heredado != Color.Empty) return heredado;
+        return porDefecto;
+    }
+
     // El sender del delegado es nullable (DataGridViewCellPaintingEventHandler
     // declara "object? sender"): con "object" el compilador complains (CS8622)
     // al suscribir y al desuscribir el handler.
     private static void Dgv_CellPainting(object? sender, DataGridViewCellPaintingEventArgs e)
     {
         if (e.RowIndex < 0) return;
+        if (e.ColumnIndex < 0) return;
         if (!(sender is DataGridView dgv)) return;
         if (!(dgv.Columns[e.ColumnIndex] is DataGridViewButtonColumn btn)) return;
+
+        // El Graphics llega nulo solo si el pintado se pide fuera del pipeline
+        // normal: en ese caso no hay nada que pintar.
+        if (e.Graphics is null) return;
 
         // Padding con color fijo (no heredar del row)
         // #F5F5F8 contrasta con blanco de filas normales Y con #F8F8F8 de filas alternas
@@ -133,8 +148,30 @@ public static class DataGridViewConfiguration
         bool esCancelar = btn.Name.Contains("Cancelar", StringComparison.OrdinalIgnoreCase)
                        || btn.Name.Contains("Cancel", StringComparison.OrdinalIgnoreCase);
 
-        var bgColor = esCancelar ? WarningOrange : AccentBlue;
-        var borderColor = esCancelar ? WarningOrangePress : AccentBluePressed;
+        // El boton se pinta a mano, asi que hay que leer el color de la celda:
+        // primero el estilo propio de la celda (donde CellFormatting deja el
+        // color atenuado cuando la accion no aplica), despues el estilo de la
+        // columna (naranja/azul) y, si no hay ninguno, el color fijo.
+        //
+        // Ojo: no se usa e.CellStyle como segundo candidato porque ese estilo
+        // es la mezcla final de la celda: en las filas alternas trae el color
+        // de fondo de la fila y taparia el color del boton.
+        var celda = dgv.Rows[e.RowIndex].Cells[e.ColumnIndex];
+
+        var bgColor = PrimerColor(
+            celda.Style.BackColor,
+            btn.DefaultCellStyle.BackColor,
+            esCancelar ? WarningOrange : AccentBlue);
+
+        var borderColor = PrimerColor(
+            celda.Style.SelectionBackColor,
+            btn.DefaultCellStyle.SelectionBackColor,
+            esCancelar ? WarningOrangePress : AccentBluePressed);
+
+        var textColor = PrimerColor(
+            celda.Style.ForeColor,
+            btn.DefaultCellStyle.ForeColor,
+            Color.White);
 
         // Pintar el botón
         using (var bg = new SolidBrush(bgColor))
@@ -147,7 +184,7 @@ public static class DataGridViewConfiguration
         TextRenderer.DrawText(
             e.Graphics, text,
             ButtonFont,
-            btnRect, Color.White,
+            btnRect, textColor,
             TextFormatFlags.HorizontalCenter
               | TextFormatFlags.VerticalCenter
               | TextFormatFlags.SingleLine);

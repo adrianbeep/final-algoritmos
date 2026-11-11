@@ -18,6 +18,7 @@ Este archivo es documentación técnica del proyecto: sirve para la entrega, par
 | D-004 | [`tipo_recursos` es un catálogo fijo, de solo lectura](#d-004--tipo_recursos-es-un-catálogo-fijo-de-solo-lectura-desde-la-aplicación) | 17/10/2026 | Aceptada |
 | D-005 | [La fábrica de recursos vive en el dominio](#d-005--la-fábrica-de-recursos-vive-en-el-dominio-no-en-la-capa-de-datos) | 04/11/2026 | Aceptada |
 | D-006 | [Cada recurso declara sus propios datos de tipo](#d-006--cada-recurso-declara-sus-propios-datos-de-tipo) | 04/11/2026 | Aceptada |
+| D-007 | [La regla de superposicion de reservas vive en la base, en una funcion](#d-007--la-regla-de-superposicion-de-reservas-vive-en-la-base-en-una-funcion) | 10/11/2026 | Aceptada |
 
 ---
 
@@ -190,7 +191,7 @@ A esto se sumaba que `CalcularPrecio()` **no tenía un solo call site** en toda 
 - **El redondeo queda en un solo lado (C#)**, que es justamente lo que se buscaba, pero implica que el `precio_dia` guardado tiene el redondeo de .NET y no el de MySQL.
 - **`RecursoDAO.Insertar` cambió de firma**: pasó de diez parámetros sueltos a `Insertar(Recurso recurso)`, simétrico con `Modificar`. No tenía callers (el formulario de Recursos todavía no existe), pero a partir de ahora quien construya el recurso tiene que pasar por el modelo y no por primitivos sueltos.
 
-**Pendiente:** el total de una reserva todavía **no** sale de `CalcularPrecio()`, y `IReservable.PuedeReservarse()` sigue sin uso: la interfaz completa está sin uso: la validación de disponibilidad y de superposición vive hoy en los procedimientos almacenados. Eso se resuelve cuando se cablee el módulo de Reservas.
+**Pendiente (resuelto en D-007, 10/11/2026):** al escribir esta decisión, el total de una reserva todavía **no** salía de `CalcularPrecio()`, y `IReservable.PuedeReservarse()` seguía sin uso: la interfaz completa estaba sin uso y la validación de disponibilidad y de superposición vivía en los procedimientos almacenados. Con el módulo de Reservas cableado, el total sale de `CalcularPrecio()` (`Reserva.CalcularTotal`) y `PuedeReservarse()` decide la disponibilidad: la interfaz tiene uso real, y la regla de superposición vive en la base, en una función.
 
 ### Referencias
 
@@ -282,7 +283,7 @@ Hay **dos caminos** para obtener un `Recurso` concreto, y los dos toman exactame
 
 Ese conocimiento tiene que estar en **un solo lugar**. Si está duplicado, un cuarto tipo obliga a tocar los dos, y es cuestión de tiempo que uno se olvide.
 
-La pregunta es **dónde** vive ese lugar. La primera implementación lo puso en `RecursoDAO.Construir`, con un `switch` sobre `nombre_tipo_recurso`. Eso dejaba la fábrica **en la capa de datos**, y el segundo camino se quedaba sin acceso: el modal no podía usarla sin depender del DAO, que es justo lo que la decisión ya tomada para Clientes evita —*"el modal de clientes no depende del DAO"*.
+La pregunta es **dónde** vive ese lugar. La primera implementación lo puso en `RecursoDAO.Construir`, con un `switch` sobre `nombre_tipo_recurso`. Eso dejaba la fábrica **en la capa de datos**, y el segundo camino se quedaba sin acceso: el modal no podía usarla sin depender del DAO para armar el recurso, que es justo lo que la decisión ya tomada para Clientes evita —*"para armar el cliente, el modal no necesita el DAO"*.
 
 El síntoma es concreto: **el `Recurso` que entrega el modal no tenía origen**. El formulario de Recursos no podía armar el objeto sin escribir su propio `switch`, es decir, duplicando el conocimiento en la capa de interfaz, que es el peor lugar posible para que viva.
 
@@ -311,6 +312,7 @@ El síntoma es concreto: **el `Recurso` que entrega el modal no tenía origen**.
 - Los dos caminos de creación usan la **misma** fábrica: un cuarto tipo se agrega en un solo lugar.
 - La capa de datos **no instancia** clases concretas. `RecursoDAO` dejó de hacer `new Sala(...)`, `new PuestoTrabajo(...)` y `new OficinaPrivada(...)`.
 - El modal de Recursos puede armar el `Recurso` **sin tocar la capa de datos**.
+- **Aclaración posterior**: los modales reciben el DAO por constructor, pero solo para **escribir** la entidad cuando el usuario guarda. Armar el objeto de dominio no pasa por el DAO: eso lo hace la fábrica, que vive en el dominio. Que el modal escriba no mueve la fábrica de lugar.
 - La invariante "una `Sala` siempre tiene capacidad" se verifica **al construir el objeto**, no recién cuando se escribe en la base.
 - La regla de precio sigue en un solo lugar: `CalcularPrecio()`.
 - **El modal puede construir el recurso mientras el usuario escribe**, sin excepciones en el flujo normal: la fábrica devuelve `null` hasta que el formulario está completo, y el precio se recalcula en vivo sobre ese mismo objeto.
@@ -417,3 +419,61 @@ Ese `switch` además **escondía un problema de precisión**. `OficinaPrivada.Me
 - `SistemaCoworking/Modelos/Sala.cs`, `PuestoTrabajo.cs`, `OficinaPrivada.cs` — cada una declara los suyos
 - `SistemaCoworking/Datos/RecursoDAO.cs` — `AgregarParametrosDetalle`
 - `SistemaCoworking/Modelos/RecursoFactory.cs` — el rechazo de los metros fraccionarios
+
+---
+
+## D-007 — La regla de superposicion de reservas vive en la base, en una funcion
+
+**Fecha:** 10/11/2026
+**Estado:** Aceptada
+**Ámbito:** Base de datos y capa de presentacion (modal de reservas)
+
+### Contexto
+
+La consigna pide "al menos una funcion definida por el usuario que tenga una utilidad real" y da como ejemplo "determinar disponibilidad". El sistema no tenia ninguna funcion de disponibilidad: las cinco que existian (`fn_total_clientes`, `fn_reservas_por_finalizar`, `fn_reservas_hoy`, `fn_recursos_disponibles`, `fn_recursos_reservados_hoy`) son todas contadores del dashboard, sin parametros.
+
+La regla que impedia superponer reservas estaba escrita dos veces, como un `IF EXISTS (SELECT ... FROM reservas ...)` duplicado dentro de `sp_alta_reserva` y `sp_modificar_reserva`. Era la unica regla del sistema duplicada entre la base y la aplicacion.
+
+Mientras tanto, el modal de reservas no daba ninguna senal antes de guardar: el usuario completaba el formulario, presionaba Guardar y recien ahi la base rechazaba la operacion con `SIGNAL 'El recurso no esta disponible en la fecha ingresada'`.
+
+Ademas, el modelo tenia la misma regla escrita en dos lugares: `Reserva.ValidarRecurso` miraba el estado del recurso y `Reserva.ValidarFechas` miraba el orden de las fechas, que es exactamente lo que hace `Recurso.PuedeReservarse`.
+
+### Decisión
+
+Se agrego la funcion `fn_recurso_ocupado(p_id_recurso, p_fecha_inicio, p_fecha_fin, p_id_reserva_excluida)`, que devuelve 1 si el recurso ya tiene una reserva confirmada que se superpone con el periodo, y 0 si no.
+
+- `sp_alta_reserva` y `sp_modificar_reserva` dejan de tener el `IF EXISTS` propio y llaman a la funcion. La regla queda escrita **una sola vez**, en la base.
+- `ReservaDAO.RecursoOcupado(...)` llama a la misma funcion, y el modal la consulta antes de guardar: si el recurso esta ocupado, avisa y no llega a escribir.
+- Se agrego el indice `ix_reservas_recurso_periodo` sobre `(id_recurso, estado_reserva, fecha_inicio, fecha_fin)`, porque la consulta de superposicion recorria la tabla entera.
+- El parametro `p_id_reserva_excluida` existe para que, al editar, la reserva no se superponga consigo misma.
+- `Reserva.ValidarRecurso` y `Reserva.ValidarFechas` se reemplazan por `Reserva.ValidarReserva`, que llama a `Recurso.PuedeReservarse` y traduce el resultado al mensaje del usuario. La regla de disponibilidad del recurso queda escrita una sola vez, en el recurso.
+
+### Alternativas descartadas
+
+- **Escribir el predicado de superposicion en C# y dejar los SP como estaban.** Se descarto porque duplicaba la regla en dos lugares: si uno cambiaba, la aplicacion y la base decidirian distinto. Es el mismo problema que la desnormalizacion de `precio_dia` (ver D-003), pero con la diferencia de que aca el duplicado estaria en el camino de la escritura.
+- **Dejar la superposicion solo en los SP y no avisar antes.** Se descarto porque el usuario descubria el conflicto recien despues de completar el formulario. La preconsulta no cambia quien decide: la base sigue validando al guardar.
+- **Una funcion por procedimiento** (`fn_recurso_ocupado_para_alta` y `..._para_modificar`). Se descarto porque el parametro `p_id_reserva_excluida` ya resuelve la diferencia con un solo parametro.
+- **Reescribir la regla en la aplicacion y sacar la funcion de la base.** Se descarto porque la consigna pide una funcion con utilidad real, y porque la base es la que tiene que decidir igual.
+
+### Consecuencias
+
+**A favor:**
+
+- La regla de superposicion existe en un solo lugar.
+- El modal avisa antes de escribir, y el error le llega al usuario en la etiqueta correspondiente y no como un MessageBox.
+- La consigna pide una funcion con utilidad real: esta la tiene y ademas la usa la propia base.
+- El indice evita el recorrido completo de la tabla en la consulta de disponibilidad.
+
+**En contra (y cómo se mitigan):**
+
+- **Un round trip mas por guardado.** El modal consulta la disponibilidad y despues escribe. Es aceptable: el volumen es bajo y la base sigue decidiendo.
+- **La consulta y el guardado no son atomicos.** Entre la consulta y el `INSERT` otra sesion podria ocupar el recurso. Por eso el SP sigue validando: la preconsulta es una comodidad, no la garantia.
+
+### Referencias
+
+- `Scripts SQL/Funciones.sql` — `fn_recurso_ocupado`
+- `Scripts SQL/Procedimientos_Almacenados.sql` — `sp_alta_reserva`, `sp_modificar_reserva`
+- `Scripts SQL/Coworking_db.sql` — indice `ix_reservas_recurso_periodo`
+- `SistemaCoworking/Datos/ReservaDAO.cs` — `RecursoOcupado`
+- `SistemaCoworking/Formularios/UserControls/ReservaModal.cs` — la preconsulta
+- `SistemaCoworking/Modelos/Reserva.cs` — `ValidarReserva`

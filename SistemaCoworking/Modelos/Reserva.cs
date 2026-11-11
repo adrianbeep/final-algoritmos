@@ -32,6 +32,21 @@ public class Reserva
     }
 
     /// <summary>
+    /// La cantidad de dias que ocupa la reserva. El sistema reserva por dias,
+    /// no por horarios: una reserva con la misma fecha de inicio y de fin
+    /// ocupa UN dia completo. El conteo es inclusivo, asi que del 10/03 al
+    /// 12/03 son 3 dias.
+    /// </summary>
+    public int DiasReservados => Math.Max(0, (FechaFin.Date - FechaInicio.Date).Days + 1);
+
+    /// <summary>
+    /// El total de la reserva: el precio por dia del recurso por la cantidad
+    /// de dias reservados. El precio por dia sale del polimorfismo, de
+    /// <see cref="Recurso.CalcularPrecio"/>.
+    /// </summary>
+    public decimal CalcularTotal(Recurso recurso) => Math.Round(recurso.PrecioDia * DiasReservados, 2);
+
+    /// <summary>
     /// La reserva tiene que ser de un cliente.
     /// </summary>
     public static bool ValidarCliente(Cliente? cliente, out string? mensajeError)
@@ -47,10 +62,14 @@ public class Reserva
     }
 
     /// <summary>
-    /// La reserva tiene que ser de un recurso, y el recurso tiene que estar
-    /// disponible: si no, el procedimiento almacenado lo rechaza.
+    /// El recurso tiene que estar disponible y las fechas tienen que ser
+    /// coherentes.
+    ///
+    /// La regla vive en el recurso: `Recurso.PuedeReservarse` decide, y aca
+    /// solo se traduce el resultado a un mensaje para el usuario. Asi la regla
+    /// no esta escrita dos veces.
     /// </summary>
-    public static bool ValidarRecurso(Recurso? recurso, out string? mensajeError)
+    public static bool ValidarReserva(Recurso? recurso, DateTime fechaInicio, DateTime fechaFin, out string? mensajeError)
     {
         if (recurso is null)
         {
@@ -58,24 +77,13 @@ public class Reserva
             return false;
         }
 
-        if (recurso.Estado != Recurso.EstadoRecurso.Disponible)
+        if (!recurso.PuedeReservarse(fechaInicio, fechaFin))
         {
-            mensajeError = "El recurso no está disponible.";
-            return false;
-        }
-
-        mensajeError = null;
-        return true;
-    }
-
-    /// <summary>
-    /// La fecha de fin tiene que ser posterior a la de inicio.
-    /// </summary>
-    public static bool ValidarFechas(DateTime fechaInicio, DateTime fechaFin, out string? mensajeError)
-    {
-        if (fechaFin <= fechaInicio)
-        {
-            mensajeError = "La fecha de fin debe ser posterior a la fecha de inicio.";
+            // El mensaje distingue los dos motivos: el recurso no esta
+            // disponible o las fechas estan al reves.
+            mensajeError = fechaFin.Date < fechaInicio.Date
+                ? "La fecha de fin no puede ser anterior a la fecha de inicio."
+                : "El recurso no está disponible.";
             return false;
         }
 

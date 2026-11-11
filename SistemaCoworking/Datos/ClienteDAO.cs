@@ -1,15 +1,18 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using MySql.Data;
-using MySql.Data.MySqlClient;
+using MySqlConnector;
 using SistemaCoworking.Modelos;
 
 namespace SistemaCoworking.Datos;
 /*
  * El DAO Data Access Object sirve para hacer consultas o
- * ejecucion de StoredProcedures, etc sin que la interfaz grafica o 
+ * ejecucion de StoredProcedures, etc sin que la interfaz grafica o
  * el dominio (entidades con logica propia)
  * tengan que tener conocimiento de la base de datos que los persiste
+ *
+ * Los errores de la base NO se capturan aca: el DAO lanza la excepcion y
+ * la captura la capa de presentacion (el modal o el form), que es la que
+ * decide como mostrarla. Por eso esta capa no depende de WinForms.
  */
 public class ClienteDAO
 {
@@ -52,7 +55,7 @@ public class ClienteDAO
                 }
             }
         }
-        
+
         return clientes;
     }
 
@@ -153,6 +156,7 @@ public class ClienteDAO
                 comando.ExecuteNonQuery();
             }
         }
+
     }
 
     public void Modificar(Cliente c)
@@ -209,5 +213,6 @@ public class ClienteDAO
                 comando.ExecuteNonQuery();
             }
         }
+
     }
 }

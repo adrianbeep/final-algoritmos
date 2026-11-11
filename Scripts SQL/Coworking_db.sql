@@ -69,10 +69,14 @@ CREATE TABLE reservas(
 	id int auto_increment primary key,
     id_cliente int not null,
     id_recurso int not null,
-    fecha_inicio datetime not null check(fecha_inicio < fecha_fin),
-    fecha_fin datetime not null check(fecha_fin > fecha_inicio),
+    fecha_inicio datetime not null check(DATE(fecha_inicio) <= DATE(fecha_fin)),
+    fecha_fin datetime not null check(DATE(fecha_fin) >= DATE(fecha_inicio)),
     estado_reserva enum('Confirmada', 'Cancelada') default 'Confirmada',
     total_reserva decimal(10,2) not null,
+    
+    -- Indice para la consulta de superposicion: la base lo usa para saber si
+    -- un recurso ya tiene una reserva confirmada en un periodo.
+    index ix_reservas_recurso_periodo (id_recurso, estado_reserva, fecha_inicio, fecha_fin),
     
     foreign key(id_cliente) references clientes(id),
     foreign key(id_recurso) references recursos(id)
@@ -83,7 +87,7 @@ CREATE TABLE auditoria_reservas(
 	id int auto_increment primary key,
     id_reserva int not null,
     accion enum('INSERT', 'CANCEL'),
-    fecha_accion datetime not null,
+    fecha_accion datetime not null default current_timestamp,
     detalle text
 );
 

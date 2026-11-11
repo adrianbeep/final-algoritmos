@@ -256,26 +256,18 @@ BEGIN
 			SET MESSAGE_TEXT = 'El recurso no esta disponible';
     END IF;
     
-    IF p_fecha_inicio >= p_fecha_fin THEN
+    IF DATE(p_fecha_inicio) > DATE(p_fecha_fin) THEN
 		SIGNAL SQLSTATE '45000'
-			SET MESSAGE_TEXT = 'La fecha de inicio debe ser anterior a la fecha de fin';
+			SET MESSAGE_TEXT = 'La fecha de inicio no puede ser posterior a la fecha de fin';
     END IF;
     
     /*
 		Esto valida que no exista una reserva de un recurso en estado confirmada
-        no choque con la fecha ingresada por parametro
+        no choque con la fecha ingresada por parametro.
+        La regla vive en la funcion fn_recurso_ocupado: la base y la aplicacion
+        usan la misma definicion.
     */
-    IF EXISTS (
-		SELECT 
-			1 
-		FROM 
-			reservas 
-		WHERE 
-			id_recurso = p_id_recurso 
-		AND estado_reserva = 'Confirmada'
-        AND fecha_inicio <= p_fecha_fin
-        AND fecha_fin >= p_fecha_inicio
-	) THEN
+    IF fn_recurso_ocupado(p_id_recurso, p_fecha_inicio, p_fecha_fin, 0) = 1 THEN
 		SIGNAL SQLSTATE '45000'
 			SET MESSAGE_TEXT = 'El recurso no esta disponible en la fecha ingresada';
     END IF;
@@ -308,27 +300,18 @@ BEGIN
 			SET MESSAGE_TEXT = 'El recurso no esta disponible';
     END IF;
     
-    IF p_fecha_inicio >= p_fecha_fin THEN
+    IF DATE(p_fecha_inicio) > DATE(p_fecha_fin) THEN
 		SIGNAL SQLSTATE '45000'
-			SET MESSAGE_TEXT = 'La fecha de inicio debe ser anterior a la fecha de fin';
+			SET MESSAGE_TEXT = 'La fecha de inicio no puede ser posterior a la fecha de fin';
     END IF;
     
     /*
 		Esto valida que no exista una reserva de un recurso en estado confirmada
-        no choque con la fecha ingresada por parametro
+        no choque con la fecha ingresada por parametro.
+        La regla vive en la funcion fn_recurso_ocupado: la base y la aplicacion
+        usan la misma definicion.
     */
-    IF EXISTS (
-		SELECT 
-			1 
-		FROM 
-			reservas 
-		WHERE 
-			id_recurso = p_id_recurso 
-		AND estado_reserva = 'Confirmada'
-        AND fecha_inicio <= p_fecha_fin
-        AND fecha_fin >= p_fecha_inicio
-        AND id != p_id_reserva
-	) THEN
+    IF fn_recurso_ocupado(p_id_recurso, p_fecha_inicio, p_fecha_fin, p_id_reserva) = 1 THEN
 		SIGNAL SQLSTATE '45000'
 			SET MESSAGE_TEXT = 'El recurso no esta disponible en la fecha ingresada';
     END IF;

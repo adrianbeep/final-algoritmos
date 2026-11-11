@@ -61,7 +61,7 @@ El detalle de la reserva va en un modal, como el de Clientes y el de Recursos: e
 - [ ] Cliente y recurso seleccionados
 - [ ] fecha_fin > fecha_inicio
 - [ ] Calculo del total correcto segun el tipo de recurso (polimorfismo)
-- [ ] La superposicion de reservas no se valida en el modal: la valida `sp_alta_reserva` al guardar
+- [ ] La superposicion de reservas se avisa en el modal antes de guardar: el modal consulta la funcion `fn_recurso_ocupado` y `sp_alta_reserva` la vuelve a validar al guardar
 
 ## Criterio de pase
 

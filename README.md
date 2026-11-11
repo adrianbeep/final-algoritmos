@@ -74,7 +74,11 @@ final-algoritmos/
 │   ├── Diagrama-clases.md          Diagrama de clases
 │   └── Decisiones.md               Decisiones de diseño
 ├── Scripts SQL/                    Scripts de base de datos
-│   └── Coworking_db.sql
+│   ├── Coworking_db.sql            Base, tablas y datos iniciales
+│   ├── Vistas.sql                  Las 2 vistas
+│   ├── Funciones.sql               Las 6 funciones
+│   ├── Procedimientos_Almacenados.sql  Los 7 procedimientos almacenados
+│   └── Triggers.sql                Los 2 triggers de auditoría
 └── SistemaCoworking/               Proyecto C# (Windows Forms)
     └── [archivos del .slnx y el proyecto]
 ```
@@ -102,9 +106,30 @@ cd final-algoritmos
 
 ### Crear la base de datos
 
+La aplicación **usa procedimientos almacenados, vistas y funciones**: no alcanza con crear las tablas. Hay que ejecutar los cinco scripts de `Scripts SQL/`, en este orden:
+
+| # | Script | Qué crea |
+|---|---|---|
+| 1 | `Coworking_db.sql` | La base `coworking`, las 6 tablas y los datos iniciales |
+| 2 | `Vistas.sql` | `vw_reservas_completas`, `vw_recursos_estado` |
+| 3 | `Funciones.sql` | Las 6 funciones `fn_*` |
+| 4 | `Procedimientos_Almacenados.sql` | Los 7 procedimientos `sp_*` |
+| 5 | `Triggers.sql` | Los 2 triggers de auditoría |
+
+> **Importante:** solo `Coworking_db.sql` incluye `USE coworking;`. Los otros cuatro se ejecutan contra el esquema que esté seleccionado en ese momento, así que en MySQL Workbench hay que **seleccionar la base `coworking` como esquema por defecto antes de correrlos**. Si se ejecuta uno de ellos con otro esquema seleccionado, los objetos se crean en la base equivocada y la aplicación falla al invocar los procedimientos.
+
+Pasos:
+
 1. Abrir MySQL Workbench y conectarse al servidor local
-2. Ejecutar el script completo: `Scripts SQL/Coworking_db.sql`
-3. Verificar que se creó la base `coworking` con las tablas y datos iniciales
+2. Ejecutar `Scripts SQL/Coworking_db.sql`
+3. Seleccionar la base `coworking` como esquema por defecto
+4. Ejecutar `Vistas.sql`, `Funciones.sql`, `Procedimientos_Almacenados.sql` y `Triggers.sql`, en ese orden
+5. Verificar que quedaron los 7 procedimientos, las 2 vistas, las 6 funciones y los 2 triggers:
+
+```sql
+SHOW PROCEDURE STATUS WHERE Db = 'coworking';
+SHOW FULL TABLES WHERE Db = 'coworking';
+```
 
 ### Abrir el proyecto
 
@@ -113,14 +138,27 @@ cd final-algoritmos
 3. Compilar la solución (`Ctrl + Shift + B`)
 4. Ejecutar con `F5`
 
-> Nota: mientras no esté implementada la Etapa 6 (configuración externa), la cadena de conexión se configura directamente en la clase `ConexionBD`.
+> **Cadena de conexión:** la configuración es **externa**. `ConexionBD` lee el archivo `appsettings.json` (copiado automáticamente al directorio de salida por el `.csproj`) mediante `Microsoft.Extensions.Configuration`. Para apuntar a otro servidor o cambiar el usuario, se edita `SistemaCoworking/appsettings.json`:
+>
+> ```json
+> {
+>   "ConnectionStrings": {
+>     "Default": "server=localhost;port=3306;database=coworking;uid=root;pwd=;"
+>   }
+> }
+> ```
+>
+> El usuario y la contraseña por defecto son `root` y vacío. Si tu MySQL local tiene otra contraseña, cambiala acá antes de ejecutar.
 
 ---
 
 ## Documentación
 
 - [Roadmap completo](./.github/ROADMAP.md) — plan de trabajo por etapas
-- [Documentación técnica](./Docs/) — DER, diagrama de clases, decisiones de diseño
+- [Documentación técnica](./Docs/) — índice de la documentación
+- [Diagrama Entidad-Relación](./Docs/DER.md) — modelo de datos de la base
+- [Diagrama de clases](./Docs/Diagrama-clases.md) — modelo de dominio: herencia, clase abstracta e interfaz
+- [Decisiones de diseño](./Docs/Decisiones.md) — qué se decidió, por qué y qué alternativa se descartó
 - [Consignas del TP](./Consignas/) — requerimientos originales de la cátedra
 - [Issues abiertos](https://github.com/adrianbeep/final-algoritmos/issues) — sub-tareas en curso
 

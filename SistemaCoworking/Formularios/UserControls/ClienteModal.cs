@@ -1,3 +1,4 @@
+using SistemaCoworking.Datos;
 using SistemaCoworking.Herramientas;
 using SistemaCoworking.Modelos;
 using System;
@@ -13,15 +14,21 @@ public partial class ClienteModal : Form
     //Si es null el modal es de alta, si no es de edicion
     private readonly Cliente? _cliente;
 
-    //El modal entrega el cliente al form, que decide si lo inserta o lo
-    //modifica. El atributo le dice al serializador del diseñador que esta
-    //propiedad no se guarda: sin el, el analizador de WinForms la toma por
-    //error y rompe el build (WFO1000).
+    //El modal escribe el cliente con el DAO que le pasa el form. La entidad
+    //guardada queda disponible aca. El atributo le dice al serializador del
+    //diseñador que esta propiedad no se guarda: sin el, el analizador de
+    //WinForms la toma por error y rompe el build (WFO1000).
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public Cliente? Entidad { get; set; }
 
+    //El DAO lo pasa el form. El modal lo usa para escribir: si la escritura
+    //falla, el DAO lanza la excepcion, el modal la captura y muestra el error,
+    //asi que el modal NO se cierra y el usuario puede corregir y reintentar sin
+    //perder lo que escribio.
+    private readonly ClienteDAO _dao;
+
     //Con cliente es edicion, sin cliente es alta
-    public ClienteModal(Cliente? cliente = null)
+    public ClienteModal(Cliente? cliente, ClienteDAO dao)
     {
         InitializeComponent();
 
@@ -35,6 +42,7 @@ public partial class ClienteModal : Form
         ButtonConfiguration.ConfigSecondary(btnCancelar);
 
         _cliente = cliente;
+        _dao = dao;
 
         if (cliente is null)
         {
@@ -117,11 +125,57 @@ public partial class ClienteModal : Form
 
         Cliente cliente = new Cliente(id, nombre, apellido, dni, telefono, email);
 
-        // El modal entrega la entidad y cierra. El form la persiste DESPUES,
-        // cuando ShowDialog() ya devolvio: si la escritura falla, el modal
-        // ya cerro y la aplicacion no queda bloqueada.
+        // La escritura la hace el modal, con el DAO que le paso el form. Si
+        // falla, el DAO lanza la excepcion, el modal la captura y muestra el
+        // error y el modal SIGUE ABIERTO con lo que cargo el usuario, para que
+        // corrija y reintente.
+        if (!Guardar(cliente))
+            return;
+
         Entidad = cliente;
         ModalConfiguration.CerrarModal(this, DialogResult.OK);
+    }
+
+    /// <summary>
+    /// Escribe el cliente. El boton se deshabilita mientras dura la escritura
+    /// para que un doble clic no dispare dos veces la misma operacion.
+    /// </summary>
+    private bool Guardar(Cliente cliente)
+    {
+        btnGuardar.Enabled = false;
+
+        try
+        {
+            // Sin cliente es un alta, con cliente es una edicion: el modal ya lo
+            // sabe, porque es el que tiene el _cliente.
+            if (_cliente is null)
+            {
+                _dao.Insertar(
+                    cliente.Nombre,
+                    cliente.Apellido,
+                    cliente.Dni,
+                    cliente.Telefono,
+                    cliente.Email);
+            }
+            else
+            {
+                _dao.Modificar(cliente);
+            }
+
+            return true;
+        }
+        catch (Exception ex)
+        {
+            // El DAO lanza y aca se captura: se muestra el error con el
+            // mensaje del SP y el modal SIGUE ABIERTO con lo que cargo el
+            // usuario, para que corrija y reintente sin perderlo.
+            ErroresDeBaseDeDatos.Mostrar(ex);
+            return false;
+        }
+        finally
+        {
+            btnGuardar.Enabled = true;
+        }
     }
 
     private void ConfigurarTxt()

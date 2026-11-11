@@ -72,7 +72,10 @@ public abstract class Recurso : IReservable
         {
             return false;
         }
-        if (fechaInicio >= fechaFin)
+        // El sistema reserva por dias: la misma fecha de inicio y de fin es
+        // una reserva de un dia completo. Solo se rechaza que el fin sea
+        // anterior al inicio.
+        if (fechaInicio.Date > fechaFin.Date)
         {
             return false;
         }

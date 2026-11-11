@@ -1,4 +1,5 @@
-﻿using SistemaCoworking.Herramientas;
+﻿using SistemaCoworking.Datos;
+using SistemaCoworking.Herramientas;
 using SistemaCoworking.Modelos;
 using System;
 using System.Collections.Generic;
@@ -22,12 +23,23 @@ namespace SistemaCoworking.Formularios.UserControls
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public Reserva? Entidad { get; set; }
 
-        public ReservaModal(Reserva? reserva = null, List<Cliente>? clientes = null, List<Recurso>? recursos = null)
+        //El DAO lo pasa el form. El modal lo usa para escribir: si la escritura
+        //falla, el DAO lanza la excepcion, el modal la captura y muestra el
+        //error, asi que el modal NO se cierra y el usuario puede corregir y
+        //reintentar sin perder lo que escribio.
+        private readonly ReservaDAO _dao;
+
+        public ReservaModal(
+            Reserva? reserva,
+            List<Cliente>? clientes,
+            List<Recurso>? recursos,
+            ReservaDAO dao)
         {
             InitializeComponent();
             ConfigurarModal();
 
             _reserva = reserva;
+            _dao = dao;
 
             // Los combos se bindean: el Value es el Id, asi que lo elegido
             // se lee con SelectedValue.
@@ -83,8 +95,8 @@ namespace SistemaCoworking.Formularios.UserControls
             lblId.Text = r.Id.ToString();
             cmbClientes.SelectedValue = r.IdCliente;
             cmbRecursos.SelectedValue = r.IdRecurso;
-            dtpInicio.Value = r.FechaInicio;
-            dtpFin.Value = r.FechaFin;
+            dtpInicio.Value = r.FechaInicio.Date;
+            dtpFin.Value = r.FechaFin.Date;
             lblEstadoInfo.Text = $"Estado: {r.Estado}";
         }
 
@@ -111,49 +123,118 @@ namespace SistemaCoworking.Formularios.UserControls
                 MostrarError(lblClienteInfo, error);
             }
 
-            if (!Reserva.ValidarRecurso(recurso, out error))
+            if (!Reserva.ValidarReserva(recurso, dtpInicio.Value, dtpFin.Value, out error))
             {
                 errores = true;
                 MostrarError(lblRecursoInfo, error);
             }
 
-            if (!Reserva.ValidarFechas(dtpInicio.Value, dtpFin.Value, out error))
-            {
-                errores = true;
-                MostrarError(lblTotalInfo, error);
-            }
-
             if (errores) return;
 
-            // El id 0 es el de una reserva que todavia no esta persistida.
-            int id = _reserva?.Id ?? 0;
+            if (cliente is null || recurso is null) return;
 
-            Entidad = new Reserva(
-                id,
-                cliente?.Id ?? 0,
-                recurso?.Id ?? 0,
-                dtpInicio.Value,
-                dtpFin.Value,
-                _reserva?.Estado ?? Reserva.EstadoReserva.Confirmada,
-                CalcularTotal(recurso));
+            // La disponibilidad real la consulta la base: si hay otra reserva
+            // confirmada en ese periodo, el recurso no esta disponible. La
+            // misma regla la aplica sp_alta_reserva al guardar, asi que la
+            // base sigue siendo la que decide.
+            bool ocupado;
+            try
+            {
+                ocupado = _dao.RecursoOcupado(
+                    recurso.Id,
+                    dtpInicio.Value,
+                    dtpFin.Value,
+                    _reserva?.Id ?? 0);
+            }
+            catch (Exception ex)
+            {
+                // El DAO lanza y aca se captura: se muestra el error y el modal
+                // sigue abierto con lo que cargo el usuario.
+                ErroresDeBaseDeDatos.Mostrar(ex);
+                return;
+            }
+
+            if (ocupado)
+            {
+                MostrarError(lblTotalInfo, "El recurso no está disponible en la fecha ingresada.");
+                return;
+            }
+
+            // El total lo calcula el modelo: los dias, la regla de la reserva,
+            // y el precio por dia, el polimorfismo de Recurso.
+            Reserva borrador = ConstruirBorrador(cliente, recurso);
+            borrador.TotalReserva = borrador.CalcularTotal(recurso);
+
+            // La escritura la hace el modal, con el DAO que le paso el form.
+            // Si falla, el DAO lanza la excepcion, el modal la captura y
+            // muestra el error (por ejemplo, que el recurso no esta
+            // disponible en esa fecha) y el modal SIGUE ABIERTO con lo que
+            // cargo el usuario, para que elija otra fecha y reintente.
+            if (!Guardar(borrador))
+                return;
+
+            Entidad = borrador;
 
             ModalConfiguration.CerrarModal(this, DialogResult.OK);
         }
 
         /// <summary>
-        /// El total de la reserva: el precio por dia del recurso por la
-        /// cantidad de dias. El precio por dia sale del polimorfismo, de
-        /// <see cref="Recurso.CalcularPrecio"/>.
+        /// Escribe la reserva. El boton se deshabilita mientras dura la
+        /// escritura para que un doble clic no dispare dos veces la misma
+        /// operacion.
         /// </summary>
-        private decimal CalcularTotal(Recurso? recurso)
+        private bool Guardar(Reserva reserva)
         {
-            if (recurso is null) return 0;
+            btnGuardar.Enabled = false;
 
-            int dias = (dtpFin.Value - dtpInicio.Value).Days;
+            try
+            {
+                // Sin reserva es un alta, con reserva es una edicion: el modal ya
+                // lo sabe, porque es el que tiene el _reserva.
+                if (_reserva is null)
+                {
+                    _dao.Insertar(
+                        reserva.IdCliente,
+                        reserva.IdRecurso,
+                        reserva.FechaInicio,
+                        reserva.FechaFin,
+                        reserva.TotalReserva);
+                }
+                else
+                {
+                    _dao.Modificar(reserva);
+                }
 
-            if (dias <= 0) return 0;
+                return true;
+            }
+            catch (Exception ex)
+            {
+                // El DAO lanza y aca se captura: se muestra el error con el
+                // mensaje del SP y el modal SIGUE ABIERTO con lo que cargo el
+                // usuario, para que corrija y reintente sin perderlo.
+                ErroresDeBaseDeDatos.Mostrar(ex);
+                return false;
+            }
+            finally
+            {
+                btnGuardar.Enabled = true;
+            }
+        }
 
-            return Math.Round(recurso.PrecioDia * dias, 2);
+        /// <summary>
+        /// La reserva con lo que el usuario eligio hasta ahora. Se arma con las
+        /// fechas SIN hora: el sistema reserva por dias, no por horarios.
+        /// </summary>
+        private Reserva ConstruirBorrador(Cliente? cliente, Recurso? recurso)
+        {
+            return new Reserva(
+                _reserva?.Id ?? 0,
+                cliente?.Id ?? 0,
+                recurso?.Id ?? 0,
+                dtpInicio.Value.Date,
+                dtpFin.Value.Date,
+                _reserva?.Estado ?? Reserva.EstadoReserva.Confirmada,
+                0);
         }
 
         /// <summary>
@@ -192,7 +273,8 @@ namespace SistemaCoworking.Formularios.UserControls
         }
 
         /// <summary>
-        /// La cantidad de dias y el total de la reserva.
+        /// La cantidad de dias y el total de la reserva. Los dos los calcula el
+        /// modelo: la regla de los dias reservados y el precio por dia.
         /// </summary>
         private void ActualizarTotal()
         {
@@ -204,13 +286,15 @@ namespace SistemaCoworking.Formularios.UserControls
                 return;
             }
 
-            int dias = (dtpFin.Value - dtpInicio.Value).Days;
+            Reserva borrador = ConstruirBorrador(cmbClientes.SelectedItem as Cliente, recurso);
 
-            if (dias <= 0) return;
-            
+            int dias = borrador.DiasReservados;
+
+            if (dias == 0) return;
+
             lblTotalInfo.ForeColor = ColorInfo;
             lblTotalInfo.Text = $"{dias} {(dias == 1 ? "día" : "días")}";
-            lblTotal.Text = $"{CalcularTotal(recurso):C}";
+            lblTotal.Text = $"{borrador.CalcularTotal(recurso):C}";
         }
 
         //=================================

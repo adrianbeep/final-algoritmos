@@ -1,4 +1,4 @@
-﻿using MySql.Data.MySqlClient;
+using MySqlConnector;
 using SistemaCoworking.Modelos;
 using System;
 using System.Collections.Generic;
@@ -7,6 +7,15 @@ using System.Text;
 
 namespace SistemaCoworking.Datos;
 
+/// <summary>
+/// Los errores de la base NO se capturan aca: el DAO lanza la excepcion y la
+/// captura la capa de presentacion (el modal o el form), que es la que decide
+/// como mostrarla. Por eso esta capa no depende de WinForms.
+///
+/// Los metodos de escritura devuelven void: la excepcion es lo que le avisa a
+/// la presentacion que la operacion fallo, asi el modal que pidio guardar sigue
+/// abierto y el usuario puede corregir y reintentar sin perder lo que escribio.
+/// </summary>
 public class ReservaDAO
 {
     public ReservaDAO() { }
@@ -77,6 +86,54 @@ public class ReservaDAO
         return r;
     }
 
+    /// <summary>
+    /// Si el recurso ya tiene una reserva confirmada que se superpone con el
+    /// periodo indicado.
+    ///
+    /// La regla de superposicion vive en la funcion fn_recurso_ocupado, que es
+    /// la misma que usan los procedimientos almacenados: la base y la
+    /// aplicacion no pueden discrepar.
+    ///
+    /// idReservaExcluida sirve para editar una reserva sin que se superponga
+    /// consigo misma: se pasa el id de la reserva que se esta editando.
+    /// </summary>
+    public bool RecursoOcupado(int idRecurso, DateTime fechaInicio, DateTime fechaFin, int idReservaExcluida = 0)
+    {
+        using (MySqlConnection conexion =
+            ConexionBD.CrearConexion())
+        {
+            conexion.Open();
+
+            using (MySqlCommand comando =
+                new MySqlCommand(
+                    "SELECT fn_recurso_ocupado(@id_recurso, @fecha_inicio, @fecha_fin, @id_reserva_excluida)",
+                    conexion))
+            {
+                comando.Parameters.AddWithValue(
+                    "@id_recurso",
+                    idRecurso
+                );
+
+                comando.Parameters.AddWithValue(
+                    "@fecha_inicio",
+                    fechaInicio
+                );
+
+                comando.Parameters.AddWithValue(
+                    "@fecha_fin",
+                    fechaFin
+                );
+
+                comando.Parameters.AddWithValue(
+                    "@id_reserva_excluida",
+                    idReservaExcluida
+                );
+
+                return Convert.ToInt32(comando.ExecuteScalar()) == 1;
+            }
+        }
+    }
+
     public void Insertar(
         int idCliente,
         int idRecurso,
@@ -126,6 +183,7 @@ public class ReservaDAO
                 comando.ExecuteNonQuery();
             }
         }
+
     }
 
     public void Modificar(Reserva reserva)
@@ -171,6 +229,7 @@ public class ReservaDAO
                 comando.ExecuteNonQuery();
             }
         }
+
     }
 
     public void Cancelar(int id)
@@ -196,5 +255,6 @@ public class ReservaDAO
                 comando.ExecuteNonQuery();
             }
         }
+
     }
 }

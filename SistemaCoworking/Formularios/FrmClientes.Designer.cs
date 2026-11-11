@@ -43,10 +43,14 @@
             colTelefono = new DataGridViewTextBoxColumn();
             colEmail = new DataGridViewTextBoxColumn();
             colAcciones = new DataGridViewButtonColumn();
+            panel6 = new Panel();
+            btnExportar = new Button();
             panel1.SuspendLayout();
             panel5.SuspendLayout();
+            panel2.SuspendLayout();
             pnDataGridView.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dgvClientes).BeginInit();
+            panel6.SuspendLayout();
             SuspendLayout();
             // 
             // panel1
@@ -79,6 +83,7 @@
             // 
             // panel2
             // 
+            panel2.Controls.Add(panel6);
             panel2.Dock = DockStyle.Bottom;
             panel2.Location = new Point(0, 380);
             panel2.Name = "panel2";
@@ -193,6 +198,25 @@
             colAcciones.UseColumnTextForButtonValue = true;
             colAcciones.Width = 125;
             // 
+            // panel6
+            // 
+            panel6.Controls.Add(btnExportar);
+            panel6.Dock = DockStyle.Right;
+            panel6.Location = new Point(643, 0);
+            panel6.Name = "panel6";
+            panel6.Size = new Size(157, 70);
+            panel6.TabIndex = 0;
+            // 
+            // btnExportar
+            // 
+            btnExportar.Location = new Point(17, 21);
+            btnExportar.Name = "btnExportar";
+            btnExportar.Size = new Size(128, 37);
+            btnExportar.TabIndex = 1;
+            btnExportar.Text = "Exportar Cliente";
+            btnExportar.UseVisualStyleBackColor = true;
+            btnExportar.Click += btnExportar_Click;
+            // 
             // FrmClientes
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
@@ -209,8 +233,10 @@
             Text = "FrmClientes";
             panel1.ResumeLayout(false);
             panel5.ResumeLayout(false);
+            panel2.ResumeLayout(false);
             pnDataGridView.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)dgvClientes).EndInit();
+            panel6.ResumeLayout(false);
             ResumeLayout(false);
         }
 
@@ -231,5 +257,7 @@
         private DataGridViewButtonColumn colAcciones;
         private Button btnCrearCliente;
         private Panel panel5;
+        private Panel panel6;
+        private Button btnExportar;
     }
 }

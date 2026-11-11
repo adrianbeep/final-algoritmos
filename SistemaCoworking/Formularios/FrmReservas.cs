@@ -44,6 +44,8 @@ public partial class FrmReservas : Form
         dgvReservas.ColumnHeadersDefaultCellStyle.Padding = new Padding(6, 10, 6, 10);
 
         CargarDataGridViewReservas(dgvReservas);
+
+        ButtonConfiguration.ConfigPrimary(btnCrearReserva);
     }
 
     private void CargarClientes()

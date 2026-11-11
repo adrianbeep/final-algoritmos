@@ -27,6 +27,7 @@ public partial class FrmClientes : Form
         CargarDataGridViewClientes(dgvClientes);
 
         ButtonConfiguration.ConfigPrimary(btnCrearCliente);
+        ButtonConfiguration.ConfigSecondary(btnExportar);
     }
 
     private void CargarDataGridViewClientes(DataGridView dgv)
@@ -239,5 +240,10 @@ public partial class FrmClientes : Form
                 MessageBoxButtons.OK,
                 MessageBoxIcon.Error);
         }
+    }
+
+    private void btnExportar_Click(object sender, EventArgs e)
+    {
+        ExportarCatalogoClientes();
     }
 }

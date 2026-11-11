@@ -12,8 +12,6 @@ Lo que falta, en una línea cada cosa:
 
 | Pendiente | Por qué |
 |---|---|
-| **Dashboard con tarjetas KPI** (issue #21) | Es el único módulo mínimo de la consigna que falta. `FrmDashboard` está vacío y `DashboardDAO` no lo usa nadie: 5 de las 6 funciones de indicadores no se muestran en ninguna parte |
-| **Botón de exportar el catálogo a JSON** | El método y el archivo de ejemplo están listos (PR #45); falta agregar el botón al formulario |
 | **Búsqueda por módulo** | *Nice to have*, fuera del alcance de la etapa 2 |
 | **DAO base** | Cada DAO repite el bloque de abrir conexión y ejecutar. Es una consolidación, no un faltante de la consigna |
 | **Documentación técnica breve** | La están escribiendo los integrantes del equipo |
@@ -107,7 +105,7 @@ Roadmap de trabajo del proyecto integrador. Cada etapa corresponde a un hito del
 
 ### Estructura de la UI
 - [x] Formulario principal con sidebar de navegación + panel central
-- [ ] Módulos accesibles desde el sidebar: Clientes, Recursos y Reservas están completos; **Dashboard sigue vacío** (issue #21)
+- [x] Módulos accesibles desde el sidebar: Clientes, Recursos, Reservas y Dashboard
 
 ### Patrón de formulario (Listado + Modal)
 - [x] Clientes: grid a la izquierda y modal de detalle con campos del cliente y botones Guardar/Cancelar
@@ -125,13 +123,13 @@ Roadmap de trabajo del proyecto integrador. Cada etapa corresponde a un hito del
 - [ ] Campo de búsqueda por módulo — *nice to have: fuera del alcance de la etapa 2. Queda para una entrega posterior si sobra tiempo.*
 
 ### Dashboard principal
-- [ ] Tarjeta: Total clientes (consume `fn_total_clientes`)
-- [ ] Tarjeta: Reservas por finalizar (consume `fn_reservas_por_finalizar`)
-- [ ] Tarjeta: Reservas hoy (consume `fn_reservas_hoy`)
-- [ ] Tarjeta: % de ocupación actual (consume `fn_recursos_disponibles` y `fn_recursos_reservados_hoy`)
+- [x] Tarjeta: Total clientes (consume `fn_total_clientes`)
+- [x] Tarjeta: Reservas por finalizar (consume `fn_reservas_por_finalizar`)
+- [x] Tarjeta: Reservas hoy (consume `fn_reservas_hoy`)
+- [x] Tarjeta: % de ocupación actual (consume `fn_recursos_disponibles` y `fn_recursos_reservados_hoy`)
 - [ ] Accesos directos a las acciones más comunes (nueva reserva, alta cliente, alta recurso)
 
-> **Nota:** `DashboardDAO` ya tiene los cinco métodos y las consultas funcionan. Lo que falta es la pantalla: `FrmDashboard` está vacío.
+> **Nota:** las cuatro tarjetas están en `FrmDashboard` y se actualizan con el botón "Actualizar" (PR #46). Lo que queda pendiente es la quinta: los accesos directos a las acciones más comunes.
 
 ---
 
@@ -142,7 +140,7 @@ Roadmap de trabajo del proyecto integrador. Cada etapa corresponde a un hito del
 - [x] Capa DAO en `Datos/` que encapsula todo el acceso a datos
 - [x] Consumo de los 7 procedimientos almacenados desde los DAO
 - [x] Consumo de las 2 vistas en los listados
-- [ ] Consumo de las funciones de indicadores desde el dashboard — `fn_recurso_ocupado` ya se consume desde el modal de reservas; las cinco de indicadores esperan al dashboard (issue #21)
+- [x] Consumo de las funciones de indicadores desde el dashboard — las cinco de indicadores se muestran en las tarjetas de `FrmDashboard` (PR #46)
 - [x] Parámetros bindeados correctamente (sin concatenación SQL)
 - [x] Cero SQL embebido fuera de `Datos/`
 - [x] Flujo: `Form → lógica → DAO → ConexionBD → MySQL`

@@ -35,6 +35,14 @@ public partial class FrmReservas : Form
         CargarRecursos();
 
         DataGridViewConfiguration.ConfigDGV(dgvReservas);
+
+        // Esta grilla tiene once columnas visibles en menos de 900 px. Con el
+        // padding por defecto los titulos quedan cortados, asi que el de la
+        // cabecera achica. El de las celdas no se puede cambiar desde aca:
+        // DataGridView solo deja escribir el estilo de la grilla antes de
+        // armarla, asi que va columna por columna en el Designer.
+        dgvReservas.ColumnHeadersDefaultCellStyle.Padding = new Padding(6, 10, 6, 10);
+
         CargarDataGridViewReservas(dgvReservas);
     }
 

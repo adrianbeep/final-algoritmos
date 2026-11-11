@@ -1,4 +1,4 @@
-﻿namespace SistemaCoworking.Formularios
+namespace SistemaCoworking.Formularios
 {
     partial class FrmReservas
     {
@@ -131,13 +131,17 @@
             colId.HeaderText = "Id";
             colId.MinimumWidth = 6;
             colId.Name = "colId";
+            colId.Visible = false;
             colId.ReadOnly = true;
             colId.Width = 125;
             // 
             // colFechaInicio
             // 
             colFechaInicio.DataPropertyName = "fecha_inicio";
-            colFechaInicio.HeaderText = "Fecha Inicio";
+            colFechaInicio.HeaderText = "Inicio";
+            colFechaInicio.DefaultCellStyle.Format = "dd/MM/yyyy";
+            colFechaInicio.DefaultCellStyle.Padding = new Padding(6, 8, 6, 8);
+            colFechaInicio.FillWeight = 100;
             colFechaInicio.MinimumWidth = 6;
             colFechaInicio.Name = "colFechaInicio";
             colFechaInicio.ReadOnly = true;
@@ -146,7 +150,10 @@
             // colFechaFin
             // 
             colFechaFin.DataPropertyName = "fecha_fin";
-            colFechaFin.HeaderText = "Fecha Fin";
+            colFechaFin.HeaderText = "Fin";
+            colFechaFin.DefaultCellStyle.Format = "dd/MM/yyyy";
+            colFechaFin.DefaultCellStyle.Padding = new Padding(6, 8, 6, 8);
+            colFechaFin.FillWeight = 100;
             colFechaFin.MinimumWidth = 6;
             colFechaFin.Name = "colFechaFin";
             colFechaFin.ReadOnly = true;
@@ -156,6 +163,8 @@
             // 
             colEstado.DataPropertyName = "estado_reserva";
             colEstado.HeaderText = "Estado";
+            colEstado.DefaultCellStyle.Padding = new Padding(6, 8, 6, 8);
+            colEstado.FillWeight = 102;
             colEstado.MinimumWidth = 6;
             colEstado.Name = "colEstado";
             colEstado.ReadOnly = true;
@@ -165,6 +174,9 @@
             // 
             colTotal.DataPropertyName = "total_reserva";
             colTotal.HeaderText = "Total";
+            colTotal.DefaultCellStyle.Format = "N0";
+            colTotal.DefaultCellStyle.Padding = new Padding(6, 8, 6, 8);
+            colTotal.FillWeight = 67;
             colTotal.MinimumWidth = 6;
             colTotal.Name = "colTotal";
             colTotal.ReadOnly = true;
@@ -173,7 +185,9 @@
             // colNombre
             // 
             colNombre.DataPropertyName = "cliente_nombre";
-            colNombre.HeaderText = "Nombre Cliente";
+            colNombre.HeaderText = "Cliente";
+            colNombre.DefaultCellStyle.Padding = new Padding(6, 8, 6, 8);
+            colNombre.FillWeight = 127;
             colNombre.MinimumWidth = 6;
             colNombre.Name = "colNombre";
             colNombre.ReadOnly = true;
@@ -183,6 +197,8 @@
             // 
             colDni.DataPropertyName = "dni";
             colDni.HeaderText = "Dni";
+            colDni.DefaultCellStyle.Padding = new Padding(6, 8, 6, 8);
+            colDni.FillWeight = 88;
             colDni.MinimumWidth = 6;
             colDni.Name = "colDni";
             colDni.ReadOnly = true;
@@ -191,7 +207,9 @@
             // colRecursoNombre
             // 
             colRecursoNombre.DataPropertyName = "recurso_nombre";
-            colRecursoNombre.HeaderText = "Nombre Recurso";
+            colRecursoNombre.HeaderText = "Recurso";
+            colRecursoNombre.DefaultCellStyle.Padding = new Padding(6, 8, 6, 8);
+            colRecursoNombre.FillWeight = 86;
             colRecursoNombre.MinimumWidth = 6;
             colRecursoNombre.Name = "colRecursoNombre";
             colRecursoNombre.ReadOnly = true;
@@ -200,24 +218,31 @@
             // colRecursoUbicacion
             // 
             colRecursoUbicacion.DataPropertyName = "recurso_ubicacion";
-            colRecursoUbicacion.HeaderText = "Ubicacion";
+            colRecursoUbicacion.HeaderText = "Ubic.";
+            colRecursoUbicacion.DefaultCellStyle.Padding = new Padding(6, 8, 6, 8);
+            colRecursoUbicacion.FillWeight = 95;
             colRecursoUbicacion.MinimumWidth = 6;
             colRecursoUbicacion.Name = "colRecursoUbicacion";
+            colRecursoUbicacion.Visible = false;
             colRecursoUbicacion.ReadOnly = true;
             colRecursoUbicacion.Width = 125;
             // 
             // colTipoRecurso
             // 
             colTipoRecurso.DataPropertyName = "nombre_tipo_recurso";
-            colTipoRecurso.HeaderText = "Tipo Recurso";
+            colTipoRecurso.HeaderText = "Tipo";
+            colTipoRecurso.DefaultCellStyle.Padding = new Padding(6, 8, 6, 8);
+            colTipoRecurso.FillWeight = 55;
             colTipoRecurso.MinimumWidth = 6;
             colTipoRecurso.Name = "colTipoRecurso";
+            colTipoRecurso.Visible = false;
             colTipoRecurso.ReadOnly = true;
             colTipoRecurso.Width = 125;
             // 
             // colEditar
             // 
             colEditar.HeaderText = "Editar";
+            colEditar.FillWeight = 69;
             colEditar.MinimumWidth = 6;
             colEditar.Name = "colEditar";
             colEditar.ReadOnly = true;
@@ -226,6 +251,7 @@
             // colCancelar
             // 
             colCancelar.HeaderText = "Cancelar";
+            colCancelar.FillWeight = 91;
             colCancelar.MinimumWidth = 6;
             colCancelar.Name = "colCancelar";
             colCancelar.ReadOnly = true;

@@ -11,6 +11,7 @@ Documentación del Sistema de Gestión de Coworking y Reservas. Este archivo es 
 | [DC.md](./DC.md) | Diagrama de contexto: el sistema completo como un proceso (nivel 0) y la operación principal "gestionar una reserva" | Documentación del análisis funcional |
 | [DFD.md](./DFD.md) | DFD de nivel 1 con los cuatro procesos, los almacenes D1 a D5 y los flujos, más los diagramas de flujo de las operaciones de escritura | Documentación del análisis funcional |
 | [Decisiones.md](./Decisiones.md) | Registro de decisiones de diseño: qué se decidió, por qué y qué alternativa se descartó | "Decisiones importantes tomadas por el grupo" |
+| [catalogo-clientes.json](./catalogo-clientes.json) | Archivo de ejemplo generado por la exportación en JSON del catálogo de clientes | "Archivo JSON de ejemplo" |
 
 ### Documentos en preparación
 

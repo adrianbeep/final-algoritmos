@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 
 namespace SistemaCoworking.Modelos;
@@ -28,7 +29,11 @@ public class Cliente
     /// Como se ve el cliente: nombre, apellido y DNI. Es lo que muestran
     /// los combos y los listados: con el nombre solo no se distingue a dos
     /// clientes que se llaman igual.
+    ///
+    /// Es un dato derivado, hecho para mostrar: no va en el JSON de la
+    /// exportacion, que lleva los datos del cliente.
     /// </summary>
+    [JsonIgnore]
     public string Descripcion => $"{Nombre} {Apellido} - DNI {Dni}";
 
     /// <summary>

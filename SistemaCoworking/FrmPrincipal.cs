@@ -51,7 +51,7 @@ public partial class FrmPrincipal : Form
 
         if (sidebarExpand)
         {
-            flpSidebar.Width -= 5;
+            flpSidebar.Width -= 25;
             if (flpSidebar.Width <= cerrada)
             {
                 sidebarExpand = false;
@@ -60,7 +60,7 @@ public partial class FrmPrincipal : Form
         }
         else
         {
-            flpSidebar.Width += 5;
+            flpSidebar.Width += 25;
             if (flpSidebar.Width >= expandida)
             {
                 sidebarExpand = true;

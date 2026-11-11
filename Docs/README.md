@@ -1,15 +1,23 @@
 # Documentación técnica
 
-Documentación del Sistema de Coworking. Cada documento responde a un
-requerimiento de la consigna del TP Final.
+Documentación del Sistema de Gestión de Coworking y Reservas. Este archivo es el
+índice: desde acá se llega a todos los documentos.
 
-| Documento | Qué contiene | Requerimiento de la consigna que cubre |
+| Documento | Qué contiene | Requerimiento que cubre |
 |---|---|---|
-| [DER.md](./DER.md) | Diagrama Entidad-Relación de la base: tablas, cardinalidades y decisiones de esquema | "Diagrama del modelo de datos" |
+| [Diccionario-datos.md](./Diccionario-datos.md) | Las 6 tablas campo por campo (tipo, precisión, nulabilidad, default, PK, FK, UNIQUE, CHECK, descripción funcional y quién escribe el dato), las 2 vistas, las 6 funciones, los 7 procedimientos almacenados y los 2 triggers | "Breve documentación técnica del sistema" |
+| [DER.md](./DER.md) | Diagrama Entidad-Relación de la base: tablas, cardinalidades, valores de los ENUM y decisiones de esquema | "Diagrama del modelo de datos" |
 | [Diagrama-clases.md](./Diagrama-clases.md) | Diagrama de clases simplificado del dominio: la jerarquía `Recurso`, la clase abstracta, la interfaz `IReservable`, las entidades y las reglas de negocio | "Diagrama de clases simplificado", "clases principales" y "uso de herencia, abstractas e interfaces" |
-| [DC.md](./DC.md) | Diagrama de contexto (nivel 0): el sistema entero como un proceso, las entidades externas y los flujos | Documentación del análisis funcional |
-| [DFD.md](./DFD.md) | DFD de nivel 1: los cuatro procesos del sistema, los almacenes de datos y los flujos entre ellos | Documentación del análisis funcional |
+| [DC.md](./DC.md) | Diagrama de contexto: el sistema completo como un proceso (nivel 0) y la operación principal "gestionar una reserva" | Documentación del análisis funcional |
+| [DFD.md](./DFD.md) | DFD de nivel 1 con los cuatro procesos, los almacenes D1 a D5 y los flujos, más los diagramas de flujo de las operaciones de escritura | Documentación del análisis funcional |
 | [Decisiones.md](./Decisiones.md) | Registro de decisiones de diseño: qué se decidió, por qué y qué alternativa se descartó | "Decisiones importantes tomadas por el grupo" |
+
+### Documentos en preparación
+
+- **Documentación técnica mínima** — objetivo del sistema, modelo de datos, clases
+  principales, uso de herencia, abstractas e interfaces, objetos de MySQL
+  utilizados y por qué, manejo de errores y decisiones del grupo.
+- **Manual de usuario** — recorrido completo de la aplicación, con capturas reales.
 
 ## Documentos de la cátedra
 

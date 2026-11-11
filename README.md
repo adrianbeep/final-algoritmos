@@ -156,9 +156,12 @@ SHOW FULL TABLES WHERE Db = 'coworking';
 
 - [Roadmap completo](./.github/ROADMAP.md) — plan de trabajo por etapas
 - [Documentación técnica](./Docs/) — índice de la documentación
+- [Diccionario de datos](./Docs/Diccionario-datos.md) — tablas, vistas, funciones, procedimientos y triggers, campo por campo
 - [Diagrama Entidad-Relación](./Docs/DER.md) — modelo de datos de la base
 - [Diagrama de clases](./Docs/Diagrama-clases.md) — modelo de dominio: herencia, clase abstracta e interfaz
-- [Decisiones de diseño](./Docs/Decisiones.md) — qué se decidió, por qué y qué alternativa se descartó
+- [Diagrama de contexto](./Docs/DC.md) — el sistema completo y la operación principal
+- [DFD y flujos de las operaciones](./Docs/DFD.md) — los procesos del sistema y el recorrido de cada escritura
+- [Decisiones de diseóo](./Docs/Decisiones.md) - qué se decidió, por qué y qué alternativa se descartó
 - [Consignas del TP](./Consignas/) — requerimientos originales de la cátedra
 - [Issues abiertos](https://github.com/adrianbeep/final-algoritmos/issues) — sub-tareas en curso
 

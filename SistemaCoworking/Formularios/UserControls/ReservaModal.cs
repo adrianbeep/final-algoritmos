@@ -1,4 +1,5 @@
-﻿using SistemaCoworking.Datos;
+﻿using MySqlConnector;
+using SistemaCoworking.Datos;
 using SistemaCoworking.Herramientas;
 using SistemaCoworking.Modelos;
 using System;
@@ -146,11 +147,39 @@ namespace SistemaCoworking.Formularios.UserControls
                     dtpFin.Value,
                     _reserva?.Id ?? 0);
             }
+            catch (MySqlException ex)
+            {
+                // El DAO lanza y aca se captura. El SQLSTATE 45000 es una regla de
+                // negocio: el mensaje es del dominio y se muestra tal cual.
+                if (ex.SqlState == "45000" || ex.Number == 1644)
+                {
+                    MessageBox.Show(
+                        ex.Message,
+                        "No se pudo completar la operacion",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Warning);
+                }
+                else
+                {
+                    MessageBox.Show(
+                        "Ocurrio un error al trabajar con la base de datos. Intente de nuevo."
+                            + Environment.NewLine + Environment.NewLine + ex.Message,
+                        "Error de base de datos",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Error);
+                }
+
+                return;
+            }
             catch (Exception ex)
             {
-                // El DAO lanza y aca se captura: se muestra el error y el modal
-                // sigue abierto con lo que cargo el usuario.
-                ErroresDeBaseDeDatos.Mostrar(ex);
+                MessageBox.Show(
+                    "Ocurrio un error inesperado. Intente de nuevo."
+                        + Environment.NewLine + Environment.NewLine + ex.Message,
+                    "Error",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+
                 return;
             }
 
@@ -202,12 +231,39 @@ namespace SistemaCoworking.Formularios.UserControls
 
                 return true;
             }
+            catch (MySqlException ex)
+            {
+                // El DAO lanza y aca se captura. El SQLSTATE 45000 es una regla de
+                // negocio: el mensaje es del dominio y se muestra tal cual.
+                if (ex.SqlState == "45000" || ex.Number == 1644)
+                {
+                    MessageBox.Show(
+                        ex.Message,
+                        "No se pudo completar la operacion",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Warning);
+                }
+                else
+                {
+                    MessageBox.Show(
+                        "Ocurrio un error al trabajar con la base de datos. Intente de nuevo."
+                            + Environment.NewLine + Environment.NewLine + ex.Message,
+                        "Error de base de datos",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Error);
+                }
+
+                return false;
+            }
             catch (Exception ex)
             {
-                // El DAO lanza y aca se captura: se muestra el error con el
-                // mensaje del SP y el modal SIGUE ABIERTO con lo que cargo el
-                // usuario, para que corrija y reintente sin perderlo.
-                ErroresDeBaseDeDatos.Mostrar(ex);
+                MessageBox.Show(
+                    "Ocurrio un error inesperado. Intente de nuevo."
+                        + Environment.NewLine + Environment.NewLine + ex.Message,
+                    "Error",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+
                 return false;
             }
             finally

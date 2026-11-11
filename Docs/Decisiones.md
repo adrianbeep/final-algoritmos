@@ -21,6 +21,7 @@ Este archivo es documentación técnica del proyecto: sirve para la entrega, par
 | D-007 | [La regla de superposicion de reservas vive en la base, en una funcion](#d-007--la-regla-de-superposicion-de-reservas-vive-en-la-base-en-una-funcion) | 10/11/2026 | Aceptada |
 | D-008 | [Los DAO de escritura reciben la entidad, no parámetros sueltos](#d-008--los-dao-de-escritura-reciben-la-entidad-no-parámetros-sueltos) | 11/11/2026 | Aceptada |
 | D-009 | [Los DAO devuelven dos cosas: la tabla plana para la grilla y la lista tipada para los combos](#d-009--los-dao-devuelven-dos-cosas-la-tabla-plana-para-la-grilla-y-la-lista-tipada-para-los-combos) | 11/11/2026 | Aceptada |
+| D-010 | [El manejo de errores de la base es explicito en cada punto de captura](#d-010--el-manejo-de-errores-de-la-base-es-explicito-en-cada-punto-de-captura) | 11/11/2026 | Aceptada |
 
 ---
 
@@ -646,3 +647,66 @@ y del script, que es donde la base ya define los nombres.
 - `SistemaCoworking/Datos/RecursoDAO.cs` — el patron que se copio
 - `SistemaCoworking/Formularios/FrmClientes.Designer.cs` — las columnas de la grilla
 - `SistemaCoworking/Formularios/FrmReservas.cs` — carga la lista de clientes para el combo
+
+---
+
+## D-010 — El manejo de errores de la base es explicito en cada punto de captura
+
+**Fecha:** 11/11/2026
+**Estado:** Aceptada
+**Ámbito:** Capa de presentacion (formularios y modales)
+
+### Contexto
+
+Los procedimientos almacenados levantan las reglas de negocio con
+`SIGNAL SQLSTATE '45000'`. El conector expone ese SQLSTATE en la excepcion, asi
+que un error de negocio se reconoce por ahi y su mensaje es el del dominio, que
+se muestra tal cual al usuario. Cualquier otro error es tecnico.
+
+La consigna pide explicitamente `catch (MySqlException ex)` en la aplicacion.
+Ese `catch` estaba encapsulado en un helper, `ErroresDeBaseDeDatos`, que
+traducía la excepcion a un MessageBox y que los formularios y los modales
+llamaban.
+
+### Decision
+
+- Se elimina `Herramientas/ErroresDeBaseDeDatos`.
+- Cada punto de captura tiene su propio `catch (MySqlException ex)`, que
+  distingue el error de negocio por el SQLSTATE `45000` (o por el codigo 1644
+  de `ER_SIGNAL_EXCEPTION`) y muestra el mensaje del dominio, y un
+  `catch (Exception ex)` para el resto.
+- El catch de MySqlException va primero: es mas especifico y el compilador
+  obliga a ese orden.
+
+### Alternativas descartadas
+
+- **Dejar el helper.** Se descarto porque la consigna pide el `catch`
+  explicito, y porque con el helper el manejo de errores queda escondido: para
+  saber que le pasa al usuario hay que abrir otro archivo.
+- **Un solo `catch (Exception ex)` con la distincion adentro.** Se descarto
+  porque la consigna pide dos catches: uno del proveedor y uno general.
+
+### Consecuencias
+
+**A favor:**
+
+- El `catch (MySqlException ex)` de la consigna aparece literal en el codigo.
+- Cada punto de captura muestra que error le puede llegar al usuario y que
+  muestra, sin seguir el rastro a otro archivo.
+- El `SQLSTATE 45000` se reconoce en el sitio, que es donde la consigna lo
+  pide.
+
+**En contra (y como se mitigan):**
+
+- **Los mensajes se repiten en los 14 puntos de captura.** Se acepta: es el
+  precio de que el manejo de errores se lea en el mismo lugar donde ocurre. Si
+  el grupo quisiera volver a un helper, la decision queda registrada aqui.
+- **La capa de presentacion ahora conoce `MySqlException`.** Se acepta: la
+  consigna lo pide en la etapa de manejo de errores, y no es lo mismo que
+  acceder a la base: la conexion y el SQL siguen siendo exclusivos de los DAO.
+
+### Referencias
+
+- `SistemaCoworking/Formularios/FrmClientes.cs`, `FrmRecursos.cs`, `FrmReservas.cs` — captura en la carga de las grillas y en la busqueda por id
+- `SistemaCoworking/Formularios/UserControls/ClienteModal.cs`, `RecursoModal.cs`, `ReservaModal.cs` — captura en el guardado
+- `Scripts SQL/Procedimientos_Almacenados.sql` — los `SIGNAL SQLSTATE '45000'` que llegan como error de negocio

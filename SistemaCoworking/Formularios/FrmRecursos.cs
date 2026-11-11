@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MySqlConnector;
+using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
 using SistemaCoworking.Datos;
@@ -40,11 +41,39 @@ public partial class FrmRecursos : Form
         {
             _tiposRecurso = _tipoRecursoDAO.ObtenerTodos();
         }
+        catch (MySqlException ex)
+        {
+            // El DAO lanza y aca se captura. El SQLSTATE 45000 es una regla de
+            // negocio: el mensaje es del dominio y se muestra tal cual.
+            if (ex.SqlState == "45000" || ex.Number == 1644)
+            {
+                MessageBox.Show(
+                    ex.Message,
+                    "No se pudo completar la operacion",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
+            }
+            else
+            {
+                MessageBox.Show(
+                    "Ocurrio un error al trabajar con la base de datos. Intente de nuevo."
+                        + Environment.NewLine + Environment.NewLine + ex.Message,
+                    "Error de base de datos",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+            }
+
+            _tiposRecurso = new List<TipoRecurso>();
+        }
         catch (Exception ex)
         {
-            // El DAO lanza y aca se captura: se muestra el error y el combo
-            // de tipos queda vacio.
-            ErroresDeBaseDeDatos.Mostrar(ex);
+            MessageBox.Show(
+                "Ocurrio un error inesperado. Intente de nuevo."
+                    + Environment.NewLine + Environment.NewLine + ex.Message,
+                "Error",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Error);
+
             _tiposRecurso = new List<TipoRecurso>();
         }
     }
@@ -57,11 +86,39 @@ public partial class FrmRecursos : Form
             dgv.DataSource = _recursoDAO.ObtenerTodos();
             dgv.ClearSelection();
         }
+        catch (MySqlException ex)
+        {
+            // El DAO lanza y aca se captura. El SQLSTATE 45000 es una regla de
+            // negocio: el mensaje es del dominio y se muestra tal cual.
+            if (ex.SqlState == "45000" || ex.Number == 1644)
+            {
+                MessageBox.Show(
+                    ex.Message,
+                    "No se pudo completar la operacion",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
+            }
+            else
+            {
+                MessageBox.Show(
+                    "Ocurrio un error al trabajar con la base de datos. Intente de nuevo."
+                        + Environment.NewLine + Environment.NewLine + ex.Message,
+                    "Error de base de datos",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+            }
+
+            dgv.DataSource = null;
+        }
         catch (Exception ex)
         {
-            // El DAO lanza y aca se captura: se muestra el error y la grilla
-            // queda vacia, pero el usuario ya sabe que fallo la consulta.
-            ErroresDeBaseDeDatos.Mostrar(ex);
+            MessageBox.Show(
+                "Ocurrio un error inesperado. Intente de nuevo."
+                    + Environment.NewLine + Environment.NewLine + ex.Message,
+                "Error",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Error);
+
             dgv.DataSource = null;
         }
     }
@@ -83,11 +140,39 @@ public partial class FrmRecursos : Form
         {
             recurso = _recursoDAO.ObtenerPorId(id);
         }
+        catch (MySqlException ex)
+        {
+            // El DAO lanza y aca se captura. El SQLSTATE 45000 es una regla de
+            // negocio: el mensaje es del dominio y se muestra tal cual.
+            if (ex.SqlState == "45000" || ex.Number == 1644)
+            {
+                MessageBox.Show(
+                    ex.Message,
+                    "No se pudo completar la operacion",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
+            }
+            else
+            {
+                MessageBox.Show(
+                    "Ocurrio un error al trabajar con la base de datos. Intente de nuevo."
+                        + Environment.NewLine + Environment.NewLine + ex.Message,
+                    "Error de base de datos",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+            }
+
+            return;
+        }
         catch (Exception ex)
         {
-            // El DAO lanza y aca se captura: se muestra el error y no se abre
-            // el modal.
-            ErroresDeBaseDeDatos.Mostrar(ex);
+            MessageBox.Show(
+                "Ocurrio un error inesperado. Intente de nuevo."
+                    + Environment.NewLine + Environment.NewLine + ex.Message,
+                "Error",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Error);
+
             return;
         }
 

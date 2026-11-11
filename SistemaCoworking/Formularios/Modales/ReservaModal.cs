@@ -10,7 +10,7 @@ using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
 
-namespace SistemaCoworking.Formularios.UserControls
+namespace SistemaCoworking.Formularios.Modales
 {
     public partial class ReservaModal : Form
     {

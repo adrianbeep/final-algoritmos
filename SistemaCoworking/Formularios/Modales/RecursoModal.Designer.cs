@@ -1,4 +1,6 @@
-namespace SistemaCoworking.Formularios.UserControls
+using SistemaCoworking.Formularios.UserControls;
+
+namespace SistemaCoworking.Formularios.Modales
 {
     partial class RecursoModal
     {

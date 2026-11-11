@@ -1,4 +1,4 @@
-namespace SistemaCoworking.Formularios.UserControls
+namespace SistemaCoworking.Formularios.Modales
 {
     partial class ReservaModal
     {

@@ -3,6 +3,8 @@
 VISTAS
 ===========================================
 */
+
+USE coworking;
 DROP VIEW IF EXISTS vw_reservas_completas;
 CREATE VIEW vw_reservas_completas AS
 SELECT

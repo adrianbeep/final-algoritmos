@@ -3,6 +3,8 @@
 FUNCIONES
 ===========================================
 */
+
+USE coworking;
 DROP FUNCTION IF EXISTS fn_total_clientes;
 DROP FUNCTION IF EXISTS fn_reservas_por_finalizar;
 DROP FUNCTION IF EXISTS fn_reservas_hoy;

@@ -27,9 +27,8 @@ orden indicado en el [README principal](../README.md#crear-la-base-de-datos):
 Coworking_db.sql  →  Vistas.sql  →  Funciones.sql  →  Procedimientos_Almacenados.sql  →  Triggers.sql
 ```
 
-Solo el primero incluye `USE coworking;`: los otros cuatro se ejecutan contra
-el esquema seleccionado, así que hay que seleccionar la base `coworking` como
-esquema por defecto antes de correrlos.
+Los cinco scripts incluyen `USE coworking;`: se pueden correr uno detrás de otro
+sin seleccionar el esquema a mano.
 
 ## Código
 

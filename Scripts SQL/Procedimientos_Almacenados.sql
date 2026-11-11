@@ -3,6 +3,8 @@
 PROCEDIMIENTOS ALMACENADOS CLIENTES
 ===========================================
 */
+
+USE coworking;
 DROP PROCEDURE IF EXISTS sp_alta_cliente;
 DROP PROCEDURE IF EXISTS sp_modificar_cliente;
 

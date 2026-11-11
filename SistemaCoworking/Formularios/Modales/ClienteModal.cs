@@ -1,5 +1,6 @@
 using MySqlConnector;
 using SistemaCoworking.Datos;
+using SistemaCoworking.Formularios.UserControls;
 using SistemaCoworking.Herramientas;
 using SistemaCoworking.Modelos;
 using System;
@@ -8,7 +9,7 @@ using System.Drawing;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 
-namespace SistemaCoworking.Formularios.UserControls;
+namespace SistemaCoworking.Formularios.Modales;
 
 public partial class ClienteModal : Form
 {

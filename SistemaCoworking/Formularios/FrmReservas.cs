@@ -1,6 +1,6 @@
 ﻿using MySqlConnector;
 using SistemaCoworking.Datos;
-using SistemaCoworking.Formularios.UserControls;
+using SistemaCoworking.Formularios.Modales;
 using SistemaCoworking.Herramientas;
 using SistemaCoworking.Modelos;
 using System;

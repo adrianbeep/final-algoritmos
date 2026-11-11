@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
 using SistemaCoworking.Datos;
-using SistemaCoworking.Formularios.UserControls;
+using SistemaCoworking.Formularios.Modales;
 using SistemaCoworking.Herramientas;
 using SistemaCoworking.Modelos;
 

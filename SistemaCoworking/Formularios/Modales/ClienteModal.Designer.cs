@@ -1,14 +1,16 @@
-namespace SistemaCoworking.Formularios.UserControls
+using SistemaCoworking.Formularios.UserControls;
+
+namespace SistemaCoworking.Formularios.Modales
 {
     partial class ClienteModal
     {
         /// <summary> 
-        /// Variable del diseñador necesaria.
+        /// Variable del diseï¿½ador necesaria.
         /// </summary>
         private System.ComponentModel.IContainer components = null;
 
         /// <summary> 
-        /// Limpiar los recursos que se estén usando.
+        /// Limpiar los recursos que se estï¿½n usando.
         /// </summary>
         /// <param name="disposing">true si los recursos administrados se deben desechar; false en caso contrario.</param>
         protected override void Dispose(bool disposing)
@@ -20,11 +22,11 @@ namespace SistemaCoworking.Formularios.UserControls
             base.Dispose(disposing);
         }
 
-        #region Código generado por el Diseñador de componentes
+        #region Cï¿½digo generado por el Diseï¿½ador de componentes
 
         /// <summary> 
-        /// Método necesario para admitir el Diseñador. No se puede modificar
-        /// el contenido de este método con el editor de código.
+        /// Mï¿½todo necesario para admitir el Diseï¿½ador. No se puede modificar
+        /// el contenido de este mï¿½todo con el editor de cï¿½digo.
         /// </summary>
         private void InitializeComponent()
         {

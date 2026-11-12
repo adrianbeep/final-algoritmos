@@ -38,6 +38,26 @@ public partial class FrmPrincipal : Form
         CargarFormularioAPanel(new FrmDashboard(), btnDashboard);
     }
 
+    /// <summary>
+    /// Define el rectángulo que ocupa la ventana cuando está maximizada.
+    ///
+    /// La ventana es sin marco (FormBorderStyle.None) porque tiene su propia barra
+    /// de título. En Windows, una ventana maximizada ocupa el "area de trabajo", que
+    /// es la pantalla MENOS la barra de tareas, y ese ajuste lo hace el marco de la
+    /// ventana. Sin marco, Windows no tiene con qué ajustarlo y expande la ventana
+    /// al monitor completo, tapando la barra de tareas.
+    ///
+    /// MaximizedBounds es la propiedad que define el area maximizada de la ventana,
+    /// asi que le indicamos explicitamente cual es: el area de trabajo del monitor
+    /// donde esta la ventana.
+    /// </summary>
+    protected override void OnLoad(EventArgs e)
+    {
+        base.OnLoad(e);
+
+        MaximizedBounds = Screen.FromControl(this).WorkingArea;
+    }
+
     //==============================
     //TRANSICION SIDEBAR
     //==============================

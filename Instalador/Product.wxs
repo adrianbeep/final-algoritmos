@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Paquete del instalador de Sistema Coworking.
+
+  Empaqueta lo que deja el "dotnet publish" en self-contained: el ejecutable, las
+  dependencias (MySqlConnector, ReaLTaiizor, Microsoft.Extensions.*), el
+  appsettings.json y el runtime de .NET, para que la app funcione en una
+  maquina donde no haya nada instalado.
+
+  La carpeta que se empaqueta la define la propiedad PublishDir. El script
+  build-installer.ps1 la arma antes de compilar este proyecto.
+-->
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
+     xmlns:ui="http://wixtoolset.org/schemas/v4/wxs/ui">
+
+  <Package Name="Sistema Coworking"
+           Manufacturer="TP Final - Sistema Coworking"
+           Version="1.0.0"
+           UpgradeCode="7C4E1B2A-9F63-4B58-8D2E-3A5C6F1B9D47"
+           Scope="perUser"
+           Compressed="yes"
+           InstallerVersion="500"
+           Language="1034">
+
+    <!-- Permite reinstalar una version mas nueva encima de una vieja. -->
+    <MajorUpgrade DowngradeErrorMessage="Ya hay una version mas nueva de Sistema Coworking instalada." />
+
+    <MediaTemplate EmbedCab="yes" />
+
+    <!--
+      Instala en la carpeta de programas del usuario (%LOCALAPPDATA%\Programs),
+      no en Program Files: asi el instalador no necesita permisos de
+      administrador y funciona en cualquier PC, incluso en las de la facultad
+      donde el usuario no es admin.
+    -->
+    <StandardDirectory Id="LocalAppDataFolder">
+      <Directory Id="INSTALLFOLDER" Name="Programs\Sistema Coworking" />
+    </StandardDirectory>
+
+    <Property Id="ARPNOREPAIR" Value="1" />
+
+    <ui:WixUI Id="WixUI_InstallDir" InstallDirectory="INSTALLFOLDER" />
+
+    <Feature Id="Main" Title="Sistema Coworking" Level="1" AllowAbsent="no">
+      <ComponentGroupRef Id="ApplicationFiles" />
+      <ComponentGroupRef Id="RemoveSatelliteFolders" />
+      <ComponentGroupRef Id="ShortcutComponents" />
+    </Feature>
+  </Package>
+
+  <Fragment>
+    <!--
+      Todos los archivos publicados. El componente se crea por archivo, asi que
+      cada dll, el .exe y el appsettings.json quedan registrados por separado
+      en el MSI.
+    -->
+    <ComponentGroup Id="ApplicationFiles" Directory="INSTALLFOLDER">
+      <Files Include="$(PublishDir)\**" />
+    </ComponentGroup>
+  </Fragment>
+
+  <Fragment>
+    <!--
+      Los recursos traducidos del runtime de .NET (satelitos) se instalan en
+      subcarpetas. Como el paquete es por usuario, esas carpetas tienen que
+      estar en la tabla RemoveFile para que la desinstalacion las borre.
+    -->
+    <ComponentGroup Id="RemoveSatelliteFolders" Directory="INSTALLFOLDER">
+      <Component Id="RemoveSatelliteFolders" Guid="6B0E9C14-3A72-4D58-9F31-58C2A7D0E846">
+        <RemoveFile Id="RemoveSatCs" Name="[INSTALLFOLDER]cs" On="uninstall" />
+        <RemoveFile Id="RemoveSatDe" Name="[INSTALLFOLDER]de" On="uninstall" />
+        <RemoveFile Id="RemoveSatEs" Name="[INSTALLFOLDER]es" On="uninstall" />
+        <RemoveFile Id="RemoveSatFr" Name="[INSTALLFOLDER]fr" On="uninstall" />
+        <RemoveFile Id="RemoveSatIt" Name="[INSTALLFOLDER]it" On="uninstall" />
+        <RemoveFile Id="RemoveSatJa" Name="[INSTALLFOLDER]ja" On="uninstall" />
+        <RemoveFile Id="RemoveSatKo" Name="[INSTALLFOLDER]ko" On="uninstall" />
+        <RemoveFile Id="RemoveSatPl" Name="[INSTALLFOLDER]pl" On="uninstall" />
+        <RemoveFile Id="RemoveSatPtBr" Name="[INSTALLFOLDER]pt-BR" On="uninstall" />
+        <RemoveFile Id="RemoveSatRu" Name="[INSTALLFOLDER]ru" On="uninstall" />
+        <RemoveFile Id="RemoveSatTr" Name="[INSTALLFOLDER]tr" On="uninstall" />
+        <RemoveFile Id="RemoveSatZhHans" Name="[INSTALLFOLDER]zh-Hans" On="uninstall" />
+        <RemoveFile Id="RemoveSatZhHant" Name="[INSTALLFOLDER]zh-Hant" On="uninstall" />
+        <RegistryValue Root="HKCU"
+                       Key="Software\SistemaCoworking"
+                       Name="Satelitos"
+                       Type="integer"
+                       Value="1"
+                       KeyPath="yes" />
+      </Component>
+    </ComponentGroup>
+  </Fragment>
+
+  <Fragment>
+    <!-- Acceso directo en el menu de Inicio, apuntando al ejecutable instalado. -->
+    <StandardDirectory Id="ProgramMenuFolder">
+      <Directory Id="ApplicationProgramsFolder" Name="Sistema Coworking" />
+    </StandardDirectory>
+
+    <ComponentGroup Id="ShortcutComponents" Directory="ApplicationProgramsFolder">
+      <Component Id="ApplicationShortcut" Guid="1E9A7D44-6C2B-4E8A-9F31-8B7D5C0A2E63">
+        <Shortcut Id="ApplicationShortcut"
+                  Name="Sistema Coworking"
+                  Description="Sistema de gestion de coworking y reservas"
+                  Target="[INSTALLFOLDER]SistemaCoworking.exe"
+                  WorkingDirectory="INSTALLFOLDER" />
+        <RemoveFolder Id="RemoveApplicationProgramsFolder" On="uninstall" />
+        <RegistryValue Root="HKCU"
+                       Key="Software\SistemaCoworking"
+                       Name="Instalado"
+                       Type="integer"
+                       Value="1"
+                       KeyPath="yes" />
+      </Component>
+    </ComponentGroup>
+  </Fragment>
+</Wix>

@@ -15,7 +15,7 @@
 
   <Package Name="Sistema Coworking"
            Manufacturer="TP Final - Sistema Coworking"
-           Version="1.0.0"
+           Version="1.0.1"
            UpgradeCode="7C4E1B2A-9F63-4B58-8D2E-3A5C6F1B9D47"
            Scope="perUser"
            Compressed="yes"

@@ -158,6 +158,10 @@ reservas.
 | `estado_reserva` | enum('Confirmada', 'Cancelada') | | Si | 'Confirmada' | | | | |
 | `total_reserva` | decimal(10,2) | 10,2 | No | | | | | |
 
+La tabla declara además el índice `ix_reservas_recurso_periodo` sobre
+`(id_recurso, estado_reserva, fecha_inicio, fecha_fin)`, que es exactamente el
+predicado que usa `fn_recurso_ocupado`.
+
 ### Significado
 
 | Campo | Descripcion funcional | Quien escribe el dato |
@@ -262,9 +266,10 @@ parámetro `p_id_reserva_excluida` permite consultar la disponibilidad al editar
 una reserva sin que la reserva se superponga consigo misma; en un alta se
 envía `0`.
 
-Las cinco primeras funciones se invocan desde `DashboardDAO`. Al día de la
-fecha, el formulario `FrmDashboard` es un marcador de posición y todavía no
-consume esa DAO, por lo que los indicadores no se muestran todavía en pantalla.
+Las cinco primeras funciones se invocan desde `DashboardDAO` y alimentan las cuatro
+tarjetas del tablero (`FrmDashboard`): la cuarta tarjeta, "Ocupación de hoy", combina
+las dos últimas en un porcentaje. El tablero muestra un botón "Actualizar" que
+vuelve a consultar los valores en la base.
 
 ## Procedimientos almacenados
 

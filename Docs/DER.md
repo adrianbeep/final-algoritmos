@@ -49,7 +49,7 @@ erDiagram
 
     auditoria_reservas {
         int id PK
-        int id_reserva "lÓgica - sin FK declarada"
+        int id_reserva "lógica - sin FK declarada"
         enum accion
         datetime fecha_accion
         text detalle

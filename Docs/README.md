@@ -15,10 +15,12 @@ Documentación del Sistema de Gestión de Coworking y Reservas. Este archivo es 
 
 ### Documentos en preparación
 
-- **Documentación técnica mínima** — objetivo del sistema, modelo de datos, clases
-  principales, uso de herencia, abstractas e interfaces, objetos de MySQL
-  utilizados y por qué, manejo de errores y decisiones del grupo.
-- **Manual de usuario** — recorrido completo de la aplicación, con capturas reales.
+La documentación técnica mínima (objetivo del sistema, modelo de datos, clases
+principales, uso de herencia, abstractas e interfaces, objetos de MySQL utilizados
+y por qué, manejo de errores y decisiones del grupo) y el manual de usuario
+(recorrido completo de la aplicación, con capturas reales) se entregan en el
+documento final de la cátedra, en PDF. Los archivos de esta carpeta son el
+respaldo técnico en Markdown de ese documento.
 
 ## Documentos de la cátedra
 

@@ -22,11 +22,13 @@ flowchart TB
     D2[("D2 Recursos")]
     D3[("D3 Reservas")]
     D4[("D4 Tipos de recurso")]
-    D5[("D5 AuditorÍa de reservas")]
+    D5[("D5 Auditoría de reservas")]
+    D6[("D6 Catálogo JSON de clientes")]
 
     P -->|"datos del cliente"| P1
     P1 -->|"alta o modificación"| D1
     D1 -->|"listado de clientes"| P1
+    P1 -->|"catálogo exportado en formato JSON"| D6
     P1 -->|"resultado de la operación"| P
 
     P -->|"datos del recurso: nombre, tipo, ubicacion, costo, estado y caracteristicas"| P2
@@ -54,20 +56,21 @@ flowchart TB
 
 | Proceso | Qué hace | Dónde está en el código |
 |---|---|---|
-| `1.0 Administrar clientes` | Alta y modificación de clientes, y listado para verlos | `Formularios/FrmClientes.cs` |
+| `1.0 Administrar clientes` | Alta y modificación de clientes, listado para verlos y exportación del catálogo en JSON | `Formularios/FrmClientes.cs` |
 | `2.0 Administrar recursos` | Alta y modificación de recursos, con las características que exige cada tipo y su estado. Listado para verlos | `Formularios/FrmRecursos.cs` |
 | `3.0 Administrar reservas` | Agenda, modifica y cancela reservas. Valida cliente, recurso y fechas en el modal, y la superposición la consulta a la base antes de guardar | `Formularios/FrmReservas.cs` |
-| `4.0 Generar indicadores y reportes` | Dashboard con los cinco indicadores del coworking | `Formularios/FrmDashboard.cs` |
+| `4.0 Generar indicadores y reportes` | Dashboard con los cuatro indicadores del coworking (el cuarto combina dos funciones de la base) | `Formularios/FrmDashboard.cs` |
 
 ## Los almacenes de datos
 
-| Almacén | Qué guarda | Tabla |
+| Almacén | Qué guarda | Tabla u objeto |
 |---|---|---|
 | `D1 Clientes` | Los clientes del coworking | `clientes` |
 | `D2 Recursos` | Los recursos y el detalle que corresponde a su tipo | `recursos`, `recursos_detalle` |
 | `D3 Reservas` | Las reservas, con su estado y su total | `reservas` |
 | `D4 Tipos de recurso` | El catálogo de tipos de recurso | `tipo_recursos` |
-| `D5 Auditoria de reservas` | El historial de altas y cancelaciones | `auditoria_reservas` |
+| `D5 Auditoría de reservas` | El historial de altas y cancelaciones | `auditoria_reservas` |
+| `D6 Catálogo JSON de clientes` | El archivo `catalogo-clientes.json` que produce la exportación | Archivo generado por la aplicación |
 
 ## Los flujos que vale la pena explicar
 
@@ -87,23 +90,29 @@ proceso `3.0` devuelve al personal una confirmación o el mensaje de error de
 la regla que falló, y esa respuesta sale hacia la misma entidad externa que
 entra. Es lo que en el nivel 0 se resume en el flujo `Sistema -> Personal`.
 
+**El archivo JSON es un almacén de datos, no una entidad externa.** La exportación la
+dispara el usuario desde el módulo de clientes y produce un archivo que queda fuera
+del sistema: por eso se dibuja como un cilindro y no como un rectángulo.
+
 ## Una cosa que el diagrama muestra y el código todavía no
 
 El diagrama describe lo que el sistema **hace**, y hay un lugar donde el código
 todavía no llega. No es una decisión de diseño: es un pendiente de cerrar.
 
-**No hay búsqueda ni baja lógica.** Ninguna pantalla busca y ninguna da de
-baja: el listado se muestra completo y la modificación es una edición. Por eso
-los flujos de `D1` y `D2` hacia sus procesos dicen solo `listado`.
+**No hay búsqueda ni baja física.** Ninguna pantalla busca y ninguna borra: el
+listado se muestra completo y la modificación es una edición. Por eso los flujos de
+`D1` y `D2` hacia sus procesos dicen solo `listado`. El campo de búsqueda por
+módulo quedó declarado explícitamente fuera del alcance de la etapa 2 de la hoja de
+ruta, y los ComboBox de los modales son de lista cerrada (`DropDownStyle =
+DropDownList`), sin edición ni filtro.
 
-La cancelación, en cambio, ya está expuesta y coincide con el diagrama: el
-botón `colCancelar` de la grilla de `FrmReservas` pide confirmación, llama a
+La cancelación, en cambio, ya está expuesta y coincide con el diagrama: el botón
+`colCancelar` de la grilla de `FrmReservas` pide confirmación, llama a
 `ReservaDAO.Cancelar(id)`, que va a `sp_cancelar_reserva`, pasa la reserva a
-`Cancelada` y dispara el trigger de auditoría. El botón solo está habilitado
-si la reserva está en estado `Confirmada`: en las que ya están canceladas
-aparece atenuado y la acción no llega a la base. Es la misma regla que aplica
-el procedimiento almacenado, resuelta en la interfaz para que el usuario no
-llegue a un error.
+`Cancelada` y dispara el trigger de auditoría. La celda de ese botón aparece
+atenuada si la reserva no está en estado `Confirmada`, y la acción no llega a la
+base. Es la misma regla que aplica el procedimiento almacenado, resuelta en la
+interfaz para que el usuario no llegue a un error.
 
 ## Balance con el nivel 0
 
@@ -151,33 +160,33 @@ textuales de cada `SIGNAL`, copiados de `Scripts SQL/Procedimientos_Almacenados.
 
 ```mermaid
 flowchart TD
-    A["El administrador abre el mÓdulo de Reservas y presiona 'Nuevo'"] --> B["Se abre el modal de reserva"]
+    A["El administrador abre el módulo de Reservas y presiona 'Nuevo'"] --> B["Se abre el modal de reserva"]
     B --> C["El administrador elige cliente, recurso, fecha_inicio y fecha_fin"]
     C --> D{"Hay un cliente elegido?"}
     D -->|"No: el modal muestra 'Elija un cliente.' en lblClienteInfo"| Z
-    D -->|SÍ| E{"Hay un recurso elegido?"}
+    D -->|Sí| E{"Hay un recurso elegido?"}
     E -->|"No: el modal muestra 'Elija un recurso.' en lblRecursoInfo"| Z
-    E -->|SÍ| F{"El recurso estÁ 'Disponible' y las fechas estÁn en orden?"}
+    E -->|Sí| F{"El recurso está 'Disponible' y las fechas están en orden?"}
     F -->|"No: el modal muestra 'El recurso no está disponible.' o 'La fecha de fin no puede ser anterior a la fecha de inicio.' en lblRecursoInfo"| Z
-    F -->|SÍ| G["El modal calcula el total: precio por dÍa × cantidad de dÍas"]
+    F -->|Sí| G["El modal calcula el total: precio por día × cantidad de días"]
     G --> H{"El recurso ya tiene una reserva confirmada que se superpone?"}
     H -->|"No: el modal avisa 'El recurso no está disponible en la fecha ingresada.'"| Z
-    H -->|SÍ| I["Se llama a sp_alta_reserva"]
+    H -->|Sí| I["Se llama a sp_alta_reserva"]
     I --> J{"El cliente existe?"}
     J -->|"No: SIGNAL 'El cliente no existe'"| S
-    J -->|SÍ| K{"El recurso existe?"}
+    J -->|Sí| K{"El recurso existe?"}
     K -->|"No: SIGNAL 'El recurso no existe'"| S
-    K -->|SÍ| L{"El recurso estÁ 'Disponible'?"}
+    K -->|Sí| L{"El recurso está 'Disponible'?"}
     L -->|"No: SIGNAL 'El recurso no esta disponible'"| S
-    L -->|SÍ| M{"Las fechas estÁn en orden?"}
+    L -->|Sí| M{"Las fechas están en orden?"}
     M -->|"No: SIGNAL 'La fecha de inicio no puede ser posterior a la fecha de fin'"| S
-    M -->|SÍ| N{"fn_recurso_ocupado devuelve 0?"}
+    M -->|Sí| N{"fn_recurso_ocupado devuelve 0?"}
     N -->|"No: SIGNAL 'El recurso no esta disponible en la fecha ingresada'"| S
-    N -->|SÍ| O["INSERT en reservas con estado_reserva 'Confirmada'"]
-    O --> P["El trigger trg_auditoria_reservas_insert escribe la auditorÍa con accion 'INSERT'"]
+    N -->|Sí| O["INSERT en reservas con estado_reserva 'Confirmada'"]
+    O --> P["El trigger trg_auditoria_reservas_insert escribe la auditoría con accion 'INSERT'"]
     P --> Q["El modal se cierra con DialogResult.OK"]
     Q --> R["FrmReservas refresca el DataGridView"]
-    S["La excepcion llega a C# como MySqlException con SqlState '45000'"] --> T["ErroresDeBaseDeDatos muestra el mensaje de negocio al usuario"]
+    S["La excepcion llega a C# como MySqlException con SqlState '45000'"] --> T["El catch de MySqlException muestra el mensaje de negocio al usuario"]
     T --> Z["No se guarda nada: el modal sigue abierto con lo que cargo el usuario"]
 ```
 
@@ -212,10 +221,10 @@ tabla (`reservas`), y el `INSERT` es atómico por sí mismo. La transacción, co
 su `ROLLBACK`, aparece en el flujo de recursos, que sí escribe en dos tablas.
 
 **El error de negocio no cierra el modal.** El `SIGNAL` viaja como
-`MySqlException` con `SqlState == "45000"`, lo captura la capa de presentación
-(`ErroresDeBaseDeDatos`) y lo muestra con su mensaje textual. El modal sigue
-abierto con lo que cargó el usuario, para que elija otra fecha y reintente sin
-perder lo escrito.
+`MySqlException` con `SqlState == "45000"`, lo captura la capa de presentación (el
+`catch (MySqlException ex)` de cada formulario y modal) y lo muestra con su mensaje
+textual. El modal sigue abierto con lo que cargó el usuario, para que elija otra
+fecha y reintente sin perder lo escrito.
 
 **El camino de éxito es el que cierra el ciclo.** La reserva queda en estado
 `Confirmada`, el trigger `trg_auditoria_reservas_insert` escribe la fila de
@@ -226,29 +235,29 @@ cierra con `DialogResult.OK` y `FrmReservas` refresca el `DataGridView`.
 
 ```mermaid
 flowchart TD
-    A["El administrador abre Clientes y presiona 'Crear', o el botÓn de la fila"] --> B["Se abre el modal de cliente"]
+    A["El administrador abre Clientes y presiona 'Crear', o el botón de la fila"] --> B["Se abre el modal de cliente"]
     B --> C["El administrador completa nombre, apellido, dni, telefono y email"]
-    C --> D{"Los datos del formulario son vÁlidos?"}
+    C --> D{"Los datos del formulario son válidos?"}
     D -->|"No: el modal muestra el mensaje en el campo correspondiente"| Z
-    D -->|SÍ| E{"Es alta o modificaciÓn?"}
-    E -->|ModificaciÓn| F["Se llama a sp_modificar_cliente"]
+    D -->|Sí| E{"Es alta o modificación?"}
+    E -->|Modificación| F["Se llama a sp_modificar_cliente"]
     E -->|Alta| G["Se llama a sp_alta_cliente"]
     F --> H{"El cliente a modificar existe?"}
     H -->|"No: SIGNAL 'No existe el cliente a modificar'"| Q
-    H -->|SÍ| I{"El dni ya lo tiene otro cliente?"}
+    H -->|Sí| I{"El dni ya lo tiene otro cliente?"}
     G --> J{"El dni ya existe?"}
     J -->|No| K{"El email ya existe?"}
     K -->|No| L["INSERT en clientes"]
-    K -->|"SÍ: SIGNAL 'Ya existe un cliente con ese email'"| Q
-    J -->|"SÍ: SIGNAL 'Ya existe un cliente con ese dni'"| Q
+    K -->|"Sí: SIGNAL 'Ya existe un cliente con ese email'"| Q
+    J -->|"Sí: SIGNAL 'Ya existe un cliente con ese dni'"| Q
     I -->|No| M{"El email ya lo tiene otro cliente?"}
     M -->|No| N["UPDATE en clientes"]
-    M -->|"SÍ: SIGNAL 'Ya existe otro cliente con ese email'"| Q
-    I -->|"SÍ: SIGNAL 'Ya existe otro cliente con ese dni'"| Q
+    M -->|"Sí: SIGNAL 'Ya existe otro cliente con ese email'"| Q
+    I -->|"Sí: SIGNAL 'Ya existe otro cliente con ese dni'"| Q
     L --> O["El modal se cierra con DialogResult.OK"]
     N --> O
     O --> P["FrmClientes refresca el DataGridView"]
-    Q["La excepcion llega a C# como MySqlException con SqlState '45000'"] --> R["ErroresDeBaseDeDatos muestra el mensaje de negocio al usuario"]
+    Q["La excepcion llega a C# como MySqlException con SqlState '45000'"] --> R["El catch de MySqlException muestra el mensaje de negocio al usuario"]
     R --> Z["No se guarda nada: el modal sigue abierto con lo que cargo el usuario"]
 ```
 
@@ -264,31 +273,31 @@ guardarse sin cambios.
 
 ```mermaid
 flowchart TD
-    A["El administrador abre Recursos y presiona 'Crear', o el botÓn de la fila"] --> B["Se abre el modal de recurso"]
+    A["El administrador abre Recursos y presiona 'Crear', o el botón de la fila"] --> B["Se abre el modal de recurso"]
     B --> C["El administrador elige el tipo y completa nombre, ubicacion, costo y estado"]
     C --> D{"El modal muestra los campos del tipo elegido?"}
     D -->|Sala| D1["capacidad de personas y proyector"]
     D -->|PuestoTrabajo| D2["numero de monitores"]
     D -->|OficinaPrivada| D3["metros cuadrados"]
-    D1 --> E{"Los datos del formulario son vÁlidos?"}
+    D1 --> E{"Los datos del formulario son válidos?"}
     D2 --> E
     D3 --> E
     E -->|"No: el modal muestra el mensaje en el campo correspondiente"| Z
-    E -->|SÍ| F{"Es alta o modificaciÓn?"}
-    F -->|ModificaciÓn| G["Se llama a sp_modificar_recurso"]
+    E -->|Sí| F{"Es alta o modificación?"}
+    F -->|Modificación| G["Se llama a sp_modificar_recurso"]
     F -->|Alta| H["Se llama a sp_alta_recurso"]
     G --> I{"El tipo de recurso es valido?"}
     H --> I
     I -->|"No: SIGNAL 'Tipo de recurso invalido'"| P
-    I -->|SÍ| J{"El tipo exige su propio dato?"}
+    I -->|Sí| J{"El tipo exige su propio dato?"}
     J -->|Sala| J1{"Falta la capacidad de personas?"}
-    J1 -->|"SÍ: SIGNAL 'Sala requiere capacidad de personas'"| P
+    J1 -->|"Sí: SIGNAL 'Sala requiere capacidad de personas'"| P
     J1 -->|No| K["START TRANSACTION"]
     J -->|PuestoTrabajo| J3{"Falta el numero de monitores?"}
-    J3 -->|"SÍ: SIGNAL 'PuestoTrabajo requiere numero de monitores'"| P
+    J3 -->|"Sí: SIGNAL 'PuestoTrabajo requiere numero de monitores'"| P
     J3 -->|No| K
     J -->|OficinaPrivada| J5{"Faltan los metros cuadrados?"}
-    J5 -->|"SÍ: SIGNAL 'OficinaPrivada requiere metros cuadrados'"| P
+    J5 -->|"Sí: SIGNAL 'OficinaPrivada requiere metros cuadrados'"| P
     J5 -->|No| K
     K --> L["Se escribe recursos y recursos_detalle (en el alta, con LAST_INSERT_ID)"]
     L --> M["COMMIT"]
@@ -296,7 +305,7 @@ flowchart TD
     M --> N["El modal se cierra con DialogResult.OK"]
     N --> O["FrmRecursos refresca el DataGridView"]
     P["DECLARE EXIT HANDLER FOR SQLEXCEPTION: ROLLBACK y RESIGNAL"] --> Q["La excepcion llega a C# como MySqlException con SqlState '45000'"]
-    Q --> R["ErroresDeBaseDeDatos muestra el mensaje de negocio al usuario"]
+    Q --> R["El catch de MySqlException muestra el mensaje de negocio al usuario"]
     R --> Z["No se guarda nada: el modal sigue abierto con lo que cargo el usuario"]
 ```
 
@@ -330,31 +339,31 @@ desincronizados.
 flowchart TD
     A["El administrador elige una reserva de la grilla"] --> B{"Es cancelar o editar?"}
     B -->|Editar| K["Se abre el modal de reserva con los datos cargados"]
-    B -->|Cancelar| C{"La reserva estÁ en estado 'Confirmada'?"}
-    C -->|"No: el botÓn colCancelar estÁ atenuado y la acciÓn no llega a la base"| Z
-    C -->|SÍ| D["El sistema pide confirmacion"]
+    B -->|Cancelar| C{"La reserva está en estado 'Confirmada'?"}
+    C -->|"No: el botón colCancelar está atenuado y la acción no llega a la base"| Z
+    C -->|Sí| D["El sistema pide confirmacion"]
     D --> E{"El administrador confirma?"}
     E -->|No| Z
-    E -->|SÍ| F["Se llama a sp_cancelar_reserva"]
+    E -->|Sí| F["Se llama a sp_cancelar_reserva"]
     F --> G{"La reserva existe y no estaba cancelada?"}
     G -->|"No: SIGNAL 'La reserva no existe o ya esta cancelada'"| T
-    G -->|SÍ| H["UPDATE en reservas: estado_reserva pasa a 'Cancelada'"]
-    H --> I["El trigger trg_auditoria_reservas_update escribe la auditorÍa con accion 'CANCEL'"]
+    G -->|Sí| H["UPDATE en reservas: estado_reserva pasa a 'Cancelada'"]
+    H --> I["El trigger trg_auditoria_reservas_update escribe la auditoría con accion 'CANCEL'"]
     I --> J["FrmReservas refresca el DataGridView"]
     K --> L["El administrador ajusta recurso, fecha_inicio y fecha_fin"]
     L --> M{"Las validaciones del modal pasan?"}
     M -->|"No: el modal muestra el mensaje y no guarda"| Z
-    M -->|SÍ| N["Se llama a sp_modificar_reserva"]
-    N --> O{"La reserva existe y estÁ 'Confirmada'?"}
+    M -->|Sí| N["Se llama a sp_modificar_reserva"]
+    N --> O{"La reserva existe y está 'Confirmada'?"}
     O -->|"No: SIGNAL 'La reserva no existe o no se puede modificar'"| T
-    O -->|SÍ| P{"El recurso existe y estÁ 'Disponible'?"}
+    O -->|Sí| P{"El recurso existe y está 'Disponible'?"}
     P -->|"No: SIGNAL 'El recurso no existe' o 'El recurso no esta disponible'"| T
-    P -->|SÍ| Q{"Las fechas estÁn en orden y no hay superposiciÓn?"}
+    P -->|Sí| Q{"Las fechas están en orden y no hay superposición?"}
     Q -->|"No: SIGNAL 'La fecha de inicio no puede ser posterior a la fecha de fin' o 'El recurso no esta disponible en la fecha ingresada'"| T
-    Q -->|SÍ| R["UPDATE en reservas con el nuevo recurso y las nuevas fechas"]
+    Q -->|Sí| R["UPDATE en reservas con el nuevo recurso y las nuevas fechas"]
     R --> S["El modal se cierra con DialogResult.OK"]
     S --> J
-    T["La excepcion llega a C# como MySqlException con SqlState '45000'"] --> U["ErroresDeBaseDeDatos muestra el mensaje de negocio al usuario"]
+    T["La excepcion llega a C# como MySqlException con SqlState '45000'"] --> U["El catch de MySqlException muestra el mensaje de negocio al usuario"]
     U --> Z["No se modifica nada"]
 ```
 
@@ -421,8 +430,8 @@ escrita.
 | La reserva y su detalle referencian clientes y recursos | `FK`: `reservas.id_cliente`, `reservas.id_recurso`, `recursos.id_tipo_recurso` y `recursos_detalle.id_recurso` | `Scripts SQL/Coworking_db.sql` |
 | Solo se cancela una reserva `Confirmada` | `ENUM`: `reservas.estado_reserva` | `Scripts SQL/Coworking_db.sql` |
 | Solo se cancela una reserva `Confirmada` (validado) | Validación dentro de un procedimiento almacenado: `sp_cancelar_reserva`, `SIGNAL 'La reserva no existe o ya esta cancelada'` | `Scripts SQL/Procedimientos_Almacenados.sql` |
-| El botón de cancelar se atenúa fuera de `Confirmada` | Validación en C#: `FrmReservas.EsCancelable` | `SistemaCoworking/Formularios/FrmReservas.cs` |
+| El botón de cancelar se atenúa fuera de `Confirmada` | Validación en C#: `FrmReservas.EsCancelable`, que atenúa la celda y bloquea el clic | `SistemaCoworking/Formularios/FrmReservas.cs` |
 | Cancelar no borra, deja la reserva en `Cancelada` | Validación dentro de un procedimiento almacenado: `sp_cancelar_reserva` hace `UPDATE`, no `DELETE` | `Scripts SQL/Procedimientos_Almacenados.sql` |
 | Solo se modifica una reserva `Confirmada` | Validación dentro de un procedimiento almacenado: `sp_modificar_reserva`, `SIGNAL 'La reserva no existe o no se puede modificar'` | `Scripts SQL/Procedimientos_Almacenados.sql` |
 | La modificación excluye la propia reserva de la superposición | Validación dentro de un procedimiento almacenado: `fn_recurso_ocupado` con `p_id_reserva_excluida` | `Scripts SQL/Funciones.sql` |
-| El error de negocio se muestra al usuario | Validación en C#: `ErroresDeBaseDeDatos.Mostrar`, que reconoce `SqlState == "45000"` | `SistemaCoworking/Herramientas/ErroresDeBaseDeDatos.cs` |
+| El error de negocio se muestra al usuario | Validación en C#: `catch (MySqlException ex)` que reconoce `ex.SqlState == "45000"` o `ex.Number == 1644` | `SistemaCoworking/Formularios/` y `SistemaCoworking/Formularios/Modales/` |

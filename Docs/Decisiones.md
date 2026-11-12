@@ -282,7 +282,7 @@ Hay **dos caminos** para obtener un `Recurso` concreto, y los dos toman exactame
 | Camino | Origen | Destino |
 |---|---|---|
 | Desde la base | el DAO lee una fila | `Sala`, `PuestoTrabajo` u `OficinaPrivada` |
-| Desde el formulario | el `RecursoModalControl` toma lo que tipeó el usuario | las mismas tres clases |
+| Desde el formulario | el `RecursoModal` toma lo que tipeó el usuario | las mismas tres clases |
 
 Ese conocimiento tiene que estar en **un solo lugar**. Si está duplicado, un cuarto tipo obliga a tocar los dos, y es cuestión de tiempo que uno se olvide.
 
@@ -345,7 +345,7 @@ Consecuencia de fondo: **el objeto que calcula el precio y el objeto que se guar
 
 - `SistemaCoworking/Modelos/RecursoFactory.cs` — la fábrica
 - `SistemaCoworking/Datos/RecursoDAO.cs` — la capa de datos la usa y ya no crea clases concretas
-- `SistemaCoworking/Formularios/UserControls/RecursoModalControl.cs` — el formulario la usa para armar el recurso
+- `SistemaCoworking/Formularios/Modales/RecursoModal.cs` — el formulario la usa para armar el recurso
 - `SistemaCoworking/Modelos/Recurso.cs`, `Sala.cs`, `PuestoTrabajo.cs`, `OficinaPrivada.cs` — la jerarquía y la regla de precio
 
 ---
@@ -478,7 +478,7 @@ Se agrego la funcion `fn_recurso_ocupado(p_id_recurso, p_fecha_inicio, p_fecha_f
 - `Scripts SQL/Procedimientos_Almacenados.sql` — `sp_alta_reserva`, `sp_modificar_reserva`
 - `Scripts SQL/Coworking_db.sql` — indice `ix_reservas_recurso_periodo`
 - `SistemaCoworking/Datos/ReservaDAO.cs` — `RecursoOcupado`
-- `SistemaCoworking/Formularios/UserControls/ReservaModal.cs` — la preconsulta
+- `SistemaCoworking/Formularios/Modales/ReservaModal.cs` — la preconsulta
 - `SistemaCoworking/Modelos/Reserva.cs` — `ValidarReserva`
 
 ---
@@ -558,8 +558,8 @@ recurso, y ese es el modal.
 - `SistemaCoworking/Datos/ClienteDAO.cs` — `Insertar(Cliente cliente)`, `Modificar(Cliente cliente)`
 - `SistemaCoworking/Datos/RecursoDAO.cs` — `Insertar(Recurso recurso)`, `Modificar(Recurso recurso)`
 - `SistemaCoworking/Datos/ReservaDAO.cs` — `Insertar(Reserva reserva)`, `Modificar(Reserva reserva)`, `Cancelar(int id)`
-- `SistemaCoworking/Formularios/UserControls/ClienteModal.cs` — arma el cliente y lo pasa entero
-- `SistemaCoworking/Formularios/UserControls/ReservaModal.cs` — arma la reserva con el total calculado
+- `SistemaCoworking/Formularios/Modales/ClienteModal.cs` — arma el cliente y lo pasa entero
+- `SistemaCoworking/Formularios/Modales/ReservaModal.cs` — arma la reserva con el total calculado
 - `.github/issues/etapa3-01-integracion.md` — el spec que pedia el contrato uniforme
 
 ---
@@ -698,7 +698,7 @@ llamaban.
 
 **En contra (y como se mitigan):**
 
-- **Los mensajes se repiten en los 14 puntos de captura.** Se acepta: es el
+- **Los mensajes se repiten en los 16 puntos de captura.** Se acepta: es el
   precio de que el manejo de errores se lea en el mismo lugar donde ocurre. Si
   el grupo quisiera volver a un helper, la decision queda registrada aqui.
 - **La capa de presentacion ahora conoce `MySqlException`.** Se acepta: la
@@ -707,6 +707,6 @@ llamaban.
 
 ### Referencias
 
-- `SistemaCoworking/Formularios/FrmClientes.cs`, `FrmRecursos.cs`, `FrmReservas.cs` — captura en la carga de las grillas y en la busqueda por id
-- `SistemaCoworking/Formularios/UserControls/ClienteModal.cs`, `RecursoModal.cs`, `ReservaModal.cs` — captura en el guardado
+- `SistemaCoworking/Formularios/FrmClientes.cs`, `FrmRecursos.cs`, `FrmReservas.cs` — captura en la carga de las grillas y en la lectura por id
+- `SistemaCoworking/Formularios/Modales/ClienteModal.cs`, `RecursoModal.cs`, `ReservaModal.cs` — captura en el guardado
 - `Scripts SQL/Procedimientos_Almacenados.sql` — los `SIGNAL SQLSTATE '45000'` que llegan como error de negocio

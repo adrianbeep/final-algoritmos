@@ -27,9 +27,9 @@ El sistema impide situaciones inconsistentes como reservar un recurso inexistent
 | C# | Lenguaje principal |
 | Windows Forms | Framework de interfaz gráfica |
 | .NET 10.0 | Runtime |
-| MySQL | Base de datos relacional |
+| MySQL o MariaDB | Base de datos relacional |
 | Visual Studio 2026 | IDE de desarrollo |
-| MySql.Data | Conector de base de datos |
+| MySqlConnector | Conector de base de datos |
 | Git + GitHub | Control de versiones |
 | GitHub Projects | Tablero Kanban de seguimiento |
 
@@ -70,9 +70,17 @@ final-algoritmos/
 │   └── Pautas de Presentacion.html
 ├── Docs/                           Documentación técnica
 │   ├── README.md                   Índice de la documentación
+│   ├── DC.md                       Diagrama de contexto
+│   ├── DFD.md                      DFD de nivel 1 y flujos de escritura
 │   ├── DER.md                      Diagrama Entidad-Relación
 │   ├── Diagrama-clases.md          Diagrama de clases
-│   └── Decisiones.md               Decisiones de diseño
+│   ├── Decisiones.md               Decisiones de diseño
+│   ├── Diccionario-datos.md        Diccionario de datos de la base
+│   └── catalogo-clientes.json      Ejemplo de exportación JSON
+├── Instalador/                     Empaquetado del instalador (WiX)
+│   ├── build-installer.ps1         Script que arma el MSI
+│   ├── Instalador.wixproj          Proyecto de WiX
+│   └── Product.wxs                 Paquete del instalador
 ├── Scripts SQL/                    Scripts de base de datos
 │   ├── Coworking_db.sql            Base, tablas y datos iniciales
 │   ├── Vistas.sql                  Las 2 vistas
@@ -154,6 +162,52 @@ SHOW FULL TABLES WHERE Db = 'coworking';
 >
 > El usuario y la contraseña por defecto son `root` y vacío. Si tu MySQL local tiene otra contraseña, cambiala acá antes de ejecutar.
 
+## El instalador
+
+La aplicación se puede instalar en cualquier PC con Windows, **sin tener que instalar
+.NET ni MySQL antes**: el instalador es *self-contained* y lleva adentro el runtime
+y todas las dependencias.
+
+**Dónde está el MSI:**
+
+```
+Instalador\output\Instalador.msi
+```
+
+Ese archivo es el que se entrega y el que se abre con doble clic para instalar.
+Se instala por usuario, en `%LOCALAPPDATA%\Programs\Sistema Coworking`, así que
+**no pide permisos de administrador** y funciona en cualquier equipo, incluso en
+los de la facultad donde el usuario no es administrador. Deja además un acceso
+directo en el Menú de Inicio.
+
+Para desinstalarlo: Menú de Inicio → "Sistema Coworking" → Desinstalar, o
+
+```powershell
+msiexec /x "%LOCALAPPDATA%\Programs\Sistema Coworking\Instalador.msi"
+```
+
+**Cómo se recompila** (por si hay que regenerarlo después de un cambio):
+
+```powershell
+.\Instalador\build-installer.ps1
+```
+
+El script hace dos pasos: un `dotnet publish` en *self-contained* que deja la
+aplicación y el runtime de .NET en `Instalador\publish\`, y después el
+empaquetado con WiX, que produce el MSI en `Instalador\output\`. La carpeta
+`Instalador\publish\` es una salida de compilación: se puede borrar y
+regenerar sin perder nada.
+
+> **Ojo con la versión:** el número de versión del paquete está en
+> `Instalador\Product.wxs` (`Version="1.0.2"`). Cada vez que se genera un MSI
+> nuevo hay que **subirla**, porque si se recompila con la misma versión que la
+> que ya está instalada, Windows Installer no reemplaza los archivos y la
+> aplicación instalada sigue siendo la anterior.
+
+> Las carpetas `Instalador\publish\` e `Instalador\obj\` están en el `.gitignore`:
+> son salidas de compilación y no van al repositorio. El `.msi` tampoco se versiona,
+> se entrega como archivo aparte.
+
 ### Generar el instalador
 
 El instalador es un proyecto de [WiX](https://wixtoolset.org/) que vive en `Instalador/`. Se arma con un script, sin necesidad de la IDE:
@@ -189,9 +243,13 @@ Qué hace:
 - [Diagrama de clases](./Docs/Diagrama-clases.md) — modelo de dominio: herencia, clase abstracta e interfaz
 - [Diagrama de contexto](./Docs/DC.md) — el sistema completo y la operación principal
 - [DFD y flujos de las operaciones](./Docs/DFD.md) — los procesos del sistema y el recorrido de cada escritura
-- [Decisiones de diseóo](./Docs/Decisiones.md) - qué se decidió, por qué y qué alternativa se descartó
+- [Decisiones de diseño](./Docs/Decisiones.md) - qué se decidió, por qué y qué alternativa se descartó
 - [Consignas del TP](./Consignas/) — requerimientos originales de la cátedra
 - [Issues abiertos](https://github.com/adrianbeep/final-algoritmos/issues) — sub-tareas en curso
+
+> La documentación técnica mínima y el manual de usuario con capturas se entregan
+> en el documento final de la cátedra (PDF). Los archivos de `Docs/` son el
+> respaldo técnico en Markdown.
 
 ---
 

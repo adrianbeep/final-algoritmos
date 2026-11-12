@@ -79,6 +79,10 @@ final-algoritmos/
 │   ├── Funciones.sql               Las 6 funciones
 │   ├── Procedimientos_Almacenados.sql  Los 7 procedimientos almacenados
 │   └── Triggers.sql                Los 2 triggers de auditoría
+├── Instalador/                     El instalador de la aplicación (WiX)
+│   ├── Product.wxs                 Qué se empaqueta y cómo se instala
+│   ├── Instalador.wixproj          Proyecto de WiX que arma el MSI
+│   └── build-installer.ps1          Publica la app y genera el MSI
 └── SistemaCoworking/               Proyecto C# (Windows Forms)
     └── [archivos del .slnx y el proyecto]
 ```
@@ -149,6 +153,30 @@ SHOW FULL TABLES WHERE Db = 'coworking';
 > ```
 >
 > El usuario y la contraseña por defecto son `root` y vacío. Si tu MySQL local tiene otra contraseña, cambiala acá antes de ejecutar.
+
+### Generar el instalador
+
+El instalador es un proyecto de [WiX](https://wixtoolset.org/) que vive en `Instalador/`. Se arma con un script, sin necesidad de la IDE:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File Instalador\build-installer.ps1
+```
+
+El script hace dos pasos: publica la aplicación en **self-contained** (se lleva el runtime de .NET adentro, así que en la PC donde se instala no hace falta tener .NET) y después arma el MSI con esa carpeta adentro.
+
+El instalador queda en `Instalador/output/Instalador.msi` (unos 45 MB) y se instala con doble clic, o:
+
+```powershell
+msiexec /i "Instalador\output\Instalador.msi"
+```
+
+Qué hace:
+
+- Instala en `%LOCALAPPDATA%\Programs\Sistema Coworking`. **No pide permisos de administrador**, para que funcione también en las PCs donde el usuario no es admin.
+- Deja un acceso directo en el menú de Inicio.
+- Se desinstala desde *Configuración → Aplicaciones* o con `msiexec /x`.
+
+> **Nota:** el MSI es una salida de compilación, así que no está en el repo. Se regenera con el script de arriba. La app instalada lee la cadena de conexión del `appsettings.json` que queda junto al ejecutable; para apuntar a otro servidor, se edita ese archivo en la carpeta de instalación.
 
 ---
 

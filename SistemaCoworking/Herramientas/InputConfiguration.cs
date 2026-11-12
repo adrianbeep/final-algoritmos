@@ -9,12 +9,12 @@ namespace SistemaCoworking.Herramientas;
 
 public static class InputConfiguration
 {
-    private static readonly Color BordeReposo = Color.FromArgb(200, 200, 200);
-    private static readonly Color BordeFocus = Color.FromArgb(0, 120, 215);
-    private static readonly Color BordeError = Color.FromArgb(198, 40, 40);
-    private static readonly Color PlaceholderColor = Color.FromArgb(150, 150, 150);
-    private static readonly Color TextoPrimario = Color.FromArgb(40, 40, 40);
-    private static readonly Color LabelColor = Color.FromArgb(80, 80, 80);
+    private static readonly Color BordeReposo = Paleta.BordeReposo;
+    private static readonly Color BordeFocus = Paleta.BordeFoco;
+    private static readonly Color BordeError = Paleta.BordeError;
+    private static readonly Color PlaceholderColor = Paleta.Placeholder;
+    private static readonly Color TextoPrimario = Paleta.Texto;
+    private static readonly Color LabelColor = Paleta.TextoEtiqueta;
     private static readonly Font InputFont = new Font("Segoe UI", 9.5F);
     private static readonly Font LabelFont = new Font("Segoe UI", 9F);
 

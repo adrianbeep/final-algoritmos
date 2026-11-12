@@ -38,6 +38,11 @@ public partial class ClienteModal : Form
         // boton Cancelar, la X y el ESC haciendo lo mismo.
         ModalConfiguration.ConfigModal(this, btnCancelar, pBoxCerrar);
 
+        // El modal se pinta con la paleta de la aplicacion: el gris del modal
+        // lo separa del blanco de la grilla que tiene debajo.
+        TemaModal.Aplicar(this);
+        lblCrear.ForeColor = Paleta.Secundario;
+
         ConfigurarTxt();
 
         ButtonConfiguration.ConfigPrimary(btnGuardar);

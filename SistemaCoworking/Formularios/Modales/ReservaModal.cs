@@ -16,8 +16,8 @@ namespace SistemaCoworking.Formularios.Modales
     {
         // El color de error es el mismo que usa el TextControl, y el de info
         // es el gris de la app.
-        private static readonly Color ColorError = Color.FromArgb(198, 40, 40);
-        private static readonly Color ColorInfo = Color.FromArgb(138, 143, 152);
+        private static readonly Color ColorError = Paleta.BordeError;
+        private static readonly Color ColorInfo = Paleta.TextoEtiqueta;
 
         private readonly Reserva? _reserva;
 
@@ -73,6 +73,11 @@ namespace SistemaCoworking.Formularios.Modales
             InputConfiguration.ConfigLabel(lblRecursoInfo);
             ButtonConfiguration.ConfigPrimary(btnGuardar);
             ButtonConfiguration.ConfigSecondary(btnCancelar);
+
+            // El modal se pinta con la paleta de la aplicacion: el gris del modal
+            // lo separa del blanco de la grilla que tiene debajo.
+            TemaModal.Aplicar(this);
+            lblCrear.ForeColor = Paleta.Secundario;
         }
 
         private void CargarComboClientes(List<Cliente>? clientes)

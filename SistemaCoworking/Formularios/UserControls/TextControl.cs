@@ -12,9 +12,9 @@ namespace SistemaCoworking.Formularios.UserControls
 
     public partial class TextControl : UserControl
     {
-        private static readonly Color BordeReposo = Color.FromArgb(200, 200, 200);
-        private static readonly Color BordeFocus = Color.FromArgb(0, 120, 215);
-        private static readonly Color BordeError = Color.FromArgb(198, 40, 40);
+        private static readonly Color BordeReposo = Paleta.BordeReposo;
+        private static readonly Color BordeFocus = Paleta.BordeFoco;
+        private static readonly Color BordeError = Paleta.BordeError;
         private string _placeholder;
         private string _value;
         private string _lblText;
@@ -170,7 +170,20 @@ namespace SistemaCoworking.Formularios.UserControls
             lbl.Text = label;
             InputConfiguration.ConfigLabel(lbl);
 
-            InputConfiguration.Configuration(barra, txt, placeholder, Color.White);
+            InputConfiguration.Configuration(barra, txt, placeholder, Paleta.FondoModal);
+
+            // El campo comparte el fondo del modal: no es una caja, es una
+            // etiqueta, una linea y el texto. El Designer deja el fondo del
+            // UserControl y el del TextBox en blanco, que es el mismo color del
+            // DataGridView de abajo del modal.
+            BackColor = Paleta.FondoModal;
+            pnPbox.BackColor = Paleta.FondoModal;
+            pBox.BackColor = Color.Transparent;
+
+            // La linea de abajo va un par de pixeles mas abajo y con menos
+            // grosor: si toca el texto del placeholder, este se ve cortado.
+            barra.Location = new Point(0, barra.Top + 2);
+            barra.Height = 2;
 
             this.TabStop = true;
             txt.TabIndex = 0;

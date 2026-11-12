@@ -93,6 +93,11 @@ public partial class RecursoModal : Form
 
         CargarComboTipoRecurso(cmbTipo);
         CargarComboEstado(cmbEstado);
+
+        // El modal se pinta con la paleta de la aplicacion: el gris del modal
+        // lo separa del blanco de la grilla que tiene debajo.
+        TemaModal.Aplicar(this);
+        lblCrear.ForeColor = Paleta.Secundario;
     }
 
     private void ConfigurarTxt()

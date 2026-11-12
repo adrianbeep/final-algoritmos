@@ -22,8 +22,8 @@ namespace SistemaCoworking.Herramientas;
 /// </summary>
 public static class ComboBoxConfiguration
 {
-    private static readonly Color TextoPrimario = Color.FromArgb(40, 40, 40);
-    private static readonly Color Fondo = Color.White;
+    private static readonly Color TextoPrimario = Paleta.Texto;
+    private static readonly Color Fondo = Paleta.FondoCampo;
 
     // Se comparte una sola instancia, como en ButtonConfiguration e
     // InputConfiguration: cada Font nuevo es un handle de GDI que hay que

@@ -22,8 +22,8 @@ namespace SistemaCoworking.Herramientas;
 /// </summary>
 public static class ModalConfiguration
 {
-    private static readonly Color TextoPrimario = Color.FromArgb(40, 40, 40);
-    private static readonly Color Fondo = Color.White;
+    private static readonly Color TextoPrimario = Paleta.Texto;
+    private static readonly Color Fondo = Paleta.FondoModal;
 
     // Radio de las esquinas redondeadas, en pixeles.
     private const int RadioEsquina = 14;

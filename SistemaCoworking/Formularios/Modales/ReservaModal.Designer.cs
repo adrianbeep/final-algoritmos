@@ -28,6 +28,7 @@ namespace SistemaCoworking.Formularios.Modales
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ReservaModal));
             cmbClientes = new ComboBox();
             label2 = new Label();
             pBoxCerrar = new PictureBox();
@@ -58,6 +59,7 @@ namespace SistemaCoworking.Formularios.Modales
             cmbClientes.Name = "cmbClientes";
             cmbClientes.Size = new Size(394, 28);
             cmbClientes.TabIndex = 67;
+            cmbClientes.SelectedIndexChanged += cmbClientes_SelectedIndexChanged;
             // 
             // label2
             // 
@@ -129,6 +131,7 @@ namespace SistemaCoworking.Formularios.Modales
             btnGuardar.TabIndex = 51;
             btnGuardar.Text = "Guardar";
             btnGuardar.UseVisualStyleBackColor = true;
+            btnGuardar.Click += btnGuardar_Click;
             // 
             // Label1
             // 
@@ -164,6 +167,7 @@ namespace SistemaCoworking.Formularios.Modales
             cmbRecursos.Name = "cmbRecursos";
             cmbRecursos.Size = new Size(394, 28);
             cmbRecursos.TabIndex = 70;
+            cmbRecursos.SelectedIndexChanged += cmbRecursos_SelectedIndexChanged;
             // 
             // lblRecursoInfo
             // 
@@ -191,6 +195,7 @@ namespace SistemaCoworking.Formularios.Modales
             dtpInicio.ShowUpDown = true;
             dtpInicio.Size = new Size(160, 27);
             dtpInicio.TabIndex = 73;
+            dtpInicio.ValueChanged += dtpInicio_ValueChanged;
             // 
             // label5
             // 
@@ -210,6 +215,7 @@ namespace SistemaCoworking.Formularios.Modales
             dtpFin.ShowUpDown = true;
             dtpFin.Size = new Size(160, 27);
             dtpFin.TabIndex = 75;
+            dtpFin.ValueChanged += dtpFin_ValueChanged;
             // 
             // lblTotalInfo
             // 
@@ -262,13 +268,9 @@ namespace SistemaCoworking.Formularios.Modales
             Controls.Add(btnGuardar);
             Controls.Add(Label1);
             FormBorderStyle = FormBorderStyle.None;
+            Icon = (Icon)resources.GetObject("$this.Icon");
             Name = "ReservaModal";
             Text = "Reservas";
-            btnGuardar.Click += btnGuardar_Click;
-            cmbClientes.SelectedIndexChanged += cmbClientes_SelectedIndexChanged;
-            cmbRecursos.SelectedIndexChanged += cmbRecursos_SelectedIndexChanged;
-            dtpInicio.ValueChanged += dtpInicio_ValueChanged;
-            dtpFin.ValueChanged += dtpFin_ValueChanged;
             Load += ReservaModal_Load;
             ((System.ComponentModel.ISupportInitialize)pBoxCerrar).EndInit();
             ResumeLayout(false);

@@ -30,6 +30,7 @@ namespace SistemaCoworking.Formularios.Modales
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(RecursoModal));
             pBoxCerrar = new PictureBox();
             lblId = new Label();
             label8 = new Label();
@@ -283,7 +284,7 @@ namespace SistemaCoworking.Formularios.Modales
             cmbEstado.Size = new Size(175, 28);
             cmbEstado.TabIndex = 49;
             // 
-            // RecursoModalControl
+            // RecursoModal
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
@@ -309,7 +310,9 @@ namespace SistemaCoworking.Formularios.Modales
             Controls.Add(Label1);
             Controls.Add(pnOficinaPrivada);
             FormBorderStyle = FormBorderStyle.None;
-            Name = "RecursoModalControl";
+            Icon = (Icon)resources.GetObject("$this.Icon");
+            Name = "RecursoModal";
+            Text = "Recursos";
             ((System.ComponentModel.ISupportInitialize)pBoxCerrar).EndInit();
             pnSala.ResumeLayout(false);
             pnPuestoTrabajo.ResumeLayout(false);

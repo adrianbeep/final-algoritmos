@@ -30,6 +30,7 @@ namespace SistemaCoworking.Formularios.Modales
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ClienteModal));
             Label1 = new Label();
             btnGuardar = new Button();
             btnCancelar = new Button();
@@ -168,7 +169,7 @@ namespace SistemaCoworking.Formularios.Modales
             pBoxCerrar.TabIndex = 24;
             pBoxCerrar.TabStop = false;
             // 
-            // ClienteModalControl
+            // ClienteModal
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
@@ -187,7 +188,9 @@ namespace SistemaCoworking.Formularios.Modales
             Controls.Add(btnGuardar);
             Controls.Add(Label1);
             FormBorderStyle = FormBorderStyle.None;
-            Name = "ClienteModalControl";
+            Icon = (Icon)resources.GetObject("$this.Icon");
+            Name = "ClienteModal";
+            Text = "Clientes";
             ((System.ComponentModel.ISupportInitialize)pBoxCerrar).EndInit();
             ResumeLayout(false);
             PerformLayout();

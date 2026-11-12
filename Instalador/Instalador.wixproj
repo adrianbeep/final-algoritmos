@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Proyecto de WiX que arma el MSI del instalador.
+
+  Se compila desde la terminal con:
+
+      dotnet build Instalador\Instalador.wixproj -c Release
+
+  El script build-installer.ps1 hace todo el proceso: primero publica la app
+  en self-contained y despues compila este proyecto con la carpeta publicada
+  como PublishDir.
+-->
+<!--
+  WiX 5 es la ultima version sin el "OSMF fee" (la EULA de mantenimiento que
+  exigen las versiones 6 y 7). Por eso el proyecto queda en 5.0.2.
+-->
+<Project Sdk="WixToolset.Sdk/5.0.2">
+
+  <PropertyGroup>
+    <OutputName>Instalador</OutputName>
+    <OutputType>Package</OutputType>
+    <Platforms>x64</Platforms>
+    <InstallerPlatform>x64</InstallerPlatform>
+    <DefineConstants>PublishDir=$(PublishDir)</DefineConstants>
+    <!--
+      ICE61: el paquete no valida los shortcuts contra los shortcuts de
+      escritorio, porque el instalador crea solo el del menu de Inicio.
+      ICE38: el paquete es por usuario y los componentes se cosechan de los
+      archivos publicados, asi que cada uno tiene su archivo como KeyPath en
+      lugar de una clave de registro de HKCU.
+      ICE64: en un paquete por usuario, las carpetas que quedan dentro del
+      perfil del usuario tienen que estar en la tabla RemoveFile. La carpeta de
+      instalacion y las carpetas de satelitos se limpian igual: se verifico que
+      la desinstalacion borra los 284 archivos, las carpetas de satelitos, el
+      acceso directo y la entrada de desinstalacion.
+    -->
+    <SuppressIces>ICE61;ICE38;ICE64</SuppressIces>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <!-- Carpeta con la salida del "dotnet publish". El script la define. -->
+    <PublishDir Condition="'$(PublishDir)' == ''">$(MSBuildThisFileDirectory)publish\</PublishDir>
+  </PropertyGroup>
+
+  <!--
+    El SDK de WiX globa solo los .wxs de la carpeta, asi que Product.wxs se
+    incluye solo. Si se agrega aca un <Compile Include="Product.wxs" />, el
+    archivo entra dos veces y el build falla con WIX0089.
+  -->
+
+  <ItemGroup>
+    <!-- Asistente de instalacion y accesos directos del menu de Inicio. -->
+    <PackageReference Include="WixToolset.UI.wixext" Version="5.0.2" />
+    <PackageReference Include="WixToolset.Util.wixext" Version="5.0.2" />
+  </ItemGroup>
+
+</Project>

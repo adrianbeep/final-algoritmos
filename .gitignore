@@ -29,6 +29,14 @@ packages/
 *.nupkg
 
 # ============================================
+# Salidas del instalador
+# ============================================
+# La carpeta que arma el "dotnet publish" y el MSI que genera WiX son salidas
+# de compilacion: se regeneran con Instalador\build-installer.ps1
+Instalador/publish/
+Instalador/output/
+
+# ============================================
 # Logs y archivos de runtime
 # ============================================
 *.log
